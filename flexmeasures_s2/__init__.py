@@ -30,4 +30,3 @@ flexmeasures_s2_api_bp: Blueprint = Blueprint(
 )
 ensure_bp_routes_are_loaded_fresh("api.somedata")
 from flexmeasures_s2.api import somedata  # noqa: E402,F401
-
