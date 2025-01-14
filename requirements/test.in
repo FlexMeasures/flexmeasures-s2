@@ -2,6 +2,7 @@
 
 pytest
 pytest-flask
+pytest-mock
 pytest-sugar
 pytest-cov
 # lets tests run successfully in containers
