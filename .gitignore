@@ -20,6 +20,7 @@ parts/
 sdist/
 var/
 wheels/
+pip-wheel-metadata/
 share/python-wheels/
 *.egg-info/
 .installed.cfg
@@ -77,6 +78,7 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+notebooks/.ipynb_checkpoints/
 
 # IPython
 profile_default/
@@ -169,3 +171,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# custom project files
+.vscode
+*.pickle
+flexmeasures.log
