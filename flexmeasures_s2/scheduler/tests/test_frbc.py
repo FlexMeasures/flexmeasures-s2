@@ -1,6 +1,7 @@
 import pandas as pd
 
 from flexmeasures_s2.scheduler.schedulers import S2Scheduler
+from JouleProfileOriginal import JouleProfileTarget
 
 
 def test_s2_frbc_scheduler(setup_frbc_asset):
@@ -11,7 +12,7 @@ def test_s2_frbc_scheduler(setup_frbc_asset):
         resolution=pd.Timedelta("PT1H"),
         flex_model={},  # S2Scheduler fetches this from asset attributes
         flex_context={
-            "target-profile": {},  # todo: port target profile from Java test
+            "target-profile": JouleProfileTarget,  # todo: port target profile from Java test
         },
     )
     results = scheduler.compute()
