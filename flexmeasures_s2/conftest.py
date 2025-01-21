@@ -14,6 +14,8 @@ from flexmeasures.data.services.users import create_user
 from flexmeasures_s2 import S2_SCHEDULER_SPECS
 from flexmeasures_s2.models.const import FRBC_TYPE
 
+from flexmeasures_s2.scheduler.test_frbc_device import test_device_state  # noqa: F401
+
 
 @pytest.fixture(scope="session")
 def app():
@@ -58,7 +60,7 @@ def setup_frbc_asset(db: SQLAlchemy, setup_admin):  # noqa: F811
     asset.attributes = {
         "custom-scheduler": S2_SCHEDULER_SPECS,
         "flex-model": {
-            "S2-FRBC-device-state": {},  # todo: add serialized state
+            "S2-FRBC-device-state": test_device_state,  # ?todo: add serialized state
         },
     }
     db.session.add(asset)
