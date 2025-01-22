@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from s2_frbc_device_state import S2FrbcDeviceState
+from flexmeasures_s2.scheduler.s2_frbc_device_state import S2FrbcDeviceState
 
 from s2python.frbc import (
     FRBCSystemDescription,
@@ -25,10 +25,11 @@ from s2python.common import (
 test_device_state = S2FrbcDeviceState(
     system_descriptions=[
         FRBCSystemDescription(
+            message_id=str(uuid.uuid4()),
             valid_from=datetime.datetime.now(tz=datetime.timezone.utc),
             actuators=[
                 FRBCActuatorDescription(
-                    id=uuid.uuid4(),
+                    id=str(uuid.uuid4()),  # Ensure id is a string
                     diagnostic_label="charge",
                     supported_commodities=[Commodity.ELECTRICITY],
                     operation_modes=[
@@ -85,7 +86,9 @@ test_device_state = S2FrbcDeviceState(
                     transitions=[
                         Transition(
                             id="off.to.on",
-                            from_="charge.off",
+                            **{
+                                "from": "charge.off"
+                            },  # Use a workaround to set 'from' since it's a keyword in Python,
                             to="charge.on",
                             start_timers=["on.to.off.timer"],
                             blocking_timers=["off.to.on.timer"],
@@ -93,7 +96,9 @@ test_device_state = S2FrbcDeviceState(
                         ),
                         Transition(
                             id="on.to.off",
-                            from_="charge.on",
+                            **{
+                                "from": "charge.on"
+                            },  # Use a workaround to set 'from' since it's a keyword in Python,
                             to="charge.off",
                             start_timers=["off.to.on.timer"],
                             blocking_timers=["on.to.off.timer"],
