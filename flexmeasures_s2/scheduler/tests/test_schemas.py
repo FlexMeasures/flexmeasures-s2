@@ -1,6 +1,9 @@
 import pytest
+import pandas as pd
 
 from flexmeasures_s2.scheduler.schemas import TNOTargetProfile
+from flexmeasures_s2.scheduler.schedulers import S2Scheduler
+from flexmeasures_s2.scheduler.tests.joule_profile import get_JouleProfileTarget
 
 
 @pytest.mark.parametrize(

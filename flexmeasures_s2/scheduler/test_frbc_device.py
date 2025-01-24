@@ -20,9 +20,26 @@ from s2python.common import (
     CommodityQuantity,
 )
 
+example_serialized_device_state = None
+
+# Load a JSON serialized FRBC device state from a file
+with open("test_frbc_device.json", "r") as file:
+    example_serialized_device_state = file.read()
+
+
+# Define specific ids
+charge_on_id = str(uuid.uuid4())
+charge_off_id = str(uuid.uuid4())
+
+on_to_off = str(uuid.uuid4())
+off_to_on = str(uuid.uuid4())
+
+on_to_off_timer_id = str(uuid.uuid4())
+off_to_on_timer_id = str(uuid.uuid4())
+
 
 # Define the test object
-test_device_state = S2FrbcDeviceState(
+example_deserialized_device_state = S2FrbcDeviceState(
     system_descriptions=[
         FRBCSystemDescription(
             message_id=str(uuid.uuid4()),
@@ -34,7 +51,7 @@ test_device_state = S2FrbcDeviceState(
                     supported_commodities=[Commodity.ELECTRICITY],
                     operation_modes=[
                         FRBCOperationMode(
-                            id="charge.on",
+                            id=charge_on_id,
                             diagnostic_label="charge.on",
                             elements=[
                                 FRBCOperationModeElement(
@@ -58,7 +75,7 @@ test_device_state = S2FrbcDeviceState(
                             abnormal_condition_only=False,
                         ),
                         FRBCOperationMode(
-                            id="charge.off",
+                            id=charge_off_id,
                             diagnostic_label="charge.off",
                             elements=[
                                 FRBCOperationModeElement(
@@ -85,34 +102,34 @@ test_device_state = S2FrbcDeviceState(
                     ],
                     transitions=[
                         Transition(
-                            id="off.to.on",
+                            id=off_to_on,
                             **{
-                                "from": "charge.off"
+                                "from": charge_off_id
                             },  # Use a workaround to set 'from' since it's a keyword in Python,
-                            to="charge.on",
-                            start_timers=["on.to.off.timer"],
-                            blocking_timers=["off.to.on.timer"],
+                            to=charge_on_id,
+                            start_timers=[on_to_off_timer_id],
+                            blocking_timers=[off_to_on_timer_id],
                             abnormal_condition_only=False,
                         ),
                         Transition(
-                            id="on.to.off",
+                            id=on_to_off,
                             **{
-                                "from": "charge.on"
+                                "from": charge_on_id
                             },  # Use a workaround to set 'from' since it's a keyword in Python,
-                            to="charge.off",
-                            start_timers=["off.to.on.timer"],
-                            blocking_timers=["on.to.off.timer"],
+                            to=charge_off_id,
+                            start_timers=[off_to_on_timer_id],
+                            blocking_timers=[on_to_off_timer_id],
                             abnormal_condition_only=False,
                         ),
                     ],
                     timers=[
                         Timer(
-                            id="on.to.off.timer",
+                            id=on_to_off_timer_id,
                             diagnostic_label="on.to.off.timer",
                             duration=30,
                         ),
                         Timer(
-                            id="off.to.on.timer",
+                            id=off_to_on_timer_id,
                             diagnostic_label="off.to.on.timer",
                             duration=30,
                         ),
