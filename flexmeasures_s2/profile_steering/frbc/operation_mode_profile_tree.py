@@ -1,19 +1,19 @@
 from datetime import datetime, timedelta
 from typing import List, Optional, Any
 
-from frbc_timestep import FrbcTimestep
+from flexmeasures_s2.profile_steering.frbc.frbc_timestep import FrbcTimestep
 from flexmeasures_s2.profile_steering.frbc.s2_frbc_device_state_wrapper import (
     S2FrbcDeviceStateWrapper,
 )
-from flexmeasures_s2.profile_steering.s2_utils.s2_actuator_configuration import S2ActuatorConfiguration
+
 from flexmeasures_s2.profile_steering.frbc.frbc_state import FrbcState
 from flexmeasures_s2.profile_steering.frbc.fill_level_target_util import FillLevelTargetUtil
 from flexmeasures_s2.profile_steering.frbc.usage_forecast_util import UsageForecastUtil
 from flexmeasures_s2.profile_steering.s2_utils.number_range_wrapper import NumberRangeWrapper
 from flexmeasures_s2.profile_steering.frbc.s2_frbc_plan import S2FrbcPlan
 from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
-from common.joule_profile import JouleProfile
-from common.soc_profile import SoCProfile
+from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
+from flexmeasures_s2.profile_steering.common.soc_profile import SoCProfile
 from pint import UnitRegistry
 
 SI = UnitRegistry()

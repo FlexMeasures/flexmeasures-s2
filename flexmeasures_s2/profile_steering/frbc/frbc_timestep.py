@@ -1,8 +1,11 @@
 from datetime import datetime, timedelta
 from typing import List, Optional, Union
 from s2python.frbc import FRBCSystemDescription, FRBCLeakageBehaviour
-from frbc_state import FrbcState, SelectionReason
+from flexmeasures_s2.profile_steering.frbc.frbc_state import FrbcState
 
+def SelectionReason(enum):
+    NO_ALTERNATIVE = 0      
+    EMERGENCY_STATE = 1
 
 class FrbcTimestep:
     def __init__(

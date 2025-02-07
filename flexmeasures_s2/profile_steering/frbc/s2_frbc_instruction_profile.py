@@ -1,6 +1,6 @@
 from typing import Dict, List
-from datetime import datetime, Duration
-from s2_frbc_actuator_configuration import S2ActuatorConfiguration
+from datetime import datetime, timedelta
+from flexmeasures_s2.profile_steering.frbc.s2_frbc_actuator_configuration import S2ActuatorConfiguration
 
 
 class S2FrbcInstructionProfile:
@@ -20,7 +20,7 @@ class S2FrbcInstructionProfile:
     def __init__(
         self,
         profile_start: datetime,
-        timestep_duration: Duration,
+        timestep_duration: timedelta,
         elements: List[Element],
     ):
         self.profile_start = profile_start

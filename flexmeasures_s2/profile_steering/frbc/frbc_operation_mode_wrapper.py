@@ -1,6 +1,5 @@
 from typing import List
-from s2_utils.number_range_wrapper import NumberRangeWrapper
-from s2_frbc_device_state_wrapper import S2FrbcDeviceStateWrapper
+from flexmeasures_s2.profile_steering.s2_utils.number_range_wrapper import NumberRangeWrapper
 
 class FrbcOperationModeElementWrapper:
     def __init__(self, frbc_operation_mode_element):
@@ -32,6 +31,7 @@ class FrbcOperationModeWrapper:
         self.uses_factor = self.calculate_uses_factor()
 
     def calculate_uses_factor(self) -> bool:
+        from flexmeasures_s2.profile_steering.frbc.s2_frbc_device_state_wrapper import S2FrbcDeviceStateWrapper
         for element in self.elements:
             if abs(element.get_fill_rate().get_start_of_range() - element.get_fill_rate().get_end_of_range()) > S2FrbcDeviceStateWrapper.epsilon:
                 return True

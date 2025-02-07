@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from s2python.common import CommodityQuantity, PowerForecast
 from s2python.frbc import FRBCSystemDescription, FRBCLeakageBehaviour, FRBCUsageForecast, FRBCFillLevelTargetProfile
 
@@ -24,7 +24,7 @@ class S2FrbcDeviceState:
         timestamp: datetime,
         energy_in_current_timestep: CommodityQuantity,
         is_online: bool,
-        power_forecast: PowerForecast,
+        power_forecast: Optional[PowerForecast],
         system_descriptions: List[FRBCSystemDescription],
         leakage_behaviours: List[FRBCLeakageBehaviour],
         usage_forecasts: List[FRBCUsageForecast],

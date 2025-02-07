@@ -1,6 +1,6 @@
 from typing import Optional
-from common.joule_profile import JouleProfile
-from common.target_profile import TargetProfile
+from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
+from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 
 
 # TODO: need a DevicePlanner class

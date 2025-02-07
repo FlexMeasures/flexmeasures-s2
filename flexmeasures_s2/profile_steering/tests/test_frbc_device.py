@@ -33,23 +33,10 @@ test_device_state = S2FrbcDeviceState(
     timestamp=datetime.datetime.now(tz=datetime.timezone.utc),
     energy_in_current_timestep=CommodityQuantity.ELECTRIC_POWER_L1,
     is_online=True,
-    power_forecast=PowerForecast(
-        message_id=str(uuid.uuid4()),
-        elements=[
-            PowerForecastElement(
-                duration=datetime.timedelta(hours=1),
-                power_values=[
-                    PowerForecastValue(
-                        value=100,
-                        timestamp=datetime.datetime.now(tz=datetime.timezone.utc),
-                    )
-                ],
-            )
-        ],
-    ),
+
     system_descriptions=[
         FRBCSystemDescription(
-                message_id=str(uuid.uuid4()),
+            message_id=str(uuid.uuid4()),
             valid_from=datetime.datetime.now(tz=datetime.timezone.utc),
             actuators=[
                 FRBCActuatorDescription(

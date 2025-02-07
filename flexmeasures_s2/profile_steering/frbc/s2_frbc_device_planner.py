@@ -1,14 +1,13 @@
 from datetime import datetime, timedelta
 from typing import Optional
-from operation_mode_profile_tree import OperationModeProfileTree
-from common.joule_profile import JouleProfile
-from common.proposal import Proposal
-from common.target_profile import TargetProfile
-from s2_frbc_plan import S2FrbcPlan
-from s2_frbc_instruction_profile import S2FrbcInstructionProfile
-from common.profile_metadata import ProfileMetadata
-from frbc.s2_frbc_device_state_wrapper import S2FrbcDeviceStateWrapper
-from common.device_planner.device_plan import DevicePlan
+from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
+from flexmeasures_s2.profile_steering.common.proposal import Proposal
+from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
+from flexmeasures_s2.profile_steering.frbc.s2_frbc_plan import S2FrbcPlan
+from flexmeasures_s2.profile_steering.frbc.s2_frbc_instruction_profile import S2FrbcInstructionProfile
+from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
+from flexmeasures_s2.profile_steering.frbc.s2_frbc_device_state_wrapper import S2FrbcDeviceStateWrapper
+from flexmeasures_s2.profile_steering.common.device_planner.device_plan import DevicePlan
 
 
 class S2FrbcDevicePlanner:
@@ -19,6 +18,7 @@ class S2FrbcDevicePlanner:
         self.null_profile = JouleProfile(profile_metadata, None)
         self.state_tree: Optional[OperationModeProfileTree] = None
         if self.is_storage_available(s2_frbc_state):
+            from flexmeasures_s2.profile_steering.frbc.operation_mode_profile_tree import OperationModeProfileTree
             self.state_tree = OperationModeProfileTree(
                 s2_frbc_state, profile_metadata, plan_due_by_date
             )

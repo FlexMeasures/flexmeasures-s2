@@ -1,7 +1,7 @@
 from typing import List, Dict
-from s2_frbc_actuator_configuration import S2FrbcActuatorConfiguration
-from common.joule_profile import JouleProfile
-from common.soc_profile import SoCProfile
+from flexmeasures_s2.profile_steering.frbc.s2_frbc_actuator_configuration import S2ActuatorConfiguration
+from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
+from flexmeasures_s2.profile_steering.common.soc_profile import SoCProfile
     
 class S2FrbcPlan:
     def __init__(
@@ -9,7 +9,7 @@ class S2FrbcPlan:
         idle: bool,
         energy,
         fill_level,
-        operation_mode_id: List[Dict[str, S2FrbcActuatorConfiguration]],
+        operation_mode_id: List[Dict[str, S2ActuatorConfiguration]],
         s2_frbc_insights_profile,
     ):
         self.idle = idle
@@ -26,6 +26,6 @@ class S2FrbcPlan:
     def get_fill_level(self) -> SoCProfile:
         return self.fill_level
 
-    def get_operation_mode_id(self) -> List[Dict[str, S2FrbcActuatorConfiguration]]:
+    def get_operation_mode_id(self) -> List[Dict[str, S2ActuatorConfiguration]]:
         return self.operation_mode_id
 

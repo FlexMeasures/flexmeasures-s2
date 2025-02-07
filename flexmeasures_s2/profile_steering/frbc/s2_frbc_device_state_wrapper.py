@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
-from s2_utils.s2_actuator_configuration import S2ActuatorConfiguration
+from flexmeasures_s2.profile_steering.frbc.s2_frbc_actuator_configuration import S2ActuatorConfiguration
 from s2python.common import CommodityQuantity
-from frbc_timestep import FrbcTimestep
-from frbc_operation_mode_wrapper import FrbcOperationModeWrapper
-from s2_frbc_device_state import S2FrbcDeviceState
+from flexmeasures_s2.profile_steering.frbc.frbc_operation_mode_wrapper import FrbcOperationModeWrapper
+from flexmeasures_s2.profile_steering.frbc.s2_frbc_device_state import S2FrbcDeviceState
+from flexmeasures_s2.profile_steering.frbc.frbc_timestep import FrbcTimestep
+
 from s2python.common.transition import Transition
 from s2python.frbc import FRBCLeakageBehaviourElement, FRBCActuatorDescription
 
@@ -77,7 +78,8 @@ class S2FrbcDeviceStateWrapper:
         ] = actuator_operation_mode_map
         return actuator_operation_mode_map
 
-    def get_operation_mode(self, target_timestep: FrbcTimestep, actuator_id: str, operation_mode_id: str) -> Optional[FrbcOperationModeWrapper]:
+    def get_operation_mode(self, target_timestep, actuator_id: str, operation_mode_id: str):
+        from flexmeasures_s2.profile_steering.frbc.frbc_operation_mode_wrapper import FrbcOperationModeWrapper
         om_key = f"{actuator_id}-{operation_mode_id}"
         if om_key in self.operation_modes:
             return self.operation_modes[om_key]
@@ -161,8 +163,9 @@ class S2FrbcDeviceStateWrapper:
 
     @staticmethod
     def get_transition(
-        target_timestep: FrbcTimestep, actuator_id: str, from_operation_mode_id: str, to_operation_mode_id: str
+        target_timestep, actuator_id: str, from_operation_mode_id: str, to_operation_mode_id: str
     ) -> Optional[Transition]:
+        from flexmeasures_s2.profile_steering.frbc.frbc_timestep import FrbcTimestep
         actuator_description = S2FrbcDeviceStateWrapper.get_actuator_description(
             target_timestep, actuator_id
         )
@@ -175,6 +178,7 @@ class S2FrbcDeviceStateWrapper:
         return None
 
     def get_operation_mode_power(self, om: FrbcOperationModeWrapper, fill_level: float, factor: float) -> float:
+        from flexmeasures_s2.profile_steering.frbc.frbc_timestep import FrbcTimestep
         element = self.find_operation_mode_element(om, fill_level)
         power_watt = 0
         for power_range in element.get_power_ranges():
