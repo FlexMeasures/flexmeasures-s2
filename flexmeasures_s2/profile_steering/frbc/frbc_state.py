@@ -4,8 +4,8 @@ from s2python.frbc import (
     TargetProfile,
     FRBCSystemDescription,
 )
-from s2_utils.s2_actuator_configuration import S2ActuatorConfiguration
-from Python.profile_steering.frbc.device_planner.s2_frbc_device_state_wrapper import (
+from flexmeasures_s2.profile_steering.s2_utils.s2_actuator_configuration import S2ActuatorConfiguration
+from flexmeasures_s2.profile_steering.frbc.s2_frbc_device_state_wrapper import (
     S2FrbcDeviceStateWrapper,
 )
 from frbc_timestep import FrbcTimestep

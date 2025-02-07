@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List
-
+from s2python.common import CommodityQuantity, PowerForecast
+from s2python.frbc import FRBCSystemDescription, FRBCLeakageBehaviour, FRBCUsageForecast, FRBCFillLevelTargetProfile
 
 class S2FrbcDeviceState:
     class ComputationalParameters:
@@ -21,14 +22,13 @@ class S2FrbcDeviceState:
         connection_id: str,
         priority_class: int,
         timestamp: datetime,
-        energy_in_current_timestep,
+        energy_in_current_timestep: CommodityQuantity,
         is_online: bool,
-        power_forecast,
-        system_descriptions: List,
-        leakage_behaviours: List,
-        usage_forecasts: List,
-        fill_level_target_profiles: List,
-        computational_parameters: "S2FrbcDeviceState.ComputationalParameters",
+        power_forecast: PowerForecast,
+        system_descriptions: List[FRBCSystemDescription],
+        leakage_behaviours: List[FRBCLeakageBehaviour],
+        usage_forecasts: List[FRBCUsageForecast],
+        fill_level_target_profiles: List[FRBCFillLevelTargetProfile],
     ):
         self.device_id = device_id
         self.device_name = device_name
@@ -42,21 +42,15 @@ class S2FrbcDeviceState:
         self.leakage_behaviours = leakage_behaviours
         self.usage_forecasts = usage_forecasts
         self.fill_level_target_profiles = fill_level_target_profiles
-        self.computational_parameters = computational_parameters
 
-    def get_system_descriptions(self) -> List:
+    def get_system_descriptions(self) -> List[FRBCSystemDescription]:
         return self.system_descriptions
 
-    def get_leakage_behaviours(self) -> List:
+    def get_leakage_behaviours(self) -> List[FRBCLeakageBehaviour]:
         return self.leakage_behaviours
 
-    def get_usage_forecasts(self) -> List:
+    def get_usage_forecasts(self) -> List[FRBCUsageForecast]:
         return self.usage_forecasts
 
-    def get_fill_level_target_profiles(self) -> List:
+    def get_fill_level_target_profiles(self) -> List[FRBCFillLevelTargetProfile]:
         return self.fill_level_target_profiles
-
-    def get_computational_parameters(
-        self,
-    ) -> "S2FrbcDeviceState.ComputationalParameters":
-        return self.computational_parameters

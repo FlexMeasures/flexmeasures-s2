@@ -1,4 +1,5 @@
 from typing import Dict, List
+from datetime import datetime, Duration
 from s2_utils.s2_actuator_configuration import S2ActuatorConfiguration
 
 
@@ -18,9 +19,9 @@ class S2FrbcInstructionProfile:
 
     def __init__(
         self,
-        profile_start,
-        timestep_duration,
-        elements: List["S2FrbcInstructionProfile.Element"],
+        profile_start: datetime,
+        timestep_duration: Duration,
+        elements: List[Element],
     ):
         self.profile_start = profile_start
         self.timestep_duration = timestep_duration

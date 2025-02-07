@@ -14,7 +14,6 @@ class S2FrbcPlan:
         self.energy = energy
         self.fill_level = fill_level
         self.operation_mode_id = operation_mode_id
-        self.s2_frbc_insights_profile = s2_frbc_insights_profile
 
     def is_idle(self) -> bool:
         return self.idle

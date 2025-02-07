@@ -1,29 +1,32 @@
 from datetime import datetime
+from typing import Optional, List
 from common.joule_profile import JouleProfile
 from common.target_profile import TargetProfile
 from common.proposal import Proposal
-
-from operation_mode_profile_tree import OperationModeProfileTree
-from s2_frbc_plan import S2FrbcPlan
-from s2_frbc_instruction_profile import S2FrbcInstructionProfile
-
+from common.profile_metadata import ProfileMetadata
+from frbc.s2_frbc_device_state_wrapper import S2FrbcDeviceStateWrapper
+from frbc.operation_mode_profile_tree import OperationModeProfileTree
+from frbc.s2_frbc_plan import S2FrbcPlan
+from frbc.s2_frbc_instruction_profile import S2FrbcInstructionProfile
+from frbc.s2_frbc_device_state import S2FrbcDeviceState
+from common.device_planner.device_plan import DevicePlan
 
 class S2FrbcDeviceController:
-    def __init__(self, s2_frbc_state, profile_metadata, plan_due_by_date):
+    def __init__(self, s2_frbc_state: S2FrbcDeviceStateWrapper, profile_metadata: ProfileMetadata, plan_due_by_date: datetime):
         self.s2_frbc_state = s2_frbc_state
         self.profile_metadata = profile_metadata
         self.zero_profile = JouleProfile(profile_metadata, 0)
         self.null_profile = JouleProfile(profile_metadata, None)
-        self.state_tree = None
+        self.state_tree: Optional[OperationModeProfileTree] = None
         if self.is_storage_available(s2_frbc_state):
             self.state_tree = OperationModeProfileTree(
                 s2_frbc_state, profile_metadata, plan_due_by_date
             )
         self.priority_class = s2_frbc_state.get_priority_class()
-        self.latest_plan = None
-        self.accepted_plan = None
+        self.latest_plan: Optional[S2FrbcPlan] = None
+        self.accepted_plan: Optional[S2FrbcPlan] = None
 
-    def is_storage_available(self, storage_state):
+    def is_storage_available(self, storage_state: S2FrbcDeviceState) -> bool:
         latest_before_first_ptu = OperationModeProfileTree.get_latest_before(
             self.profile_metadata.get_profile_start(),
             storage_state.get_system_descriptions(),
@@ -50,18 +53,18 @@ class S2FrbcDeviceController:
             and active_and_upcoming_system_descriptions_has_active_storage
         )
 
-    def get_device_id(self):
+    def get_device_id(self) -> str:
         return self.s2_frbc_state.get_device_id()
 
-    def get_connection_id(self):
+    def get_connection_id(self) -> str:
         return self.s2_frbc_state.get_connection_id()
 
-    def get_device_name(self):
+    def get_device_name(self) -> str:
         return self.s2_frbc_state.get_device_name()
 
     def create_improved_planning(
-        self, diff_to_global_target, diff_to_max, diff_to_min, plan_due_by_date
-    ):
+        self, diff_to_global_target: TargetProfile, diff_to_max: JouleProfile, diff_to_min: JouleProfile, plan_due_by_date: datetime
+    ) -> Proposal:
         target = diff_to_global_target.add(self.accepted_plan.get_energy())
         max_profile = diff_to_max.add(self.accepted_plan.get_energy())
         min_profile = diff_to_min.add(self.accepted_plan.get_energy())
@@ -81,10 +84,9 @@ class S2FrbcDeviceController:
         )
         return proposal
 
-    def create_initial_planning(self, plan_due_by_date):
+    def create_initial_planning(self, plan_due_by_date: datetime) -> JouleProfile:
         if self.is_storage_available(self.s2_frbc_state):
             self.latest_plan = self.state_tree.find_best_plan(
-                # TODO: make an util or make a new class
                 TargetProfile.null_profile(self.profile_metadata),
                 self.null_profile,
                 self.null_profile,
@@ -94,7 +96,7 @@ class S2FrbcDeviceController:
         self.accepted_plan = self.latest_plan
         return self.latest_plan.get_energy()
 
-    def accept_proposal(self, accepted_proposal):
+    def accept_proposal(self, accepted_proposal: Proposal) -> None:
         if accepted_proposal.get_origin() != self:
             raise ValueError(
                 f"Storage controller '{self.get_device_id()}' received a proposal that he did not send."
@@ -111,13 +113,13 @@ class S2FrbcDeviceController:
             )
         self.accepted_plan = self.latest_plan
 
-    def get_current_profile(self):
+    def get_current_profile(self) -> JouleProfile:
         return self.accepted_plan.get_energy()
 
-    def get_latest_plan(self):
+    def get_latest_plan(self) -> Optional[S2FrbcPlan]:
         return self.latest_plan
 
-    def get_device_plan(self):
+    def get_device_plan(self) -> DevicePlan:
         return DevicePlan(
             self.get_device_id(),
             self.get_device_name(),
@@ -131,7 +133,7 @@ class S2FrbcDeviceController:
         )
 
     @staticmethod
-    def convert_plan_to_instructions(profile_metadata, device_plan):
+    def convert_plan_to_instructions(profile_metadata: ProfileMetadata, device_plan: S2FrbcPlan) -> S2FrbcInstructionProfile:
         elements = []
         actuator_configurations_per_timestep = device_plan.get_operation_mode_id()
         if actuator_configurations_per_timestep is not None:
@@ -144,5 +146,5 @@ class S2FrbcDeviceController:
             elements = [None] * profile_metadata.get_nr_of_timesteps()
         return S2FrbcInstructionProfile(profile_metadata, elements)
 
-    def get_priority_class(self):
+    def get_priority_class(self) -> int:
         return self.priority_class
