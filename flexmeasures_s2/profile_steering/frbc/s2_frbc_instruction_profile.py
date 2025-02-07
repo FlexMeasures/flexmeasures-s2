@@ -1,6 +1,6 @@
 from typing import Dict, List
 from datetime import datetime, Duration
-from s2_utils.s2_actuator_configuration import S2ActuatorConfiguration
+from s2_frbc_actuator_configuration import S2ActuatorConfiguration
 
 
 class S2FrbcInstructionProfile:

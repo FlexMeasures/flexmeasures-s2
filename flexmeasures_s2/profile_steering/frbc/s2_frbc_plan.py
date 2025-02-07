@@ -1,13 +1,15 @@
 from typing import List, Dict
-
-
+from s2_frbc_actuator_configuration import S2FrbcActuatorConfiguration
+from common.joule_profile import JouleProfile
+from common.soc_profile import SoCProfile
+    
 class S2FrbcPlan:
     def __init__(
         self,
         idle: bool,
         energy,
         fill_level,
-        operation_mode_id: List[Dict[str, "S2ActuatorConfiguration"]],
+        operation_mode_id: List[Dict[str, S2FrbcActuatorConfiguration]],
         s2_frbc_insights_profile,
     ):
         self.idle = idle
@@ -18,14 +20,12 @@ class S2FrbcPlan:
     def is_idle(self) -> bool:
         return self.idle
 
-    def get_energy(self):
+    def get_energy(self) -> JouleProfile:
         return self.energy
 
-    def get_fill_level(self):
+    def get_fill_level(self) -> SoCProfile:
         return self.fill_level
 
-    def get_operation_mode_id(self) -> List[Dict[str, "S2ActuatorConfiguration"]]:
+    def get_operation_mode_id(self) -> List[Dict[str, S2FrbcActuatorConfiguration]]:
         return self.operation_mode_id
 
-    def get_s2_frbc_insights_profile(self):
-        return self.s2_frbc_insights_profile
