@@ -1,5 +1,5 @@
 from typing import List, Union
-from common.joule_profile import JouleProfile
+from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 
 
 class TargetProfile:

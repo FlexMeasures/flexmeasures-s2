@@ -1,19 +1,24 @@
 from datetime import datetime, timedelta
+from typing import List, Optional, Any
 
-from frbc_timestep import FrbcTimestep
-from Python.profile_steering.frbc.device_planner.s2_frbc_device_state_wrapper import (
+from flexmeasures_s2.profile_steering.frbc.frbc_timestep import FrbcTimestep
+from flexmeasures_s2.profile_steering.frbc.s2_frbc_device_state_wrapper import (
     S2FrbcDeviceStateWrapper,
 )
-from s2_utils.s2_actuator_configuration import S2ActuatorConfiguration
-from frbc_state import FrbcState
-from fill_level_target_util import FillLevelTargetUtil
-from usage_forecast_util import UsageForecastUtil
-from s2_utils.number_range_wrapper import NumberRangeWrapper
-from device_planner.s2_frbc_plan import S2FrbcPlan
-from common.joule_profile import JouleProfile
-from common.soc_profile import SoCProfile
 
-# TODO: Add S2FrbcInsightsProfile?
+from flexmeasures_s2.profile_steering.frbc.frbc_state import FrbcState
+from flexmeasures_s2.profile_steering.frbc.fill_level_target_util import FillLevelTargetUtil
+from flexmeasures_s2.profile_steering.frbc.usage_forecast_util import UsageForecastUtil
+from flexmeasures_s2.profile_steering.s2_utils.number_range_wrapper import NumberRangeWrapper
+from flexmeasures_s2.profile_steering.frbc.s2_frbc_plan import S2FrbcPlan
+from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
+from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
+from flexmeasures_s2.profile_steering.common.soc_profile import SoCProfile
+from pint import UnitRegistry
+
+SI = UnitRegistry()
+
+# TODO: Add S2FrbcInsightsProfile?->Update 08-02-2025: Not needed for now
 
 
 class OperationModeProfileTree:
@@ -29,10 +34,10 @@ class OperationModeProfileTree:
         self.timestep_duration_seconds = int(
             profile_metadata.get_timestep_duration().total_seconds()
         )
-        self.timesteps = []
+        self.timesteps: List[FrbcTimestep] = []
         self.generate_timesteps()
 
-    def generate_timesteps(self):
+    def generate_timesteps(self) -> None:
         time_step_start = self.profile_metadata.get_profile_start()
         for i in range(self.profile_metadata.get_nr_of_timesteps()):
             time_step_end = (
@@ -93,7 +98,7 @@ class OperationModeProfileTree:
             time_step_start = time_step_end
 
     @staticmethod
-    def get_latest_before(before, select_from, get_date_time):
+    def get_latest_before(before: datetime, select_from: List[Any], get_date_time: Any) -> Optional[Any]:
         latest_before = None
         latest_before_date_time = None
         if select_from:
@@ -110,8 +115,8 @@ class OperationModeProfileTree:
 
     @staticmethod
     def get_fill_level_target_for_timestep(
-        fill_level_target_profile, time_step_start, time_step_end
-    ):
+        fill_level_target_profile: Optional[Any], time_step_start: datetime, time_step_end: datetime
+    ) -> Optional[NumberRangeWrapper]:
         if not fill_level_target_profile:
             return None
         time_step_end -= timedelta(milliseconds=1)
@@ -132,7 +137,7 @@ class OperationModeProfileTree:
         return NumberRangeWrapper(lower, upper)
 
     @staticmethod
-    def get_usage_forecast_for_timestep(usage_forecast, time_step_start, time_step_end):
+    def get_usage_forecast_for_timestep(usage_forecast: Optional[Any], time_step_start: datetime, time_step_end: datetime) -> float:
         if not usage_forecast:
             return 0
         time_step_end -= timedelta(milliseconds=1)
@@ -142,7 +147,7 @@ class OperationModeProfileTree:
             usage += element.get_usage()
         return usage
 
-    def find_best_plan(self, target_profile, diff_to_min_profile, diff_to_max_profile):
+    def find_best_plan(self, target_profile: Any, diff_to_min_profile: Any, diff_to_max_profile: Any) -> S2FrbcPlan:
         for i, ts in enumerate(self.timesteps):
             ts.clear()
             ts.set_targets(
@@ -170,14 +175,14 @@ class OperationModeProfileTree:
         return self.convert_to_plan(first_timestep_index, end_state)
 
     @staticmethod
-    def find_best_end_state(states):
+    def find_best_end_state(states: List[FrbcState]) -> FrbcState:
         best_state = states[0]
         for state in states[1:]:
             if state.is_preferable_than(best_state).result:
                 best_state = state
         return best_state
 
-    def convert_to_plan(self, first_timestep_index_with_state, end_state):
+    def convert_to_plan(self, first_timestep_index_with_state: int, end_state: FrbcState) -> S2FrbcPlan:
         energy = [None] * self.profile_metadata.get_nr_of_timesteps()
         fill_level = [None] * self.profile_metadata.get_nr_of_timesteps()
         actuators = [None] * self.profile_metadata.get_nr_of_timesteps()
@@ -196,8 +201,7 @@ class OperationModeProfileTree:
                 fill_level[i] = 0.0
                 actuators[i] = {}
                 insight_elements[i] = None
-        # energy[0] += self.device_state.get_energy_in_current_timestep().to(SI.JOULE).magnitude
-        # TODO: find alternative for SI.JOULE
+        energy[0] += self.device_state.get_energy_in_current_timestep().to(SI.joule).magnitude
         return S2FrbcPlan(
             False,
             JouleProfile(self.profile_metadata, energy),
@@ -205,5 +209,5 @@ class OperationModeProfileTree:
             actuators,
         )
 
-    def get_timestep_duration_seconds(self):
+    def get_timestep_duration_seconds(self) -> int:
         return self.timestep_duration_seconds

@@ -1,15 +1,15 @@
 import logging
 from datetime import datetime, timedelta
 from s2python.frbc import (
-    TargetProfile,
     FRBCSystemDescription,
 )
-from s2_utils.s2_actuator_configuration import S2ActuatorConfiguration
-from Python.profile_steering.frbc.device_planner.s2_frbc_device_state_wrapper import (
+from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
+from flexmeasures_s2.profile_steering.frbc.s2_frbc_device_state_wrapper import (
     S2FrbcDeviceStateWrapper,
 )
-from frbc_timestep import FrbcTimestep
-from selection_reason_result import SelectionResult, SelectionReason
+from flexmeasures_s2.profile_steering.frbc.s2_frbc_actuator_configuration import S2ActuatorConfiguration
+from flexmeasures_s2.profile_steering.frbc.frbc_timestep import FrbcTimestep
+from flexmeasures_s2.profile_steering.frbc.selection_reason_result import SelectionResult, SelectionReason
 from typing import Dict, Optional
 
 
