@@ -8,7 +8,18 @@ class SelectionReason:
 
 
 class SelectionResult:
-    def __init__(self, result: bool, reason: SelectionReason, timestep: int, system_description: str, previous_state: str, actuator_configurations: str, fill_level: float, bucket: str, timestep_energy: float):
+    def __init__(
+        self,
+        result: bool,
+        reason: SelectionReason,
+        timestep: int,
+        system_description: str,
+        previous_state: str,
+        actuator_configurations: str,
+        fill_level: float,
+        bucket: str,
+        timestep_energy: float,
+    ):
         self.result = result
         self.reason = reason
         self.timestep = timestep
@@ -18,7 +29,7 @@ class SelectionResult:
         self.fill_level = fill_level
         self.bucket = bucket
         self.timestep_energy = timestep_energy
-        
+
     def get_timestep(self):
         return self.timestep
 

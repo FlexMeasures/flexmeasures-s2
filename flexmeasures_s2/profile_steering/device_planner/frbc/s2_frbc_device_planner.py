@@ -1,14 +1,16 @@
 from datetime import datetime, timedelta
+from flexmeasures_s2.profile_steering.device_planner.device_planner import DevicePlanner
 
-from operation_mode_profile_tree import OperationModeProfileTree
-from common.joule_profile import JouleProfile
-from common.proposal import Proposal
-from common.target_profile import TargetProfile
-from s2_frbc_plan import S2FrbcPlan
-from s2_frbc_instruction_profile import S2FrbcInstructionProfile
+from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
+from flexmeasures_s2.profile_steering.common.proposal import Proposal
+from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
+from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_plan import S2FrbcPlan
+from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_instruction_profile import (
+    S2FrbcInstructionProfile,
+)
 
 
-class S2FrbcDevicePlanner:
+class S2FrbcDevicePlanner(DevicePlanner):
     def __init__(self, s2_frbc_state, profile_metadata, plan_due_by_date):
         self.s2_frbc_state = s2_frbc_state
         self.profile_metadata = profile_metadata
