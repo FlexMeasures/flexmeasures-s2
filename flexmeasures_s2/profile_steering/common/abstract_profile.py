@@ -17,7 +17,9 @@ class AbstractProfile(ABC, Generic[E, PT]):
     def validate(self, profile_metadata: ProfileMetadata, elements: List[E]):
         if elements is None:
             raise ValueError("elements cannot be null")
-        if (24 * 60 * 60 * 1000) % profile_metadata.get_timestep_duration().total_seconds() != 0:
+        if (
+            24 * 60 * 60 * 1000
+        ) % profile_metadata.get_timestep_duration().total_seconds() != 0:
             raise ValueError("A day should be dividable by the timeStepDuration")
         if (
             not self.start_of_current_aligned_date(
@@ -26,7 +28,9 @@ class AbstractProfile(ABC, Generic[E, PT]):
             )
             == profile_metadata.get_profile_start()
         ):
-            raise ValueError("The startTimeDuration should be aligned with the timeStepDuration")
+            raise ValueError(
+                "The startTimeDuration should be aligned with the timeStepDuration"
+            )
 
     def get_profile_metadata(self) -> ProfileMetadata:
         return self.metadata
@@ -35,7 +39,7 @@ class AbstractProfile(ABC, Generic[E, PT]):
         return self.elements
 
     def get_element_end_date_at(self, index: int) -> datetime:
-        return self.metadata.get_profile_start_at_timestep_nr(index + 1)
+        return self.metadata.get_profile_start_at_timestep(index + 1)
 
     def index_at(self, date: datetime) -> int:
         return self.metadata.get_starting_step_nr(date)
@@ -54,19 +58,32 @@ class AbstractProfile(ABC, Generic[E, PT]):
         if ms_since_last_aligned_date == 0:
             return date
         else:
-            return date + timedelta(milliseconds=(time_step_duration_ms - ms_since_last_aligned_date))
+            return date + timedelta(
+                milliseconds=(time_step_duration_ms - ms_since_last_aligned_date)
+            )
 
     @staticmethod
-    def start_of_current_aligned_date(date: datetime, time_step_duration: timedelta) -> datetime:
-        ms_since_last_aligned_date = (date.timestamp() * 1000) % time_step_duration.total_seconds() * 1000
+    def start_of_current_aligned_date(
+        date: datetime, time_step_duration: timedelta
+    ) -> datetime:
+        ms_since_last_aligned_date = (
+            (date.timestamp() * 1000) % time_step_duration.total_seconds() * 1000
+        )
         if ms_since_last_aligned_date == 0:
             return date
         else:
-            return datetime.fromtimestamp(date.timestamp() - ms_since_last_aligned_date / 1000)
+            return datetime.fromtimestamp(
+                date.timestamp() - ms_since_last_aligned_date / 1000
+            )
 
     @staticmethod
-    def end_of_current_aligned_date(date: datetime, time_step_duration: timedelta) -> datetime:
-        return AbstractProfile.start_of_current_aligned_date(date, time_step_duration) + time_step_duration
+    def end_of_current_aligned_date(
+        date: datetime, time_step_duration: timedelta
+    ) -> datetime:
+        return (
+            AbstractProfile.start_of_current_aligned_date(date, time_step_duration)
+            + time_step_duration
+        )
 
     @staticmethod
     def get_start_of_day(date: datetime) -> datetime:
@@ -82,4 +99,4 @@ class AbstractProfile(ABC, Generic[E, PT]):
 
     @abstractmethod
     def is_compatible(self, other: PT) -> bool:
-        pass
+        return self.metadata == other.metadata

@@ -1,7 +1,9 @@
-from typing import Optional, List
-from datetime import datetime
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
-from flexmeasures_s2.profile_steering.frbc.s2_frbc_instruction_profile import S2FrbcInstructionProfile
+from flexmeasures_s2.profile_steering.common.soc_profile import SoCProfile
+from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_instruction_profile import (
+    S2FrbcInstructionProfile,
+)
+
 
 class DevicePlan:
     def __init__(
@@ -10,7 +12,7 @@ class DevicePlan:
         device_name: str,
         connection_id: str,
         energy_profile: JouleProfile,
-        fill_level_profile: Optional[JouleProfile],
+        fill_level_profile: SoCProfile,
         instruction_profile: S2FrbcInstructionProfile,
     ):
         self.device_id = device_id
@@ -32,17 +34,15 @@ class DevicePlan:
     def get_energy_profile(self) -> JouleProfile:
         return self.energy_profile
 
-    def get_fill_level_profile(self) -> Optional[JouleProfile]:
+    def get_fill_level_profile(self) -> SoCProfile:
         return self.fill_level_profile
 
     def get_instruction_profile(self) -> S2FrbcInstructionProfile:
         return self.instruction_profile
 
-
     def __str__(self) -> str:
         return (
             f"DevicePlan(device_id={self.device_id}, device_name={self.device_name}, "
             f"connection_id={self.connection_id}, energy_profile={self.energy_profile}, "
-            f"fill_level_profile={self.fill_level_profile}, instruction_profile={self.instruction_profile}, "
-            f"insights_profile={self.insights_profile})"
-        ) 
+            f"fill_level_profile={self.fill_level_profile}, instruction_profile={self.instruction_profile})"
+        )

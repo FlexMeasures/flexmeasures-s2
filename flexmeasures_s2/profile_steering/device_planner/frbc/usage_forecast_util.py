@@ -1,8 +1,7 @@
 # TODO: Is this the same as FRBCUsageForecast?
 
 
-from datetime import datetime, timedelta
-from s2python.frbc import FRBCUsageForecast, FRBCUsageForecastElement
+from datetime import timedelta
 
 
 class UsageForecastElement:

@@ -3,6 +3,8 @@ from typing import Optional
 from abc import ABC, abstractmethod
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.common.proposal import Proposal
+from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
+from flexmeasures_s2.profile_steering.common.device_planner.device_plan import DevicePlan
 
 
 class DevicePlanner(ABC):
@@ -24,7 +26,7 @@ class DevicePlanner(ABC):
     @abstractmethod
     def create_improved_planning(
         self,
-        cluster_diff_profile: JouleProfile,
+        cluster_diff_profile: TargetProfile,
         diff_to_max_profile: JouleProfile,
         diff_to_min_profile: JouleProfile,
         plan_due_by_date: datetime,
@@ -69,7 +71,7 @@ class DevicePlanner(ABC):
         pass
 
     @abstractmethod
-    def get_device_plan(self) -> Optional[JouleProfile]:
+    def get_device_plan(self) -> Optional[DevicePlan]:
         """Get the device plan."""
         pass
 

@@ -1,6 +1,8 @@
 from typing import Dict, List
 from datetime import datetime, timedelta
-from flexmeasures_s2.profile_steering.frbc.s2_frbc_actuator_configuration import S2ActuatorConfiguration
+from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_actuator_configuration import (
+    S2ActuatorConfiguration,
+)
 
 
 class S2FrbcInstructionProfile:

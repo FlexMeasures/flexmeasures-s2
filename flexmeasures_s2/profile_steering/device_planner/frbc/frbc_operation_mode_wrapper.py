@@ -1,11 +1,14 @@
 from typing import List
-from flexmeasures_s2.profile_steering.s2_utils.number_range_wrapper import NumberRangeWrapper
+from flexmeasures_s2.profile_steering.s2_utils.number_range_wrapper import (
+    NumberRangeWrapper,
+)
+
 
 class FrbcOperationModeElementWrapper:
     def __init__(self, frbc_operation_mode_element):
         self.fill_rate = NumberRangeWrapper(
             frbc_operation_mode_element.get_fill_rate().get_start_of_range(),
-            frbc_operation_mode_element.get_fill_rate().get_end_of_range()
+            frbc_operation_mode_element.get_fill_rate().get_end_of_range(),
         )
         self.power_ranges = [
             NumberRangeWrapper(pr.get_start_of_range(), pr.get_end_of_range())
@@ -31,12 +34,27 @@ class FrbcOperationModeWrapper:
         self.uses_factor = self.calculate_uses_factor()
 
     def calculate_uses_factor(self) -> bool:
-        from flexmeasures_s2.profile_steering.frbc.s2_frbc_device_state_wrapper import S2FrbcDeviceStateWrapper
+        from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state_wrapper import (
+            S2FrbcDeviceStateWrapper,
+        )
+
         for element in self.elements:
-            if abs(element.get_fill_rate().get_start_of_range() - element.get_fill_rate().get_end_of_range()) > S2FrbcDeviceStateWrapper.epsilon:
+            if (
+                abs(
+                    element.get_fill_rate().get_start_of_range()
+                    - element.get_fill_rate().get_end_of_range()
+                )
+                > S2FrbcDeviceStateWrapper.epsilon
+            ):
                 return True
             for power_range in element.get_power_ranges():
-                if abs(power_range.get_start_of_range() - power_range.get_end_of_range()) > S2FrbcDeviceStateWrapper.epsilon:
+                if (
+                    abs(
+                        power_range.get_start_of_range()
+                        - power_range.get_end_of_range()
+                    )
+                    > S2FrbcDeviceStateWrapper.epsilon
+                ):
                     return True
         return False
 
@@ -44,4 +62,4 @@ class FrbcOperationModeWrapper:
         return self.elements
 
     def is_uses_factor(self) -> bool:
-        return self.uses_factor 
+        return self.uses_factor

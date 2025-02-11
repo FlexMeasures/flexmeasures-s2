@@ -1,15 +1,19 @@
-import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from s2python.frbc import (
     FRBCSystemDescription,
 )
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
-from flexmeasures_s2.profile_steering.frbc.s2_frbc_device_state_wrapper import (
+from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state_wrapper import (
     S2FrbcDeviceStateWrapper,
 )
-from flexmeasures_s2.profile_steering.frbc.s2_frbc_actuator_configuration import S2ActuatorConfiguration
-from flexmeasures_s2.profile_steering.frbc.frbc_timestep import FrbcTimestep
-from flexmeasures_s2.profile_steering.frbc.selection_reason_result import SelectionResult, SelectionReason
+from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_actuator_configuration import (
+    S2ActuatorConfiguration,
+)
+from flexmeasures_s2.profile_steering.device_planner.frbc.frbc_timestep import FrbcTimestep
+from flexmeasures_s2.profile_steering.device_planner.frbc.selection_reason_result import (
+    SelectionResult,
+    SelectionReason,
+)
 from typing import Dict, Optional
 
 
@@ -32,12 +36,12 @@ class FrbcState:
             self.system_description.get_storage().get_status().get_present_fill_level()
         )
         self.bucket = 0
-        self.timestep_energy = 0
-        self.sum_squared_distance = 0
-        self.sum_squared_constraint_violation = 0
-        self.sum_energy_cost = 0
-        self.sum_squared_energy = 0
-        self.selection_reason = None
+        self.timestep_energy = 0.0
+        self.sum_squared_distance = 0.0
+        self.sum_squared_constraint_violation = 0.0
+        self.sum_energy_cost = 0.0
+        self.sum_squared_energy = 0.0
+        self.selection_reason: Optional[SelectionReason] = None
         self.actuator_configurations = actuator_configurations or {}
         self.timer_elapse_map = (
             self.get_initial_timer_elapse_map_for_system_description(
@@ -54,7 +58,7 @@ class FrbcState:
                 )
                 self.actuator_configurations[actuator.get_id()] = actuator_config
         else:
-            self.calculate_state_values(previous_state, actuator_configurations)
+            self.calculate_state_values(previous_state, self.actuator_configurations)
 
     @staticmethod
     def get_initial_timer_elapse_map_for_system_description(
@@ -73,7 +77,7 @@ class FrbcState:
         previous_state: "FrbcState",
         actuator_configurations: Dict[str, S2ActuatorConfiguration],
     ):
-        self.timestep_energy = 0
+        self.timestep_energy = 0.0
         self.fill_level = previous_state.get_fill_level()
         seconds = self.timestep.get_duration_seconds()
         for actuator_id, actuator_configuration in actuator_configurations.items():
@@ -134,6 +138,8 @@ class FrbcState:
                         previous_operation_mode_id,
                         new_operation_mode_id,
                     )
+                    if transition is None:
+                        continue
                     for timer_id in transition.get_start_timers():
                         duration = S2FrbcDeviceStateWrapper.get_timer_duration(
                             self.timestep, actuator_id, timer_id
@@ -157,12 +163,7 @@ class FrbcState:
                 + (target.get_joules() - self.timestep_energy) ** 2
             )
             self.sum_energy_cost = previous_state.get_sum_energy_cost()
-        elif isinstance(target, TargetProfile.TariffElement):
-            self.sum_squared_distance = previous_state.get_sum_squared_distance()
-            self.sum_energy_cost = (
-                previous_state.get_sum_energy_cost()
-                + target.get_tariff() * (self.timestep_energy / 3_600_000)
-            )
+
         else:
             self.sum_squared_distance = previous_state.get_sum_squared_distance()
             self.sum_energy_cost = previous_state.get_sum_energy_cost()
@@ -188,7 +189,7 @@ class FrbcState:
             + squared_constraint_violation
         )
         self.sum_squared_energy = (
-            previous_state.get_sum_squared_energy() + self.timestep_energy**2
+            previous_state.get_sum_squared_energy() + self.timestep_energy ** 2
         )
 
     @staticmethod
@@ -259,30 +260,31 @@ class FrbcState:
             >= self.constraint_epsilon
         ):
             return SelectionResult(
-                self.sum_squared_constraint_violation
+                result=self.sum_squared_constraint_violation
                 < other_state.get_sum_squared_constraint_violation(),
-                SelectionReason.CONGESTION_CONSTRAINT,
+                reason=SelectionReason.CONGESTION_CONSTRAINT,
             )
         elif (
             abs(self.sum_squared_distance - other_state.get_sum_squared_distance())
             >= self.constraint_epsilon
         ):
             return SelectionResult(
-                self.sum_squared_distance < other_state.get_sum_squared_distance(),
-                SelectionReason.ENERGY_TARGET,
+                result=self.sum_squared_distance
+                < other_state.get_sum_squared_distance(),
+                reason=SelectionReason.ENERGY_TARGET,
             )
         elif (
             abs(self.sum_energy_cost - other_state.get_sum_energy_cost())
             >= self.tariff_epsilon
         ):
             return SelectionResult(
-                self.sum_energy_cost < other_state.get_sum_energy_cost(),
-                SelectionReason.TARIFF_TARGET,
+                result=self.sum_energy_cost < other_state.get_sum_energy_cost(),
+                reason=SelectionReason.TARIFF_TARGET,
             )
         else:
             return SelectionResult(
-                self.sum_squared_energy < other_state.get_sum_squared_energy(),
-                SelectionReason.MIN_ENERGY,
+                result=self.sum_squared_energy < other_state.get_sum_squared_energy(),
+                reason=SelectionReason.MIN_ENERGY,
             )
 
     def is_within_fill_level_range(self):
@@ -308,32 +310,38 @@ class FrbcState:
     def get_actuator_configurations(self):
         return self.actuator_configurations
 
-    def get_fill_level(self):
+    def get_fill_level(self) -> float:
         return self.fill_level
 
-    def get_bucket(self):
+    def get_bucket(self) -> int:
         return self.bucket
 
-    def get_timestep_energy(self):
+    def get_timestep_energy(self) -> float:
         return self.timestep_energy
 
-    def get_sum_squared_distance(self):
+    def get_sum_squared_distance(self) -> float:
         return self.sum_squared_distance
 
-    def get_sum_squared_constraint_violation(self):
+    def get_sum_squared_constraint_violation(self) -> float:
         return self.sum_squared_constraint_violation
 
-    def get_sum_energy_cost(self):
+    def get_sum_energy_cost(self) -> float:
         return self.sum_energy_cost
 
-    def get_sum_squared_energy(self):
+    def get_sum_squared_energy(self) -> float:
         return self.sum_squared_energy
 
-    def get_timer_elapse_map(self):
+    def get_timer_elapse_map(self) -> Dict[str, datetime]:
         return self.timer_elapse_map
 
-    def set_selection_reason(self, selection_reason: SelectionReason):
+    def set_selection_reason(self, selection_reason):
         self.selection_reason = selection_reason
 
-    def get_selection_reason(self):
+    def get_selection_reason(self) -> Optional[SelectionReason]:
         return self.selection_reason
+
+    def get_system_description(self) -> FRBCSystemDescription:
+        return self.system_description
+
+    def get_timestep(self) -> FrbcTimestep:
+        return self.timestep

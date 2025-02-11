@@ -1,7 +1,13 @@
 from datetime import datetime
 from typing import List, Optional
 from s2python.common import CommodityQuantity, PowerForecast
-from s2python.frbc import FRBCSystemDescription, FRBCLeakageBehaviour, FRBCUsageForecast, FRBCFillLevelTargetProfile
+from s2python.frbc import (
+    FRBCSystemDescription,
+    FRBCLeakageBehaviour,
+    FRBCUsageForecast,
+    FRBCFillLevelTargetProfile,
+)
+
 
 class S2FrbcDeviceState:
     class ComputationalParameters:
@@ -29,6 +35,7 @@ class S2FrbcDeviceState:
         leakage_behaviours: List[FRBCLeakageBehaviour],
         usage_forecasts: List[FRBCUsageForecast],
         fill_level_target_profiles: List[FRBCFillLevelTargetProfile],
+        computational_parameters: ComputationalParameters,
     ):
         self.device_id = device_id
         self.device_name = device_name
@@ -42,7 +49,8 @@ class S2FrbcDeviceState:
         self.leakage_behaviours = leakage_behaviours
         self.usage_forecasts = usage_forecasts
         self.fill_level_target_profiles = fill_level_target_profiles
-
+        self.computational_parameters = computational_parameters
+        
     def get_system_descriptions(self) -> List[FRBCSystemDescription]:
         return self.system_descriptions
 
@@ -54,3 +62,25 @@ class S2FrbcDeviceState:
 
     def get_fill_level_target_profiles(self) -> List[FRBCFillLevelTargetProfile]:
         return self.fill_level_target_profiles
+
+    def get_device_id(self) -> str:
+        return self.device_id
+
+    def get_device_name(self) -> str:
+        return self.device_name
+
+    def get_connection_id(self) -> str:
+        return self.connection_id
+
+    def _is_online(self) -> bool:
+        return self.is_online
+
+    def get_computational_parameters(self) -> ComputationalParameters:
+        return self.computational_parameters
+
+    def get_power_forecast(self) -> Optional[PowerForecast]:
+        return self.power_forecast
+    
+    def get_energy_in_current_timestep(self) -> CommodityQuantity:
+        return self.energy_in_current_timestep
+    

@@ -1,5 +1,4 @@
-from datetime import datetime, timedelta
-from s2python.frbc import FRBCFillLevelTargetProfile, FRBCFillLevelTargetProfileElement
+from datetime import timedelta
 
 
 class FillLevelTargetElement:

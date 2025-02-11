@@ -3,7 +3,8 @@ from flexmeasures.data.schemas import AwareDateTimeField, DurationField
 from marshmallow import Schema, fields
 
 
-class S2FlexModelSchema(Schema): ...
+class S2FlexModelSchema(Schema):
+    ...
 
 
 class TNOTargetProfile(Schema):

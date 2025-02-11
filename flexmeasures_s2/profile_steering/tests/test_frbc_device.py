@@ -33,7 +33,18 @@ test_device_state = S2FrbcDeviceState(
     timestamp=datetime.datetime.now(tz=datetime.timezone.utc),
     energy_in_current_timestep=CommodityQuantity.ELECTRIC_POWER_L1,
     is_online=True,
-
+    power_forecast=PowerForecast(
+        message_id=str(uuid.uuid4()),
+        valid_from=datetime.datetime.now(tz=datetime.timezone.utc),
+        elements=[
+            PowerForecastElement(
+                values=[PowerForecastValue(0.0, CommodityQuantity.ELECTRIC_POWER_L1)]
+            )
+        ],
+    ),
+    leakage_behaviours=[],
+    usage_forecasts=[],
+    fill_level_target_profiles=[],
     system_descriptions=[
         FRBCSystemDescription(
             message_id=str(uuid.uuid4()),
