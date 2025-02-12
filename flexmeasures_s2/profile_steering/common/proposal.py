@@ -4,7 +4,6 @@ from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 from flexmeasures_s2.profile_steering.device_planner.device_planner import DevicePlanner
 
 
-# TODO: need a DevicePlanner class
 class Proposal:
     def __init__(
         self,

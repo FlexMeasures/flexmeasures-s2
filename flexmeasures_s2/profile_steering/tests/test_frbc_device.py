@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from flexmeasures_s2.profile_steering.frbc.s2_frbc_device_state import S2FrbcDeviceState
+from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import S2FrbcDeviceState
 
 from s2python.frbc import (
     FRBCSystemDescription,
@@ -21,6 +21,7 @@ from s2python.common import (
     PowerForecast,
     PowerForecastElement,
     PowerForecastValue,
+    
 )
 
 
@@ -33,12 +34,22 @@ test_device_state = S2FrbcDeviceState(
     timestamp=datetime.datetime.now(tz=datetime.timezone.utc),
     energy_in_current_timestep=CommodityQuantity.ELECTRIC_POWER_L1,
     is_online=True,
+    computational_parameters=S2FrbcDeviceState.ComputationalParameters(
+        nr_of_buckets=10,
+        stratification_layers=10,
+    ),
     power_forecast=PowerForecast(
+        start_time=datetime.datetime.now(tz=datetime.timezone.utc),
         message_id=str(uuid.uuid4()),
-        valid_from=datetime.datetime.now(tz=datetime.timezone.utc),
         elements=[
             PowerForecastElement(
-                values=[PowerForecastValue(0.0, CommodityQuantity.ELECTRIC_POWER_L1)]
+                duration=int(datetime.timedelta(hours=1).total_seconds()),
+                power_values=[
+                    PowerForecastValue(
+                        value_expected=0.0,
+                        commodity_quantity=CommodityQuantity.ELECTRIC_POWER_L1,
+                    )
+                ],
             )
         ],
     ),

@@ -1,9 +1,9 @@
 import pytest
 from datetime import datetime, timezone, timedelta
-from flexmeasures_s2.profile_steering.frbc.s2_frbc_device_planner import (
+from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_planner import (
     S2FrbcDevicePlanner,
 )
-from flexmeasures_s2.profile_steering.frbc.s2_frbc_device_state_wrapper import (
+from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state_wrapper import (
     S2FrbcDeviceStateWrapper,
 )
 from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
@@ -24,7 +24,7 @@ def test_create_initial_planning():
     plan_due_by_date = profile_metadata.get_profile_start() + timedelta(seconds=10)
 
     # Initialize the planner
-    planner = S2FrbcDevicePlanner(device_state, profile_metadata, plan_due_by_date)
+    planner = S2FrbcDevicePlanner(test_device_state, profile_metadata, plan_due_by_date)
 
     # Call the method to test
     joule_profile = planner.create_initial_planning(plan_due_by_date)
@@ -36,5 +36,8 @@ def test_create_initial_planning():
         elements=JouleProfileTarget,
     )
 
+    print(joule_profile)
+    print(expected_joule_profile)
+    print(joule_profile == expected_joule_profile)
     # Assert that the output matches the expected output
     assert joule_profile == expected_joule_profile

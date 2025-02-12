@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Optional
 from abc import ABC, abstractmethod
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
-from flexmeasures_s2.profile_steering.common.proposal import Proposal
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 from flexmeasures_s2.profile_steering.common.device_planner.device_plan import DevicePlan
 
@@ -30,7 +29,7 @@ class DevicePlanner(ABC):
         diff_to_max_profile: JouleProfile,
         diff_to_min_profile: JouleProfile,
         plan_due_by_date: datetime,
-    ) -> Proposal:
+    ) -> 'Proposal':
         """Create an improved planning proposal.
 
         Args:
@@ -57,7 +56,7 @@ class DevicePlanner(ABC):
         pass
 
     @abstractmethod
-    def accept_proposal(self, accepted_proposal: Proposal):
+    def accept_proposal(self, accepted_proposal: 'Proposal'):
         """Accept a proposal and update the device's planning.
 
         Args:

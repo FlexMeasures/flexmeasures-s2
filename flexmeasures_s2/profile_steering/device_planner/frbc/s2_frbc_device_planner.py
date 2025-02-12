@@ -55,21 +55,21 @@ class S2FrbcDevicePlanner(DevicePlanner):
         latest_before_first_ptu = OperationModeProfileTree.get_latest_before(
             self.profile_metadata.get_profile_start(),
             storage_state.get_system_descriptions(),
-            lambda sd: sd.get_valid_from(),
+            lambda sd: sd.valid_from,
         )
         if not storage_state.get_system_descriptions():
             return False
         if latest_before_first_ptu is None:
             active_and_upcoming_system_descriptions_has_active_storage = any(
-                sd.get_valid_from() <= self.profile_metadata.get_profile_end()
-                and sd.get_valid_from() >= self.profile_metadata.get_profile_start()
+                sd.valid_from <= self.profile_metadata.get_profile_end()
+                and sd.valid_from >= self.profile_metadata.get_profile_start()
                 and sd.get_storage().get_status() is not None
                 for sd in storage_state.get_system_descriptions()
             )
         else:
             active_and_upcoming_system_descriptions_has_active_storage = any(
-                sd.get_valid_from() <= self.profile_metadata.get_profile_end()
-                and sd.get_valid_from() >= latest_before_first_ptu.get_valid_from()
+                sd.valid_from <= self.profile_metadata.get_profile_end()
+                and sd.valid_from >= latest_before_first_ptu.valid_from
                 and sd.get_storage().get_status() is not None
                 for sd in storage_state.get_system_descriptions()
             )

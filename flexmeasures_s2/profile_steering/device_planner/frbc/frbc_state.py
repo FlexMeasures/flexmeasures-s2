@@ -3,13 +3,12 @@ from s2python.frbc import (
     FRBCSystemDescription,
 )
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
-from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state_wrapper import (
-    S2FrbcDeviceStateWrapper,
-)
+import flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state_wrapper as s2_frbc_device_state_wrapper
+
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_actuator_configuration import (
     S2ActuatorConfiguration,
 )
-from flexmeasures_s2.profile_steering.device_planner.frbc.frbc_timestep import FrbcTimestep
+import flexmeasures_s2.profile_steering.device_planner.frbc.frbc_timestep as frbc_timestep
 from flexmeasures_s2.profile_steering.device_planner.frbc.selection_reason_result import (
     SelectionResult,
     SelectionReason,
@@ -23,8 +22,8 @@ class FrbcState:
 
     def __init__(
         self,
-        device_state: S2FrbcDeviceStateWrapper,
-        timestep: FrbcTimestep,
+        device_state,
+        timestep,
         previous_state: Optional["FrbcState"] = None,
         actuator_configurations: Optional[Dict[str, S2ActuatorConfiguration]] = None,
     ):
@@ -103,11 +102,11 @@ class FrbcState:
                 * seconds
             )
         self.fill_level -= (
-            S2FrbcDeviceStateWrapper.get_leakage_rate(self.timestep, self.fill_level)
+            s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_leakage_rate(self.timestep, self.fill_level)
             * seconds
         )
         self.fill_level += self.timestep.get_forecasted_usage()
-        self.bucket = S2FrbcDeviceStateWrapper.calculate_bucket(
+        self.bucket = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.calculate_bucket(
             self.timestep, self.fill_level
         )
         self.update_timers(previous_state, actuator_configurations)
@@ -132,7 +131,7 @@ class FrbcState:
                 )
                 new_operation_mode_id = actuator_configuration.get_operation_mode_id()
                 if previous_operation_mode_id != new_operation_mode_id:
-                    transition = S2FrbcDeviceStateWrapper.get_transition(
+                    transition = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_transition(
                         self.timestep,
                         actuator_id,
                         previous_operation_mode_id,
@@ -141,7 +140,7 @@ class FrbcState:
                     if transition is None:
                         continue
                     for timer_id in transition.get_start_timers():
-                        duration = S2FrbcDeviceStateWrapper.get_timer_duration(
+                        duration = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_timer_duration(
                             self.timestep, actuator_id, timer_id
                         )
                         new_finished_at = self.timestep.get_start_date() + duration
@@ -196,7 +195,7 @@ class FrbcState:
     def timer_key(actuator_id: str, timer_id: str) -> str:
         return f"{actuator_id}-{timer_id}"
 
-    def generate_next_timestep_states(self, target_timestep: FrbcTimestep):
+    def generate_next_timestep_states(self, target_timestep):
         all_actions = self.device_state.get_all_possible_actuator_configurations(
             target_timestep
         )
@@ -206,7 +205,7 @@ class FrbcState:
     @staticmethod
     def try_create_next_state(
         previous_state: "FrbcState",
-        target_timestep: FrbcTimestep,
+        target_timestep,
         actuator_configs_for_target_timestep: Dict[str, S2ActuatorConfiguration],
     ):
         if (
@@ -224,7 +223,7 @@ class FrbcState:
                 )
                 new_operation_mode_id = actuator_configuration.get_operation_mode_id()
                 if previous_operation_mode_id != new_operation_mode_id:
-                    transition = S2FrbcDeviceStateWrapper.get_transition(
+                    transition = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_transition(
                         target_timestep,
                         actuator_id,
                         previous_operation_mode_id,
@@ -343,5 +342,5 @@ class FrbcState:
     def get_system_description(self) -> FRBCSystemDescription:
         return self.system_description
 
-    def get_timestep(self) -> FrbcTimestep:
+    def get_timestep(self):
         return self.timestep

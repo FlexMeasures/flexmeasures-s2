@@ -7,7 +7,6 @@ from s2python.common import CommodityQuantity
 from flexmeasures_s2.profile_steering.device_planner.frbc.frbc_operation_mode_wrapper import (
     FrbcOperationModeWrapper,
 )
-from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import S2FrbcDeviceState
 from flexmeasures_s2.profile_steering.device_planner.frbc.frbc_timestep import FrbcTimestep
 
 from s2python.common.transition import Transition
@@ -17,7 +16,7 @@ from s2python.frbc import FRBCLeakageBehaviourElement, FRBCActuatorDescription
 class S2FrbcDeviceStateWrapper:
     epsilon = 1e-4
 
-    def __init__(self, device_state: S2FrbcDeviceState):
+    def __init__(self, device_state):
         self.device_state = device_state
         self.nr_of_buckets: int = device_state.get_computational_parameters().get_nr_of_buckets()
         self.nr_of_stratification_layers: int = 0  # Initialize appropriately
