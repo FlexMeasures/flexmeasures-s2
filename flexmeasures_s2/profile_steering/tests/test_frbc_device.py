@@ -243,9 +243,17 @@ def create_recharge_system_description(
         transition_duration=None,
         abnormal_condition_only=False
     )
+    charge_actuator_id = str(uuid.uuid4())
+
+    charge_actuator_status = FRBCActuatorStatus(
+        message_id=str(uuid.uuid4()),
+        actuator_id=charge_actuator_id,
+        active_operation_mode_id=id_on_operation_mode,
+        operation_mode_factor=0,
+    )
 
     charge_actuator_description = FRBCActuatorDescription(
-        id=str(uuid.uuid4()),
+        id=charge_actuator_id,
         diagnostic_label="charge",
         operation_modes=[on_operation_mode, off_operation_mode],
         transitions=[transition_from_on_to_off, transition_from_off_to_on],
@@ -341,9 +349,16 @@ def create_driving_system_description(
         elements=[off_operation_element],
         abnormal_condition_only=False,
     )
+    off_actuator_id = str(uuid.uuid4())
+    off_actuator_status = FRBCActuatorStatus(
+        message_id=str(uuid.uuid4()),
+        actuator_id=off_actuator_id,
+        active_operation_mode_id=id_off_operation_mode,
+        operation_mode_factor=0,
+    )
     off_actuator = FRBCActuatorDescription(
-        id=str(uuid.uuid4()),
-        diagnostic_label="off.to.on.timer",
+        id=off_actuator_id,
+        diagnostic_label="off",
         operation_modes=[off_operation_mode],
         transitions=[],
         timers=[],
@@ -364,6 +379,7 @@ def create_driving_system_description(
         valid_from=start_of_drive,
         actuators=[off_actuator],
         storage=storage_description,
+        actuator_statuses={off_actuator_id: off_actuator_status},
     )
 
 

@@ -181,7 +181,7 @@ class OperationModeProfileTree:
         )
         first_timestep = self.timesteps[first_timestep_index]
         last_timestep = self.timesteps[-1]
-        state_zero = FrbcState(self.device_state, first_timestep)
+        state_zero = FrbcState(self.device_state, first_timestep, 0)
         state_zero.generate_next_timestep_states(first_timestep)
         for i in range(first_timestep_index, len(self.timesteps) - 1):
             current_timestep = self.timesteps[i]
