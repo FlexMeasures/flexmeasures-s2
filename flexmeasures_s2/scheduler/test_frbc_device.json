@@ -1,0 +1,123 @@
+{
+    "system_descriptions": [
+        {
+            "message_type": "FRBC.SystemDescription",
+            "message_id": "f6769b77-3d85-4d61-8a28-3bd70fc5cef4",
+            "valid_from": "2025-01-21 17:52:08.121054+00:00",
+            "actuators": [
+                {
+                    "id": "1ebd596b-3031-403f-95a1-9520550b161b",
+                    "diagnostic_label": "charge",
+                    "supported_commodities": [
+                        "Commodity.ELECTRICITY"
+                    ],
+                    "operation_modes": [
+                        {
+                            "id": "charge.on",
+                            "diagnostic_label": "charge.on",
+                            "elements": [
+                                {
+                                    "fill_level_range": {
+                                        "start_of_range": 0.0,
+                                        "end_of_range": 100.0
+                                    },
+                                    "fill_rate": {
+                                        "start_of_range": 0.0054012349,
+                                        "end_of_range": 0.0054012349
+                                    },
+                                    "power_ranges": [
+                                        {
+                                            "start_of_range": 28000.0,
+                                            "end_of_range": 28000.0,
+                                            "commodity_quantity": "CommodityQuantity.ELECTRIC_POWER_L1"
+                                        }
+                                    ],
+                                    "running_costs": null
+                                }
+                            ],
+                            "abnormal_condition_only": false
+                        },
+                        {
+                            "id": "charge.off",
+                            "diagnostic_label": "charge.off",
+                            "elements": [
+                                {
+                                    "fill_level_range": {
+                                        "start_of_range": 0.0,
+                                        "end_of_range": 100.0
+                                    },
+                                    "fill_rate": {
+                                        "start_of_range": 0.0,
+                                        "end_of_range": 0.0
+                                    },
+                                    "power_ranges": [
+                                        {
+                                            "start_of_range": 0.0,
+                                            "end_of_range": 0.0,
+                                            "commodity_quantity": "CommodityQuantity.ELECTRIC_POWER_L1"
+                                        }
+                                    ],
+                                    "running_costs": null
+                                }
+                            ],
+                            "abnormal_condition_only": false
+                        }
+                    ],
+                    "transitions": [
+                        {
+                            "id": "off.to.on",
+                            "from_": "charge.off",
+                            "to": "charge.on",
+                            "start_timers": [
+                                "on.to.off.timer"
+                            ],
+                            "blocking_timers": [
+                                "off.to.on.timer"
+                            ],
+                            "transition_costs": null,
+                            "transition_duration": null,
+                            "abnormal_condition_only": false
+                        },
+                        {
+                            "id": "on.to.off",
+                            "from_": "charge.on",
+                            "to": "charge.off",
+                            "start_timers": [
+                                "off.to.on.timer"
+                            ],
+                            "blocking_timers": [
+                                "on.to.off.timer"
+                            ],
+                            "transition_costs": null,
+                            "transition_duration": null,
+                            "abnormal_condition_only": false
+                        }
+                    ],
+                    "timers": [
+                        {
+                            "id": "on.to.off.timer",
+                            "diagnostic_label": "on.to.off.timer",
+                            "duration": 30
+                        },
+                        {
+                            "id": "off.to.on.timer",
+                            "diagnostic_label": "off.to.on.timer",
+                            "duration": 30
+                        }
+                    ]
+                }
+            ],
+            "storage": {
+                "diagnostic_label": "battery",
+                "fill_level_label": "SoC %",
+                "provides_leakage_behaviour": false,
+                "provides_fill_level_target_profile": true,
+                "provides_usage_forecast": false,
+                "fill_level_range": {
+                    "start_of_range": 0.0,
+                    "end_of_range": 100.0
+                }
+            }
+        }
+    ]
+}
