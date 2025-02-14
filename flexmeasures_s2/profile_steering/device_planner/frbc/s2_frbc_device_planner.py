@@ -1,13 +1,18 @@
 from datetime import datetime
 from typing import Optional
+
+from sqlalchemy.sql.base import elements
+
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.common.proposal import Proposal
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
-from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_plan import S2FrbcPlan
+from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_plan import \
+    S2FrbcPlan
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_instruction_profile import (
     S2FrbcInstructionProfile,
 )
-from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
+from flexmeasures_s2.profile_steering.common.profile_metadata import \
+    ProfileMetadata
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state_wrapper import (
     S2FrbcDeviceStateWrapper,
 )
@@ -28,10 +33,10 @@ from flexmeasures_s2.profile_steering.device_planner.device_planner_abstract imp
 # make sure this is a DevicePlanner
 class S2FrbcDevicePlanner(DevicePlanner):
     def __init__(
-        self,
-        s2_frbc_state: S2FrbcDeviceState,
-        profile_metadata: ProfileMetadata,
-        plan_due_by_date: datetime,
+            self,
+            s2_frbc_state: S2FrbcDeviceState,
+            profile_metadata: ProfileMetadata,
+            plan_due_by_date: datetime,
     ):
         self.s2_frbc_state = s2_frbc_state
         self.profile_metadata = profile_metadata
@@ -43,7 +48,7 @@ class S2FrbcDevicePlanner(DevicePlanner):
         self.null_profile = JouleProfile(
             profile_metadata.get_profile_start(),
             profile_metadata.get_timestep_duration(),
-            None,
+            elements=[None] * profile_metadata.get_nr_of_timesteps(),
         )
         if self.is_storage_available(self.s2_frbc_state):
             self.state_tree = OperationModeProfileTree(
@@ -57,29 +62,32 @@ class S2FrbcDevicePlanner(DevicePlanner):
 
     def is_storage_available(self, storage_state: S2FrbcDeviceState) -> bool:
         latest_before_first_ptu = OperationModeProfileTree.get_latest_before(
-            self.profile_metadata.get_profile_start(),
+            self.profile_metadata.get_profile_start().replace(tzinfo=None),
             storage_state.get_system_descriptions(),
-            lambda sd: sd.valid_from,
+            lambda sd: sd.valid_from.replace(tzinfo=None),
         )
         if not storage_state.get_system_descriptions():
             return False
         if latest_before_first_ptu is None:
             active_and_upcoming_system_descriptions_has_active_storage = any(
-                sd.valid_from <= self.profile_metadata.get_profile_end()
-                and sd.valid_from >= self.profile_metadata.get_profile_start()
-                and sd.get_storage().get_status() is not None
+                # TODO: ask if TypeError: can't compare offset-naive and offset-aware datetimes could be solved differently
+                self.profile_metadata.get_profile_end().replace(
+                    tzinfo=None) >= sd.valid_from.replace(
+                    tzinfo=None) >= self.profile_metadata.get_profile_start().replace(
+                    tzinfo=None)
                 for sd in storage_state.get_system_descriptions()
             )
         else:
             active_and_upcoming_system_descriptions_has_active_storage = any(
-                sd.valid_from <= self.profile_metadata.get_profile_end()
-                and sd.valid_from >= latest_before_first_ptu.valid_from
-                and sd.get_storage().get_status() is not None
+                self.profile_metadata.get_profile_end().replace(
+                    tzinfo=None) >= sd.valid_from.replace(
+                    tzinfo=None) >= latest_before_first_ptu.valid_from.replace(
+                    tzinfo=None)
                 for sd in storage_state.get_system_descriptions()
             )
         return (
-            storage_state._is_online()
-            and active_and_upcoming_system_descriptions_has_active_storage
+                storage_state._is_online()
+                and active_and_upcoming_system_descriptions_has_active_storage
         )
 
     def get_device_id(self) -> str:
@@ -92,11 +100,11 @@ class S2FrbcDevicePlanner(DevicePlanner):
         return self.s2_frbc_state.get_device_name()
 
     def create_improved_planning(
-        self,
-        diff_to_global_target: TargetProfile,
-        diff_to_max: JouleProfile,
-        diff_to_min: JouleProfile,
-        plan_due_by_date: datetime,
+            self,
+            diff_to_global_target: TargetProfile,
+            diff_to_max: JouleProfile,
+            diff_to_min: JouleProfile,
+            plan_due_by_date: datetime,
     ) -> Proposal:
         if self.accepted_plan is None:
             raise ValueError("No accepted plan found")
@@ -129,7 +137,8 @@ class S2FrbcDevicePlanner(DevicePlanner):
         )
         return proposal
 
-    def create_initial_planning(self, plan_due_by_date: datetime) -> JouleProfile:
+    def create_initial_planning(self,
+                                plan_due_by_date: datetime) -> JouleProfile:
         if self.is_storage_available(self.s2_frbc_state):
             self.latest_plan = self.state_tree.find_best_plan(
                 TargetProfile.null_profile(self.profile_metadata),
@@ -187,7 +196,7 @@ class S2FrbcDevicePlanner(DevicePlanner):
 
     @staticmethod
     def convert_plan_to_instructions(
-        profile_metadata: ProfileMetadata, device_plan: S2FrbcPlan
+            profile_metadata: ProfileMetadata, device_plan: S2FrbcPlan
     ) -> S2FrbcInstructionProfile:
         elements = []
         actuator_configurations_per_timestep = device_plan.get_operation_mode_id()

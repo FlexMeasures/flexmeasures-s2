@@ -60,17 +60,17 @@ class OperationModeProfileTree:
             current_system_description = self.get_latest_before(
                 time_step_start_dt,
                 self.device_state.get_system_descriptions(),
-                lambda sd: sd.get_valid_from(),
+                lambda sd: sd.valid_from,
             )
             current_leakage_behaviour = self.get_latest_before(
                 time_step_start_dt,
                 self.device_state.get_leakage_behaviours(),
-                lambda lb: lb.get_valid_from(),
+                lambda lb: lb.valid_from,
             )
             current_fill_level = self.get_latest_before(
                 time_step_start_dt,
                 self.device_state.get_fill_level_target_profiles(),
-                lambda fl: fl.get_start_time(),
+                lambda fl: fl.start_time,
             )
             current_fill_level_target = None
             if current_fill_level:
@@ -85,7 +85,7 @@ class OperationModeProfileTree:
             current_usage_forecast = self.get_latest_before(
                 time_step_start_dt,
                 self.device_state.get_usage_forecasts(),
-                lambda uf: uf.get_start_time(),
+                lambda uf: uf.start_time,
             )
             current_usage_forecast_profile = None
             if current_usage_forecast:
@@ -109,18 +109,18 @@ class OperationModeProfileTree:
             time_step_start = time_step_end
 
     @staticmethod
-    def get_latest_before(
-        before: datetime, select_from: List[Any], get_date_time: Any
-    ) -> Optional[Any]:
+    def get_latest_before(before, select_from, get_date_time):
         latest_before = None
         latest_before_date_time = None
         if select_from:
             for current in select_from:
                 if current:
-                    current_date_time = get_date_time(current)
+                    current_date_time = get_date_time(current).replace(
+                        tzinfo=None)
+                    before = before.replace(tzinfo=None)
                     if current_date_time <= before and (
-                        latest_before is None
-                        or current_date_time > latest_before_date_time
+                            latest_before is None
+                            or current_date_time > latest_before_date_time
                     ):
                         latest_before = current
                         latest_before_date_time = current_date_time
@@ -136,17 +136,17 @@ class OperationModeProfileTree:
             return None
         time_step_end -= timedelta(milliseconds=1)
         lower, upper = None, None
-        for e in fill_level_target_profile.get_elements_in_range(
-            time_step_start, time_step_end
+        for e in FillLevelTargetUtil.get_elements_in_range(
+            fill_level_target_profile, time_step_start, time_step_end
         ):
-            if e.get_lower_limit() is not None and (
-                lower is None or e.get_lower_limit() > lower
+            if e.lower_limit is not None and (
+                lower is None or e.lower_limit > lower
             ):
-                lower = e.get_lower_limit()
-            if e.get_upper_limit() is not None and (
-                upper is None or e.get_upper_limit() < upper
+                lower = e.lower_limit
+            if e.upper_limit is not None and (
+                upper is None or e.upper_limit < upper
             ):
-                upper = e.get_upper_limit()
+                upper = e.upper_limit
         if lower is None and upper is None:
             return None
         return NumberRangeWrapper(lower, upper)
@@ -161,9 +161,8 @@ class OperationModeProfileTree:
             return 0
         time_step_end -= timedelta(milliseconds=1)
         usage = 0
-        sub_profile = usage_forecast.sub_profile(time_step_start, time_step_end)
-        for element in sub_profile.get_elements():
-            usage += element.get_usage()
+        usage = UsageForecastUtil.sub_profile(usage_forecast, time_step_start, time_step_end)
+        
         return usage
 
     def find_best_plan(

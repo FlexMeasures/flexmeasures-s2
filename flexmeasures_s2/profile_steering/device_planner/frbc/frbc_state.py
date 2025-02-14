@@ -31,8 +31,11 @@ class FrbcState:
         self.timestep = timestep
         self.previous_state = previous_state
         self.system_description = timestep.get_system_description()
+        #TODO:  The Java code for s2 contains a status field for storage.
+        #       This is not present in the S2FRBCSystemDescription.
+        #       We should add it to the S2FRBCSystemDescription.
         self.fill_level = (
-            self.system_description.get_storage().get_status().get_present_fill_level()
+            self.system_description.storage.status.present_fill_level
         )
         self.bucket = 0
         self.timestep_energy = 0.0
