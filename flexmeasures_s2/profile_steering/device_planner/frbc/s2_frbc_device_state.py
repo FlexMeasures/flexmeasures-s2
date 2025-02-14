@@ -7,6 +7,7 @@ from s2python.frbc import (
     FRBCUsageForecast,
     FRBCFillLevelTargetProfile,
 )
+from s2python.generated.gen_s2 import PowerValue
 
 
 class S2FrbcDeviceState:
@@ -28,7 +29,7 @@ class S2FrbcDeviceState:
         connection_id: str,
         priority_class: int,
         timestamp: datetime,
-        energy_in_current_timestep: CommodityQuantity,
+        energy_in_current_timestep: PowerValue,
         is_online: bool,
         power_forecast: Optional[PowerForecast],
         system_descriptions: List[FRBCSystemDescription],
@@ -50,7 +51,7 @@ class S2FrbcDeviceState:
         self.usage_forecasts = usage_forecasts
         self.fill_level_target_profiles = fill_level_target_profiles
         self.computational_parameters = computational_parameters
-        
+
     def get_system_descriptions(self) -> List[FRBCSystemDescription]:
         return self.system_descriptions
 
@@ -80,7 +81,6 @@ class S2FrbcDeviceState:
 
     def get_power_forecast(self) -> Optional[PowerForecast]:
         return self.power_forecast
-    
+
     def get_energy_in_current_timestep(self) -> CommodityQuantity:
         return self.energy_in_current_timestep
-    

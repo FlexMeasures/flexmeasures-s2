@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 from typing import List, Optional
-from flexmeasures_s2.profile_steering.s2_utils.number_range_wrapper import NumberRangeWrapper
+from flexmeasures_s2.profile_steering.s2_utils.number_range_wrapper import (
+    NumberRangeWrapper,
+)
 from s2python.frbc import FRBCSystemDescription, FRBCLeakageBehaviour
 from flexmeasures_s2.profile_steering.device_planner.frbc.frbc_state import FrbcState
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import (
@@ -47,7 +49,9 @@ class FrbcTimestep:
     def get_nr_of_buckets(self) -> int:
         return self.nr_of_buckets
 
-    def set_targets(self, target: float, min_constraint: float, max_constraint: float) -> None:
+    def set_targets(
+        self, target: float, min_constraint: float, max_constraint: float
+    ) -> None:
         self.target = target
         self.min_constraint = min_constraint
         self.max_constraint = max_constraint
@@ -66,7 +70,8 @@ class FrbcTimestep:
         else:
             if (
                 self.emergency_state is None
-                or state.get_fill_level_distance() < self.emergency_state.get_fill_level_distance()
+                or state.get_fill_level_distance()
+                < self.emergency_state.get_fill_level_distance()
             ):
                 self.emergency_state = state
                 state.set_selection_reason(SelectionReason.EMERGENCY_STATE)
@@ -118,10 +123,14 @@ class FrbcTimestep:
         final_states = self.get_final_states()
         if self.fill_level_target is None:
             return final_states
-        final_states = [s for s in final_states if self.state_is_within_fill_level_target_range(s)]
+        final_states = [
+            s for s in final_states if self.state_is_within_fill_level_target_range(s)
+        ]
         if final_states:
             return final_states
-        best_state = min(self.get_final_states(), key=self.get_fill_level_target_distance)
+        best_state = min(
+            self.get_final_states(), key=self.get_fill_level_target_distance
+        )
         return [best_state]
 
     def state_is_within_fill_level_target_range(self, state: FrbcState) -> bool:

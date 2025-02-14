@@ -17,8 +17,12 @@ from flexmeasures_s2.profile_steering.common.device_planner.device_plan import (
 from flexmeasures_s2.profile_steering.device_planner.frbc.operation_mode_profile_tree import (
     OperationModeProfileTree,
 )
-from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import S2FrbcDeviceState
-from flexmeasures_s2.profile_steering.device_planner.device_planner import DevicePlanner
+from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import (
+    S2FrbcDeviceState,
+)
+from flexmeasures_s2.profile_steering.device_planner.device_planner_abstract import (
+    DevicePlanner,
+)
 
 
 # make sure this is a DevicePlanner
@@ -73,7 +77,10 @@ class S2FrbcDevicePlanner(DevicePlanner):
                 and sd.get_storage().get_status() is not None
                 for sd in storage_state.get_system_descriptions()
             )
-        return storage_state._is_online() and active_and_upcoming_system_descriptions_has_active_storage
+        return (
+            storage_state._is_online()
+            and active_and_upcoming_system_descriptions_has_active_storage
+        )
 
     def get_device_id(self) -> str:
         return self.s2_frbc_state.get_device_id()
@@ -100,7 +107,9 @@ class S2FrbcDevicePlanner(DevicePlanner):
         min_profile = diff_to_min.add(self.accepted_plan.get_energy())
 
         if self.is_storage_available(self.s2_frbc_state):
-            self.latest_plan = self.state_tree.find_best_plan(target, min_profile, max_profile)
+            self.latest_plan = self.state_tree.find_best_plan(
+                target, min_profile, max_profile
+            )
         else:
             self.latest_plan = S2FrbcPlan(
                 idle=True,
@@ -141,9 +150,13 @@ class S2FrbcDevicePlanner(DevicePlanner):
         if self.latest_plan is None:
             raise ValueError("No latest plan found")
         if accepted_proposal.get_origin() != self:
-            raise ValueError(f"Storage controller '{self.get_device_id()}' received a proposal that he did not send.")
+            raise ValueError(
+                f"Storage controller '{self.get_device_id()}' received a proposal that he did not send."
+            )
         if not accepted_proposal.get_proposed_plan() == self.latest_plan.get_energy():
-            raise ValueError(f"Storage controller '{self.get_device_id()}' received a proposal that he did not send.")
+            raise ValueError(
+                f"Storage controller '{self.get_device_id()}' received a proposal that he did not send."
+            )
         if accepted_proposal.get_congestion_improvement_value() < 0:
             raise ValueError(
                 f"Storage controller '{self.get_device_id()}' received a proposal with negative improvement"
@@ -167,7 +180,9 @@ class S2FrbcDevicePlanner(DevicePlanner):
             connection_id=self.get_connection_id(),
             energy_profile=self.accepted_plan.get_energy(),
             fill_level_profile=self.accepted_plan.get_fill_level(),
-            instruction_profile=self.convert_plan_to_instructions(self.profile_metadata, self.accepted_plan),
+            instruction_profile=self.convert_plan_to_instructions(
+                self.profile_metadata, self.accepted_plan
+            ),
         )
 
     @staticmethod
@@ -178,7 +193,9 @@ class S2FrbcDevicePlanner(DevicePlanner):
         actuator_configurations_per_timestep = device_plan.get_operation_mode_id()
         if actuator_configurations_per_timestep is not None:
             for actuator_configurations in actuator_configurations_per_timestep:
-                new_element = S2FrbcInstructionProfile.Element(not actuator_configurations, actuator_configurations)
+                new_element = S2FrbcInstructionProfile.Element(
+                    not actuator_configurations, actuator_configurations
+                )
                 elements.append(new_element)
         else:
             elements = [None] * profile_metadata.get_nr_of_timesteps()

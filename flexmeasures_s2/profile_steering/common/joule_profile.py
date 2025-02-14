@@ -82,7 +82,7 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
         )
 
     def sum_quadratic_distance(self) -> float:
-        return sum(e ** 2 for e in self.elements if e is not None)
+        return sum(e**2 for e in self.elements if e is not None)
 
     def is_below_or_equal(self, other: "JouleProfile") -> bool:
         if not self.is_compatible(other):

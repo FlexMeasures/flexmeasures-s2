@@ -1,7 +1,9 @@
 from typing import Optional
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
-from flexmeasures_s2.profile_steering.device_planner.device_planner import DevicePlanner
+from flexmeasures_s2.profile_steering.device_planner.device_planner_abstract import (
+    DevicePlanner,
+)
 
 
 class Proposal:
@@ -28,7 +30,9 @@ class Proposal:
         if self.global_improvement_value is None:
             self.global_improvement_value = (
                 self.global_diff_target.sum_quadratic_distance()
-                - self.global_diff_target.add(self.old_plan).subtract(self.proposed_plan).sum_quadratic_distance()
+                - self.global_diff_target.add(self.old_plan)
+                .subtract(self.proposed_plan)
+                .sum_quadratic_distance()
             )
         return self.global_improvement_value
 
@@ -56,14 +60,18 @@ class Proposal:
                 self.old_plan.get_profile_metadata().get_timestep_duration(),
                 [0] * len(self.old_plan.get_elements()),
             )
-            exceed_max_target_old = self.diff_to_congestion_max.minimum(zero_profile).sum_quadratic_distance()
+            exceed_max_target_old = self.diff_to_congestion_max.minimum(
+                zero_profile
+            ).sum_quadratic_distance()
             exceed_max_target_proposal = (
                 self.diff_to_congestion_max.add(self.old_plan)
                 .subtract(self.proposed_plan)
                 .minimum(zero_profile)
                 .sum_quadratic_distance()
             )
-            exceed_min_target_old = self.diff_to_congestion_min.maximum(zero_profile).sum_quadratic_distance()
+            exceed_min_target_old = self.diff_to_congestion_min.maximum(
+                zero_profile
+            ).sum_quadratic_distance()
             exceed_min_target_proposal = (
                 self.diff_to_congestion_min.add(self.old_plan)
                 .subtract(self.proposed_plan)
@@ -86,7 +94,10 @@ class Proposal:
 
     def is_preferred_to(self, other: "Proposal") -> bool:
         if self.get_congestion_improvement_value() >= 0:
-            if self.get_global_improvement_value() > other.get_global_improvement_value():
+            if (
+                self.get_global_improvement_value()
+                > other.get_global_improvement_value()
+            ):
                 return True
             elif (
                 self.get_global_improvement_value()

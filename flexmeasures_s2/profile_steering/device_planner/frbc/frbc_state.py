@@ -102,12 +102,16 @@ class FrbcState:
                 * seconds
             )
         self.fill_level -= (
-            s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_leakage_rate(self.timestep, self.fill_level)
+            s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_leakage_rate(
+                self.timestep, self.fill_level
+            )
             * seconds
         )
         self.fill_level += self.timestep.get_forecasted_usage()
-        self.bucket = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.calculate_bucket(
-            self.timestep, self.fill_level
+        self.bucket = (
+            s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.calculate_bucket(
+                self.timestep, self.fill_level
+            )
         )
         self.update_timers(previous_state, actuator_configurations)
         self.calculate_scores(previous_state)
@@ -188,7 +192,7 @@ class FrbcState:
             + squared_constraint_violation
         )
         self.sum_squared_energy = (
-            previous_state.get_sum_squared_energy() + self.timestep_energy ** 2
+            previous_state.get_sum_squared_energy() + self.timestep_energy**2
         )
 
     @staticmethod
