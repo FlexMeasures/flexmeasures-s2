@@ -78,11 +78,9 @@ class S2FrbcDeviceStateWrapper:
         self, target_timestep: FrbcTimestep
     ) -> Dict[str, List[str]]:
         actuator_operation_mode_map = {}
-        for a in target_timestep.get_system_description().get_actuators():
-            actuator_operation_mode_map[a.get_id()] = [
-                om.get_id()
-                for om in a.get_operation_modes()
-                if not om.get_abnormal_condition_only()
+        for a in target_timestep.get_system_description().actuators:
+            actuator_operation_mode_map[str(a.id)] = [
+                str(om.id) for om in a.operation_modes if not om.abnormal_condition_only
             ]
         self.actuator_operation_mode_map_per_timestep[
             target_timestep.get_start_date()
@@ -99,13 +97,13 @@ class S2FrbcDeviceStateWrapper:
         om_key = f"{actuator_id}-{operation_mode_id}"
         if om_key in self.operation_modes:
             return self.operation_modes[om_key]
-        actuators = target_timestep.get_system_description().get_actuators()
+        actuators = target_timestep.get_system_description().actuators
         found_actuator_description = next(
-            (ad for ad in actuators if ad.get_id() == actuator_id), None
+            (ad for ad in actuators if str(ad.id) == actuator_id), None
         )
         if found_actuator_description:
-            for operation_mode in found_actuator_description.get_operation_modes():
-                if operation_mode.get_id() == operation_mode_id:
+            for operation_mode in found_actuator_description.operation_modes:
+                if str(operation_mode.id) == operation_mode_id:
                     found_operation_mode = FrbcOperationModeWrapper(operation_mode)
                     self.operation_modes[om_key] = found_operation_mode
                     return found_operation_mode
@@ -206,10 +204,10 @@ class S2FrbcDeviceStateWrapper:
             raise ValueError(
                 f"Actuator description not found for actuator {actuator_id}"
             )
-        for transition in actuator_description.get_transitions():
+        for transition in actuator_description.transitions:
             if (
-                transition.get_from() == from_operation_mode_id
-                and transition.get_to() == to_operation_mode_id
+                str(transition.from_) == from_operation_mode_id
+                and str(transition.to) == to_operation_mode_id
             ):
                 return transition
         return None
@@ -351,8 +349,8 @@ class S2FrbcDeviceStateWrapper:
         return next(
             (
                 ad
-                for ad in target_timestep.get_system_description().get_actuators()
-                if ad.get_id() == actuator_id
+                for ad in target_timestep.get_system_description().actuators
+                if str(ad.id) == actuator_id
             ),
             None,
         )

@@ -6,8 +6,7 @@ from s2python.frbc.frbc_actuator_description import FRBCActuatorDescription
 from s2python.frbc.frbc_fill_level_target_profile_element import (
     FRBCFillLevelTargetProfileElement,
 )
-from s2python.frbc.frbc_leakage_behaviour_element import \
-    FRBCLeakageBehaviourElement
+from s2python.frbc.frbc_leakage_behaviour_element import FRBCLeakageBehaviourElement
 from s2python.frbc.frbc_operation_mode import FRBCOperationMode
 from s2python.frbc.frbc_usage_forecast_element import FRBCUsageForecastElement
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_planner import (
@@ -16,15 +15,13 @@ from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_planner
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import (
     S2FrbcDeviceState,
 )
-from flexmeasures_s2.profile_steering.common.profile_metadata import \
-    ProfileMetadata
+from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
 from s2python.frbc import FRBCSystemDescription
 from s2python.frbc import FRBCUsageForecast
 from s2python.frbc import FRBCFillLevelTargetProfile
 from s2python.frbc import FRBCLeakageBehaviour
 from s2python.frbc import FRBCOperationModeElement
-from s2python.frbc import FRBCActuatorStatus, FRBCStorageStatus, \
-    FRBCStorageDescription
+from s2python.frbc import FRBCActuatorStatus, FRBCStorageStatus, FRBCStorageDescription
 from s2python.common import PowerRange
 from s2python.common import NumberRange
 from s2python.common import CommodityQuantity
@@ -62,8 +59,7 @@ def test_connexxion_ev_bus_baseline_byd_225():
     )
 
     # Create leakage behaviour
-    recharge_leakage1 = create_recharge_leakage_behaviour(
-        start_of_recharge1)
+    recharge_leakage1 = create_recharge_leakage_behaviour(start_of_recharge1)
 
     # Create usage forecast
     recharge_usage_forecast1 = create_recharge_usage_forecast(
@@ -103,8 +99,7 @@ def test_connexxion_ev_bus_baseline_byd_225():
         charging_power_kw_day,
         soc_percentage_before_charging2,
     )
-    recharge_leakage2 = create_recharge_leakage_behaviour(
-        start_of_recharge2)
+    recharge_leakage2 = create_recharge_leakage_behaviour(start_of_recharge2)
     recharge_usage_forecast2 = create_recharge_usage_forecast(
         start_of_recharge2, recharge_duration2
     )
@@ -141,19 +136,17 @@ def test_connexxion_ev_bus_baseline_byd_225():
             recharge_fill_level_target1,
             recharge_fill_level_target2,
         ],
-        computational_parameters=S2FrbcDeviceState.ComputationalParameters(
-            1000, 20
-        ),
+        computational_parameters=S2FrbcDeviceState.ComputationalParameters(1000, 20),
     )
     target_metadata = ProfileMetadata(
-        profile_start=omloop_starts_at, timestep_duration=timedelta(seconds=300),
-        nr_of_timesteps=288
+        profile_start=omloop_starts_at,
+        timestep_duration=timedelta(seconds=300),
+        nr_of_timesteps=288,
     )
 
     plan_due_by_date = target_metadata.get_profile_start() + timedelta(seconds=10)
 
-    planner = S2FrbcDevicePlanner(device_state, target_metadata,
-                                  plan_due_by_date)
+    planner = S2FrbcDevicePlanner(device_state, target_metadata, plan_due_by_date)
     planning = planner.create_initial_planning(plan_due_by_date)
 
     assert planning == get_JouleProfileTarget()
@@ -161,10 +154,10 @@ def test_connexxion_ev_bus_baseline_byd_225():
 
 @staticmethod
 def create_recharge_system_description(
-        start_of_recharge,
-        charge_power_soc_percentage_per_second,
-        charging_power_kw,
-        soc_percentage_before_charging,
+    start_of_recharge,
+    charge_power_soc_percentage_per_second,
+    charging_power_kw,
+    soc_percentage_before_charging,
 ) -> FRBCSystemDescription:
     # Create and return a mock system description for recharging
     on_operation_element = FRBCOperationModeElement(
@@ -222,21 +215,16 @@ def create_recharge_system_description(
 
     transition_from_on_to_off = Transition(
         id=str(uuid.uuid4()),
-        **{
-            "from": id_on_operation_mode
-        },
+        **{"from": id_on_operation_mode},
         to=id_off_operation_mode,
         start_timers=[id_off_to_on_timer],
         blocking_timers=[id_on_to_off_timer],
         transition_duration=None,
         abnormal_condition_only=False
-
     )
     transition_from_off_to_on = Transition(
         id=str(uuid.uuid4()),
-        **{
-            "from": id_off_operation_mode
-        },
+        **{"from": id_off_operation_mode},
         to=id_on_operation_mode,
         start_timers=[id_on_to_off_timer],
         blocking_timers=[id_off_to_on_timer],
@@ -259,6 +247,11 @@ def create_recharge_system_description(
         transitions=[transition_from_on_to_off, transition_from_off_to_on],
         timers=[on_to_off_timer, off_to_on_timer],
         supported_commodities=[Commodity.ELECTRICITY],
+        status=charge_actuator_status,
+    )
+
+    storage_status = FRBCStorageStatus(
+        message_id=str(uuid.uuid4()), present_fill_level=soc_percentage_before_charging
     )
 
     frbc_storage_description = FRBCStorageDescription(
@@ -268,6 +261,7 @@ def create_recharge_system_description(
         provides_fill_level_target_profile=True,
         provides_usage_forecast=False,
         fill_level_range=NumberRange(start_of_range=0, end_of_range=100),
+        status=storage_status,
     )
 
     frbc_system_description = FRBCSystemDescription(
@@ -280,67 +274,66 @@ def create_recharge_system_description(
     return frbc_system_description
 
 
-def create_recharge_leakage_behaviour( start_of_recharge):
+def create_recharge_leakage_behaviour(start_of_recharge):
     return FRBCLeakageBehaviour(
         message_id=str(uuid.uuid4()),
         valid_from=start_of_recharge,
         elements=[
             FRBCLeakageBehaviourElement(
-                fill_level_range=NumberRange(start_of_range=0,
-                                             end_of_range=100),
+                fill_level_range=NumberRange(start_of_range=0, end_of_range=100),
                 leakage_rate=0,
             )
         ],
     )
 
 
-def create_recharge_usage_forecast(start_of_recharge,
-                                   recharge_duration):
+def create_recharge_usage_forecast(start_of_recharge, recharge_duration):
     no_usage = FRBCUsageForecastElement(
-        duration=int(recharge_duration.total_seconds()),
-        usage_rate_expected=0
+        duration=int(recharge_duration.total_seconds()), usage_rate_expected=0
     )
     return FRBCUsageForecast(
-        message_id=str(uuid.uuid4()), start_time=start_of_recharge,
-        elements=[no_usage]
+        message_id=str(uuid.uuid4()), start_time=start_of_recharge, elements=[no_usage]
     )
 
 
 @staticmethod
 def create_recharge_fill_level_target_profile(
-        start_of_recharge,
-        recharge_duration,
-        final_fill_level_target,
-        soc_percentage_before_charging,
+    start_of_recharge,
+    recharge_duration,
+    final_fill_level_target,
+    soc_percentage_before_charging,
 ):
     during_charge = FRBCFillLevelTargetProfileElement(
         duration=max(recharge_duration.total_seconds() - 10, 0),
         fill_level_range=NumberRange(
-            start_of_range=soc_percentage_before_charging,
-            end_of_range=100),
+            start_of_range=soc_percentage_before_charging, end_of_range=100
+        ),
     )
     end_of_charge = FRBCFillLevelTargetProfileElement(
         duration=min(recharge_duration.total_seconds(), 10),
-        fill_level_range=NumberRange(start_of_range=final_fill_level_target,
-                                     end_of_range=100),
+        fill_level_range=NumberRange(
+            start_of_range=final_fill_level_target, end_of_range=100
+        ),
     )
     return FRBCFillLevelTargetProfile(
         message_id=str(uuid.uuid4()),
         start_time=start_of_recharge,
-        elements=[during_charge, end_of_charge]
+        elements=[during_charge, end_of_charge],
     )
 
 
 @staticmethod
-def create_driving_system_description(
-        start_of_drive, soc_percentage_before_driving
-):
+def create_driving_system_description(start_of_drive, soc_percentage_before_driving):
     off_operation_element = FRBCOperationModeElement(
         fill_level_range=NumberRange(start_of_range=0, end_of_range=100),
         fill_rate=NumberRange(start_of_range=0, end_of_range=0),
         power_ranges=[
-            PowerRange(start_of_range=0, end_of_range=0,
-                       commodity_quantity=CommodityQuantity.ELECTRIC_POWER_L1)],
+            PowerRange(
+                start_of_range=0,
+                end_of_range=0,
+                commodity_quantity=CommodityQuantity.ELECTRIC_POWER_L1,
+            )
+        ],
     )
     id_off_operation_mode = str(uuid.uuid4())
     off_operation_mode = FRBCOperationMode(
@@ -363,9 +356,11 @@ def create_driving_system_description(
         transitions=[],
         timers=[],
         supported_commodities=[Commodity.ELECTRICITY],
+        status=off_actuator_status,
     )
-    storage_status = FRBCStorageStatus(message_id=str(uuid.uuid4()),
-                                       present_fill_level=soc_percentage_before_driving)
+    storage_status = FRBCStorageStatus(
+        message_id=str(uuid.uuid4()), present_fill_level=soc_percentage_before_driving
+    )
     storage_description = FRBCStorageDescription(
         diagnostic_label="battery",
         fill_level_label="SoC %",
@@ -373,24 +368,24 @@ def create_driving_system_description(
         provides_fill_level_target_profile=True,
         provides_usage_forecast=False,
         fill_level_range=NumberRange(start_of_range=0, end_of_range=100),
+        status=storage_status,
     )
     return FRBCSystemDescription(
         message_id=str(uuid.uuid4()),
         valid_from=start_of_drive,
         actuators=[off_actuator],
         storage=storage_description,
-        actuator_statuses={off_actuator_id: off_actuator_status},
     )
 
 
 @staticmethod
 def create_driving_usage_forecast(
-         start_of_driving, next_drive_duration, soc_usage_per_second
+    start_of_driving, next_drive_duration, soc_usage_per_second
 ):
     no_usage = FRBCUsageForecastElement(
         duration=int(next_drive_duration.total_seconds()),
         usage_rate_expected=(-1 * soc_usage_per_second),
     )
-    return FRBCUsageForecast(message_id=str(uuid.uuid4()),
-                             start_time=start_of_driving,
-                             elements=[no_usage])
+    return FRBCUsageForecast(
+        message_id=str(uuid.uuid4()), start_time=start_of_driving, elements=[no_usage]
+    )

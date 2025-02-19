@@ -32,7 +32,7 @@ class UsageForecastUtil:
         elements = []
         start = usage_forecast.start_time
         for element in usage_forecast.elements:
-            end = start + timedelta(seconds=element.duration.__root__)
+            end = start + timedelta(seconds=element.duration.root)
             elements.append(
                 UsageForecastElement(start, end, element.usage_rate_expected)
             )

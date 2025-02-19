@@ -115,12 +115,11 @@ class OperationModeProfileTree:
         if select_from:
             for current in select_from:
                 if current:
-                    current_date_time = get_date_time(current).replace(
-                        tzinfo=None)
+                    current_date_time = get_date_time(current).replace(tzinfo=None)
                     before = before.replace(tzinfo=None)
                     if current_date_time <= before and (
-                            latest_before is None
-                            or current_date_time > latest_before_date_time
+                        latest_before is None
+                        or current_date_time > latest_before_date_time
                     ):
                         latest_before = current
                         latest_before_date_time = current_date_time
@@ -139,13 +138,9 @@ class OperationModeProfileTree:
         for e in FillLevelTargetUtil.get_elements_in_range(
             fill_level_target_profile, time_step_start, time_step_end
         ):
-            if e.lower_limit is not None and (
-                lower is None or e.lower_limit > lower
-            ):
+            if e.lower_limit is not None and (lower is None or e.lower_limit > lower):
                 lower = e.lower_limit
-            if e.upper_limit is not None and (
-                upper is None or e.upper_limit < upper
-            ):
+            if e.upper_limit is not None and (upper is None or e.upper_limit < upper):
                 upper = e.upper_limit
         if lower is None and upper is None:
             return None
@@ -161,8 +156,10 @@ class OperationModeProfileTree:
             return 0
         time_step_end -= timedelta(milliseconds=1)
         usage = 0
-        usage = UsageForecastUtil.sub_profile(usage_forecast, time_step_start, time_step_end)
-        
+        usage = UsageForecastUtil.sub_profile(
+            usage_forecast, time_step_start, time_step_end
+        )
+
         return usage
 
     def find_best_plan(

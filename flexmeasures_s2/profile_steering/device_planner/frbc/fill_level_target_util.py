@@ -22,7 +22,6 @@ class FillLevelTargetElement:
 
     def date_in_element(self, date):
         return self.start <= date <= self.end
-    
 
 
 class FillLevelTargetUtil:
@@ -31,7 +30,7 @@ class FillLevelTargetUtil:
         elements = []
         start = fill_level_target_profile.start_time
         for element in fill_level_target_profile.elements:
-            end = start + timedelta(seconds=element.duration.__root__)
+            end = start + timedelta(seconds=element.duration.root)
             elements.append(
                 FillLevelTargetElement(
                     start,
@@ -42,7 +41,7 @@ class FillLevelTargetUtil:
             )
             start = end + timedelta(milliseconds=1)
         return elements
-    
+
     @staticmethod
     def get_elements_in_range(target_profile, start, end):
         elements_in_range = []

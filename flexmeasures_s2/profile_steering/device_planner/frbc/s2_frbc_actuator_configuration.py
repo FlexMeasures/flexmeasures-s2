@@ -1,5 +1,7 @@
 from typing import Dict, Any
 
+# TODO: Should this just be an actuator description
+
 
 class S2ActuatorConfiguration:
     def __init__(self, operation_mode_id, factor):
