@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, timezone
 
 
 class FillLevelTargetElement:
@@ -28,7 +28,7 @@ class FillLevelTargetUtil:
     @staticmethod
     def from_fill_level_target_profile(fill_level_target_profile):
         elements = []
-        start = fill_level_target_profile.start_time
+        start = fill_level_target_profile.start_time.astimezone(timezone.utc)
         for element in fill_level_target_profile.elements:
             end = start + timedelta(seconds=element.duration.root)
             elements.append(

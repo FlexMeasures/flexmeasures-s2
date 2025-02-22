@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 from typing import List, Optional
+
+from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 from flexmeasures_s2.profile_steering.s2_utils.number_range_wrapper import (
     NumberRangeWrapper,
 )
@@ -57,7 +59,7 @@ class FrbcTimestep:
         self.max_constraint = max_constraint
 
     def add_state(self, state: FrbcState) -> None:
-        if state.is_within_fill_level_range():
+        if state and state.is_within_fill_level_range():
             stored_state = self.state_list[state.get_bucket()]
             if stored_state is None:
                 self.state_list[state.get_bucket()] = state
@@ -98,7 +100,7 @@ class FrbcTimestep:
     def get_duration_seconds(self) -> int:
         return int(self.duration.total_seconds())
 
-    def get_target(self) -> float:
+    def get_target(self) -> TargetProfile.JouleElement:
         return self.target
 
     def get_min_constraint(self) -> float:
@@ -115,6 +117,9 @@ class FrbcTimestep:
 
     def get_final_states(self) -> List[FrbcState]:
         final_states = [state for state in self.state_list if state is not None]
+        #print out the position of the states in final_states
+        for i, state in enumerate(final_states):
+            print(f"State {i} at position {state.get_bucket()}")
         if not final_states and self.emergency_state is not None:
             return [self.emergency_state]
         return final_states
@@ -129,7 +134,7 @@ class FrbcTimestep:
         if final_states:
             return final_states
         best_state = min(
-            self.get_final_states(), key=self.get_fill_level_target_distance
+                self.get_final_states(), key=self.get_fill_level_target_distance
         )
         return [best_state]
 

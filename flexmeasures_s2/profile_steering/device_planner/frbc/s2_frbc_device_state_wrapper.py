@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
+import uuid
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_actuator_configuration import (
     S2ActuatorConfiguration,
 )
@@ -12,14 +13,14 @@ from flexmeasures_s2.profile_steering.device_planner.frbc.frbc_timestep import (
 )
 
 from s2python.common.transition import Transition
-from s2python.frbc import FRBCLeakageBehaviourElement, FRBCActuatorDescription
-
+from s2python.frbc import FRBCLeakageBehaviourElement, FRBCActuatorDescription, FRBCActuatorStatus, FRBCStorageStatus
+from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import S2FrbcDeviceState
 
 class S2FrbcDeviceStateWrapper:
     epsilon = 1e-4
 
     def __init__(self, device_state):
-        self.device_state = device_state
+        self.device_state : S2FrbcDeviceState = device_state
         self.nr_of_buckets: int = (
             device_state.get_computational_parameters().get_nr_of_buckets()
         )
@@ -88,7 +89,7 @@ class S2FrbcDeviceStateWrapper:
         return actuator_operation_mode_map
 
     def get_operation_mode(
-        self, target_timestep, actuator_id: str, operation_mode_id: str
+        self, target_timestep, actuator_id: uuid.UUID, operation_mode_id: str
     ):
         from flexmeasures_s2.profile_steering.device_planner.frbc.frbc_operation_mode_wrapper import (
             FrbcOperationModeWrapper,
@@ -110,7 +111,7 @@ class S2FrbcDeviceStateWrapper:
         return None
 
     def operation_mode_uses_factor(
-        self, target_timestep: FrbcTimestep, actuator_id: str, operation_mode_id: str
+        self, target_timestep: FrbcTimestep, actuator_id: uuid.UUID, operation_mode_id: str
     ) -> bool:
         key = f"{actuator_id}-{operation_mode_id}"
         if key not in self.operation_mode_uses_factor_map:
@@ -122,7 +123,7 @@ class S2FrbcDeviceStateWrapper:
 
     def get_all_possible_actuator_configurations(
         self, target_timestep: FrbcTimestep
-    ) -> List[Dict[str, S2ActuatorConfiguration]]:
+    ) -> List[Dict[Any, S2ActuatorConfiguration]]:
         timestep_date = target_timestep.get_start_date()
         if timestep_date not in self.all_actions:
             possible_actuator_configs = {}
@@ -192,24 +193,36 @@ class S2FrbcDeviceStateWrapper:
     @staticmethod
     def get_transition(
         target_timestep,
-        actuator_id: str,
-        from_operation_mode_id: str,
-        to_operation_mode_id: str,
+        actuator_id: uuid.UUID,
+        from_operation_mode_id: uuid.UUID,
+        to_operation_mode_id: uuid.UUID,
     ) -> Optional[Transition]:
 
         actuator_description = S2FrbcDeviceStateWrapper.get_actuator_description(
             target_timestep, actuator_id
         )
         if actuator_description is None:
-            raise ValueError(
-                f"Actuator description not found for actuator {actuator_id}"
-            )
+            return None
+        # Make sure from_operation_mode_id and to_operation_mode_id are UUIDs
+        if isinstance(from_operation_mode_id, str):
+            from_operation_mode_id = uuid.UUID(from_operation_mode_id)
+        if isinstance(to_operation_mode_id, str):
+            to_operation_mode_id = uuid.UUID(to_operation_mode_id)
+
         for transition in actuator_description.transitions:
+            # Make sure transition.from_ and transition.to are UUIDs
+            if isinstance(transition.from_, str):
+                transition.from_ = uuid.UUID(transition.from_)
+            if isinstance(transition.to, str):
+                transition.to = uuid.UUID(transition.to)
             if (
-                str(transition.from_) == from_operation_mode_id
-                and str(transition.to) == to_operation_mode_id
+                transition.from_ == from_operation_mode_id
+                and transition.to == to_operation_mode_id
             ):
                 return transition
+            else:
+                # print(f"Transition {transition.from_} -> {transition.to} does not match {from_operation_mode_id} -> {to_operation_mode_id}")
+                pass
         return None
 
     def get_operation_mode_power(
@@ -219,14 +232,14 @@ class S2FrbcDeviceStateWrapper:
         element = self.find_operation_mode_element(om, fill_level)
         power_watt = 0
         for power_range in element.get_power_ranges():
-            if power_range.get_commodity_quantity() in [
+            if power_range.commodity_quantity in [
                 CommodityQuantity.ELECTRIC_POWER_L1,
                 CommodityQuantity.ELECTRIC_POWER_L2,
                 CommodityQuantity.ELECTRIC_POWER_L3,
                 CommodityQuantity.ELECTRIC_POWER_3_PHASE_SYMMETRIC,
             ]:
-                start = power_range.get_start_of_range()
-                end = power_range.get_end_of_range()
+                start = power_range.start_of_range
+                end = power_range.end_of_range
                 power_watt += (end - start) * factor + start
         return power_watt
 
@@ -268,7 +281,7 @@ class S2FrbcDeviceStateWrapper:
         else:
             return S2FrbcDeviceStateWrapper.find_leakage_element(
                 target_timestep, fill_level
-            ).get_leakage_rate()
+            ).leakage_rate
 
     @staticmethod
     def find_leakage_element(
@@ -278,19 +291,19 @@ class S2FrbcDeviceStateWrapper:
         element = next(
             (
                 e
-                for e in leakage.get_elements()
-                if e.get_fill_level_range().get_start_of_range()
+                for e in leakage.elements
+                if e.fill_level_range.start_of_range
                 <= fill_level
-                <= e.get_fill_level_range().get_end_of_range()
+                <= e.fill_level_range.end_of_range
             ),
             None,
         )
         if element is None:
-            first = leakage.get_elements()[0]
-            last = leakage.get_elements()[-1]
+            first = leakage.elements[0]
+            last = leakage.elements[-1]
             element = (
                 first
-                if fill_level < first.get_fill_level_range().get_start_of_range()
+                if fill_level < first.fill_level_range.start_of_range
                 else last
             )
         return element
@@ -299,15 +312,15 @@ class S2FrbcDeviceStateWrapper:
     def calculate_bucket(target_timestep: FrbcTimestep, fill_level: float) -> int:
         fill_level_lower_limit = (
             target_timestep.get_system_description()
-            .get_storage()
-            .get_fill_level_range()
-            .get_start_of_range()
+            .storage
+            .fill_level_range
+            .start_of_range
         )
         fill_level_upper_limit = (
             target_timestep.get_system_description()
-            .get_storage()
-            .get_fill_level_range()
-            .get_end_of_range()
+            .storage
+            .fill_level_range
+            .end_of_range
         )
         return int(
             (fill_level - fill_level_lower_limit)
@@ -317,7 +330,7 @@ class S2FrbcDeviceStateWrapper:
 
     @staticmethod
     def get_timer_duration_milliseconds(
-        target_timestep: FrbcTimestep, actuator_id: str, timer_id: str
+        target_timestep: FrbcTimestep, actuator_id: uuid.UUID, timer_id: uuid.UUID
     ) -> int:
         actuator_description = S2FrbcDeviceStateWrapper.get_actuator_description(
             target_timestep, actuator_id
@@ -327,14 +340,15 @@ class S2FrbcDeviceStateWrapper:
                 f"Actuator description not found for actuator {actuator_id}"
             )
         timer = next(
-            (t for t in actuator_description.get_timers() if t.get_id() == timer_id),
+            (t for t in actuator_description.timers if t.id == timer_id),
             None,
         )
-        return timer.get_duration() if timer else 0
+        # Return the duration in milliseconds directly
+        return timer.duration.root if timer else 0
 
     @staticmethod
     def get_timer_duration(
-        target_timestep: FrbcTimestep, actuator_id: str, timer_id: str
+        target_timestep: FrbcTimestep, actuator_id: uuid.UUID, timer_id: uuid.UUID
     ) -> timedelta:
         return timedelta(
             milliseconds=S2FrbcDeviceStateWrapper.get_timer_duration_milliseconds(
@@ -344,16 +358,24 @@ class S2FrbcDeviceStateWrapper:
 
     @staticmethod
     def get_actuator_description(
-        target_timestep: FrbcTimestep, actuator_id: str
+        target_timestep: FrbcTimestep, actuator_id: uuid.UUID
     ) -> Optional[FRBCActuatorDescription]:
         return next(
             (
                 ad
                 for ad in target_timestep.get_system_description().actuators
-                if str(ad.id) == actuator_id
+                if ad.id == actuator_id
             ),
             None,
         )
+    
+
 
     def get_energy_in_current_timestep(self) -> CommodityQuantity:
         return self.device_state.get_energy_in_current_timestep()
+
+    def get_actuator_statuses(self) -> List[FRBCActuatorStatus]:
+        return self.device_state.get_actuator_statuses()
+
+    def get_storage_status(self) -> List[FRBCStorageStatus]:
+        return self.device_state.get_storage_status()

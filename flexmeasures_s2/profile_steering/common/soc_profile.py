@@ -6,11 +6,13 @@ from datetime import datetime
 
 class SoCProfile(AbstractProfile[float, "SoCProfile"]):
     def __init__(
-        self, profile_start, timestep_duration, elements: Optional[List[float]] = None
+        self, profile_metadata: ProfileMetadata, elements: Optional[List[float]] = None
     ):
-        self.profile_start = profile_start
-        self.timestep_duration = timestep_duration
-        super().__init__(profile_start, elements if elements is not None else [])
+        self.profile_metadata = profile_metadata
+        self.timestep_duration = self.profile_metadata.get_timestep_duration()
+        self.profile_start = self.profile_metadata.get_profile_start()
+        self.profile_end = self.profile_metadata.get_profile_end()
+        super().__init__(self.profile_metadata, elements if elements is not None else [])
 
     def default_value(self) -> Optional[float]:
         return None

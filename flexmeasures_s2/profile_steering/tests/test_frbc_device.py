@@ -1,7 +1,7 @@
 import pytest
 from datetime import datetime, timedelta, timezone
 import uuid
-
+import logging
 from s2python.frbc.frbc_actuator_description import FRBCActuatorDescription
 from s2python.frbc.frbc_fill_level_target_profile_element import (
     FRBCFillLevelTargetProfileElement,
@@ -22,7 +22,7 @@ from s2python.frbc import FRBCFillLevelTargetProfile
 from s2python.frbc import FRBCLeakageBehaviour
 from s2python.frbc import FRBCOperationModeElement
 from s2python.frbc import FRBCActuatorStatus, FRBCStorageStatus, FRBCStorageDescription
-from s2python.common import PowerRange
+from s2python.common import PowerRange, Duration
 from s2python.common import NumberRange
 from s2python.common import CommodityQuantity
 from s2python.common import Transition
@@ -30,6 +30,13 @@ from s2python.common import Timer
 from s2python.common import PowerValue
 from s2python.common import Commodity
 from joule_profile_example import get_JouleProfileTarget
+
+# Global variables to store IDs for debugging
+charge_actuator_id = None
+id_on_operation_mode = None
+id_off_operation_mode = None
+id_on_to_off_timer = None
+id_off_to_on_timer = None
 
 
 def test_connexxion_ev_bus_baseline_byd_225():
@@ -51,7 +58,7 @@ def test_connexxion_ev_bus_baseline_byd_225():
     final_fill_level_target1 = 100
 
     # Create system description
-    recharge_system_description1 = create_recharge_system_description(
+    recharge_system_description1, charge_actuator_status1, storage_status1 = create_recharge_system_description(
         start_of_recharge=start_of_recharge1,
         charge_power_soc_percentage_per_second=charge_power_soc_percentage_per_second_night,
         charging_power_kw=charging_power_kw_night,
@@ -81,7 +88,7 @@ def test_connexxion_ev_bus_baseline_byd_225():
     drive_consume_soc_per_second1 = 0.00375927565821256038647342995169
     soc_percentage_before_driving1 = 100
 
-    drive_system_description1 = create_driving_system_description(
+    drive_system_description1, off_actuator_status1, storage_status1 = create_driving_system_description(
         start_of_drive1, soc_percentage_before_driving1
     )
     drive_usage_forecast1 = create_driving_usage_forecast(
@@ -93,7 +100,7 @@ def test_connexxion_ev_bus_baseline_byd_225():
     soc_percentage_before_charging2 = 37.7463951
     final_fill_level_target2 = 94.4825134
 
-    recharge_system_description2 = create_recharge_system_description(
+    recharge_system_description2, charge_actuator_status2, storage_status2 = create_recharge_system_description(
         start_of_recharge2,
         charge_power_soc_percentage_per_second_day,
         charging_power_kw_day,
@@ -137,19 +144,23 @@ def test_connexxion_ev_bus_baseline_byd_225():
             recharge_fill_level_target2,
         ],
         computational_parameters=S2FrbcDeviceState.ComputationalParameters(1000, 20),
+        actuator_statuses=[off_actuator_status1, charge_actuator_status1, charge_actuator_status2],
+        storage_status=[storage_status1, storage_status2],
     )
+    epoch_time = datetime(1970, 1, 1, tzinfo=timezone.utc)
     target_metadata = ProfileMetadata(
-        profile_start=omloop_starts_at,
+        profile_start=epoch_time,
         timestep_duration=timedelta(seconds=300),
         nr_of_timesteps=288,
     )
 
     plan_due_by_date = target_metadata.get_profile_start() + timedelta(seconds=10)
 
+    print("Start")
     planner = S2FrbcDevicePlanner(device_state, target_metadata, plan_due_by_date)
     planning = planner.create_initial_planning(plan_due_by_date)
-
-    assert planning == get_JouleProfileTarget()
+    print(planning.elements)
+    assert planning.elements == get_JouleProfileTarget()
 
 
 @staticmethod
@@ -159,6 +170,7 @@ def create_recharge_system_description(
     charging_power_kw,
     soc_percentage_before_charging,
 ) -> FRBCSystemDescription:
+    global charge_actuator_id, id_on_operation_mode, id_off_operation_mode, id_on_to_off_timer, id_off_to_on_timer
     # Create and return a mock system description for recharging
     on_operation_element = FRBCOperationModeElement(
         fill_level_range=NumberRange(start_of_range=0, end_of_range=100),
@@ -175,9 +187,10 @@ def create_recharge_system_description(
         ],
     )
     id_on_operation_mode = str(uuid.uuid4())
+    logging.debug(f"id_on_operation_mode: {id_on_operation_mode}")
     on_operation_mode = FRBCOperationMode(
         id=id_on_operation_mode,
-        diagnostic_label="on",
+        diagnostic_label="charge.on",
         elements=[on_operation_element],
         abnormal_condition_only=False,
     )
@@ -193,28 +206,32 @@ def create_recharge_system_description(
         ],
     )
     id_off_operation_mode = str(uuid.uuid4())
+    logging.debug(f"id_off_operation_mode: {id_off_operation_mode}")
     off_operation_mode = FRBCOperationMode(
         id=id_off_operation_mode,
-        diagnostic_label="off",
+        diagnostic_label="charge.off",
         elements=[off_operation_element],
         abnormal_condition_only=False,
     )
 
     id_on_to_off_timer = str(uuid.uuid4())
+    logging.debug(f"id_on_to_off_timer: {id_on_to_off_timer}")
     on_to_off_timer = Timer(
         id=id_on_to_off_timer,
         diagnostic_label="on.to.off.timer",
-        duration=int(timedelta(minutes=30).total_seconds()),
+        duration=Duration(30),
     )
     id_off_to_on_timer = str(uuid.uuid4())
+    logging.debug(f"id_off_to_on_timer: {id_off_to_on_timer}")
     off_to_on_timer = Timer(
         id=id_off_to_on_timer,
         diagnostic_label="off.to.on.timer",
-        duration=int(timedelta(minutes=30).total_seconds()),
+        duration=Duration(30),
     )
-
+    transition_id_from_on_to_off = str(uuid.uuid4())
+    logging.debug(f"transition_id_from_on_to_off: {transition_id_from_on_to_off}")
     transition_from_on_to_off = Transition(
-        id=str(uuid.uuid4()),
+        id=transition_id_from_on_to_off,
         **{"from": id_on_operation_mode},
         to=id_off_operation_mode,
         start_timers=[id_off_to_on_timer],
@@ -222,8 +239,10 @@ def create_recharge_system_description(
         transition_duration=None,
         abnormal_condition_only=False
     )
+    transition_id_from_off_to_on = str(uuid.uuid4())
+    logging.debug(f"transition_id_from_off_to_on: {transition_id_from_off_to_on}")
     transition_from_off_to_on = Transition(
-        id=str(uuid.uuid4()),
+        id=transition_id_from_off_to_on,
         **{"from": id_off_operation_mode},
         to=id_on_operation_mode,
         start_timers=[id_on_to_off_timer],
@@ -232,7 +251,7 @@ def create_recharge_system_description(
         abnormal_condition_only=False
     )
     charge_actuator_id = str(uuid.uuid4())
-
+    logging.debug(f"charge_actuator_id: {charge_actuator_id}")
     charge_actuator_status = FRBCActuatorStatus(
         message_id=str(uuid.uuid4()),
         actuator_id=charge_actuator_id,
@@ -242,16 +261,16 @@ def create_recharge_system_description(
 
     charge_actuator_description = FRBCActuatorDescription(
         id=charge_actuator_id,
-        diagnostic_label="charge",
+        diagnostic_label="charge.actuator",
         operation_modes=[on_operation_mode, off_operation_mode],
         transitions=[transition_from_on_to_off, transition_from_off_to_on],
         timers=[on_to_off_timer, off_to_on_timer],
         supported_commodities=[Commodity.ELECTRICITY],
-        status=charge_actuator_status,
     )
-
+    storage_status_id = str(uuid.uuid4())
+    logging.debug(f"storage_status_id: {storage_status_id}")
     storage_status = FRBCStorageStatus(
-        message_id=str(uuid.uuid4()), present_fill_level=soc_percentage_before_charging
+        message_id=storage_status_id, present_fill_level=soc_percentage_before_charging
     )
 
     frbc_storage_description = FRBCStorageDescription(
@@ -261,7 +280,6 @@ def create_recharge_system_description(
         provides_fill_level_target_profile=True,
         provides_usage_forecast=False,
         fill_level_range=NumberRange(start_of_range=0, end_of_range=100),
-        status=storage_status,
     )
 
     frbc_system_description = FRBCSystemDescription(
@@ -271,12 +289,14 @@ def create_recharge_system_description(
         storage=frbc_storage_description,
     )
 
-    return frbc_system_description
+    return frbc_system_description, charge_actuator_status, storage_status
 
 
 def create_recharge_leakage_behaviour(start_of_recharge):
+    leakage_id = str(uuid.uuid4())
+    logging.debug(f"leakage_id: {leakage_id}")
     return FRBCLeakageBehaviour(
-        message_id=str(uuid.uuid4()),
+        message_id=leakage_id,
         valid_from=start_of_recharge,
         elements=[
             FRBCLeakageBehaviourElement(
@@ -291,8 +311,10 @@ def create_recharge_usage_forecast(start_of_recharge, recharge_duration):
     no_usage = FRBCUsageForecastElement(
         duration=int(recharge_duration.total_seconds()), usage_rate_expected=0
     )
+    usage_id = str(uuid.uuid4())
+    logging.debug(f"usage_id: {usage_id}")
     return FRBCUsageForecast(
-        message_id=str(uuid.uuid4()), start_time=start_of_recharge, elements=[no_usage]
+        message_id=usage_id, start_time=start_of_recharge, elements=[no_usage]
     )
 
 
@@ -315,8 +337,10 @@ def create_recharge_fill_level_target_profile(
             start_of_range=final_fill_level_target, end_of_range=100
         ),
     )
+    fill_level_id = str(uuid.uuid4())
+    logging.debug(f"fill_level_id: {fill_level_id}")
     return FRBCFillLevelTargetProfile(
-        message_id=str(uuid.uuid4()),
+        message_id=fill_level_id,
         start_time=start_of_recharge,
         elements=[during_charge, end_of_charge],
     )
@@ -324,6 +348,7 @@ def create_recharge_fill_level_target_profile(
 
 @staticmethod
 def create_driving_system_description(start_of_drive, soc_percentage_before_driving):
+    global off_actuator_id, id_off_operation_mode
     off_operation_element = FRBCOperationModeElement(
         fill_level_range=NumberRange(start_of_range=0, end_of_range=100),
         fill_rate=NumberRange(start_of_range=0, end_of_range=0),
@@ -336,6 +361,7 @@ def create_driving_system_description(start_of_drive, soc_percentage_before_driv
         ],
     )
     id_off_operation_mode = str(uuid.uuid4())
+    logging.debug(f"id_off_operation_mode: {id_off_operation_mode}")
     off_operation_mode = FRBCOperationMode(
         id=id_off_operation_mode,
         diagnostic_label="off",
@@ -343,6 +369,7 @@ def create_driving_system_description(start_of_drive, soc_percentage_before_driv
         abnormal_condition_only=False,
     )
     off_actuator_id = str(uuid.uuid4())
+    logging.debug(f"off_actuator_id: {off_actuator_id}")
     off_actuator_status = FRBCActuatorStatus(
         message_id=str(uuid.uuid4()),
         actuator_id=off_actuator_id,
@@ -356,7 +383,6 @@ def create_driving_system_description(start_of_drive, soc_percentage_before_driv
         transitions=[],
         timers=[],
         supported_commodities=[Commodity.ELECTRICITY],
-        status=off_actuator_status,
     )
     storage_status = FRBCStorageStatus(
         message_id=str(uuid.uuid4()), present_fill_level=soc_percentage_before_driving
@@ -368,14 +394,13 @@ def create_driving_system_description(start_of_drive, soc_percentage_before_driv
         provides_fill_level_target_profile=True,
         provides_usage_forecast=False,
         fill_level_range=NumberRange(start_of_range=0, end_of_range=100),
-        status=storage_status,
     )
     return FRBCSystemDescription(
         message_id=str(uuid.uuid4()),
         valid_from=start_of_drive,
         actuators=[off_actuator],
         storage=storage_description,
-    )
+    ), off_actuator_status, storage_status
 
 
 @staticmethod

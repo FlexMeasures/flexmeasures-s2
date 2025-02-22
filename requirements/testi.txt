@@ -1,0 +1,26 @@
+------------------------------- live log call ---------------------------------
+DEBUG    root:test_frbc_device.py:189 id_on_operation_mode: 40f02a1a-b71f-4b13-b4db-d6615cdc7632
+DEBUG    root:test_frbc_device.py:208 id_off_operation_mode: 47084817-e501-40d0-9f81-406fce9032fc
+DEBUG    root:test_frbc_device.py:217 id_on_to_off_timer: 1feeb7b7-e678-4cc6-8c6f-d41c46d88407
+DEBUG    root:test_frbc_device.py:224 id_off_to_on_timer: 94d57718-9476-4d5b-94b5-c76c2255a4e5
+DEBUG    root:test_frbc_device.py:231 transition_id_from_on_to_off: 8570120b-48d0-42a3-b42f-985c61c8c349
+DEBUG    root:test_frbc_device.py:242 transition_id_from_off_to_on: b9ff11b2-b30b-461c-bb07-614f01028043
+DEBUG    root:test_frbc_device.py:253 charge_actuator_id: a789ccf2-421a-401a-bc17-bb3cda046a7c
+DEBUG    root:test_frbc_device.py:270 storage_status_id: 75c172de-c979-46a0-94fb-bd1094574e76
+DEBUG    root:test_frbc_device.py:296 leakage_id: 419d990c-59c6-4730-9d50-d76e2306b473
+DEBUG    root:test_frbc_device.py:314 usage_id: 8b2d5a37-99f3-461b-9b27-9cdc4b94579b
+DEBUG    root:test_frbc_device.py:340 fill_level_id: 31b2b09e-0cc2-43be-8508-c62ac476a73f
+DEBUG    root:test_frbc_device.py:363 id_off_operation_mode: 4556efd8-7100-4e6a-97a0-a547bafe8635
+DEBUG    root:test_frbc_device.py:371 off_actuator_id: 8776272a-b248-4f46-bca9-e1a9ed12c062
+DEBUG    root:test_frbc_device.py:189 id_on_operation_mode: 7ad73695-de85-4418-924d-9c8a7978e533
+DEBUG    root:test_frbc_device.py:208 id_off_operation_mode: bdfef5ff-92c4-423b-8732-2e69592b69c6
+DEBUG    root:test_frbc_device.py:217 id_on_to_off_timer: 0f7715ee-ae0d-4e96-8f0a-7425458f94b7
+DEBUG    root:test_frbc_device.py:224 id_off_to_on_timer: ff2a07a4-1ac2-4f26-b6ce-9aecbc881e03
+DEBUG    root:test_frbc_device.py:231 transition_id_from_on_to_off: 8291c6da-651d-4b71-9551-05648423a4f5
+DEBUG    root:test_frbc_device.py:242 transition_id_from_off_to_on: f00c941b-f841-455e-b5f2-0060fb1471ff
+DEBUG    root:test_frbc_device.py:253 charge_actuator_id: 3f2b289f-d99c-40f7-bdbb-ac990e862b6b
+DEBUG    root:test_frbc_device.py:270 storage_status_id: b400ada9-c7ac-474d-ab4c-07d293877eed
+DEBUG    root:test_frbc_device.py:296 leakage_id: f924bdd5-b86e-49b8-a5a4-17b1ede0a070
+DEBUG    root:test_frbc_device.py:314 usage_id: a7dc2f34-ab08-45c3-81bf-5acee9f03f98
+DEBUG    root:test_frbc_device.py:340 fill_level_id: 4957ee14-db91-4d2f-a8b6-2c5204123758
+Start

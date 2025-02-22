@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Dict
 from s2python.common import CommodityQuantity, PowerForecast
 from s2python.frbc import (
     FRBCSystemDescription,
@@ -7,7 +7,8 @@ from s2python.frbc import (
     FRBCUsageForecast,
     FRBCFillLevelTargetProfile,
 )
-from s2python.generated.gen_s2 import PowerValue
+from s2python.frbc.frbc_actuator_status import FRBCActuatorStatus
+from s2python.generated.gen_s2 import FRBCStorageStatus, PowerValue
 
 
 class S2FrbcDeviceState:
@@ -37,6 +38,8 @@ class S2FrbcDeviceState:
         usage_forecasts: List[FRBCUsageForecast],
         fill_level_target_profiles: List[FRBCFillLevelTargetProfile],
         computational_parameters: ComputationalParameters,
+        actuator_statuses: Optional[List[FRBCActuatorStatus]] = None,
+        storage_status: Optional[List[FRBCStorageStatus]] = None,
     ):
         self.device_id = device_id
         self.device_name = device_name
@@ -51,6 +54,8 @@ class S2FrbcDeviceState:
         self.usage_forecasts = usage_forecasts
         self.fill_level_target_profiles = fill_level_target_profiles
         self.computational_parameters = computational_parameters
+        self.actuator_statuses = actuator_statuses
+        self.storage_status = storage_status
 
     def get_system_descriptions(self) -> List[FRBCSystemDescription]:
         return self.system_descriptions
@@ -84,3 +89,9 @@ class S2FrbcDeviceState:
 
     def get_energy_in_current_timestep(self) -> CommodityQuantity:
         return self.energy_in_current_timestep
+
+    def get_actuator_statuses(self) -> List[FRBCActuatorStatus]:
+        return self.actuator_statuses
+
+    def get_storage_status(self) -> List[FRBCStorageStatus]:
+        return self.storage_status

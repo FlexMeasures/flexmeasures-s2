@@ -50,7 +50,7 @@ class S2FrbcDevicePlanner(DevicePlanner):
         )
         if self.is_storage_available(self.s2_frbc_state):
             self.state_tree = OperationModeProfileTree(
-                S2FrbcDeviceStateWrapper(self.s2_frbc_state),
+                self.s2_frbc_state,
                 profile_metadata,
                 plan_due_by_date,
             )
