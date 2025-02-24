@@ -47,6 +47,12 @@ class FrbcTimestep:
         self.forecasted_fill_level_usage: float = forecasted_fill_level_usage
         self.state_list: List[Optional[FrbcState]] = [None] * (self.nr_of_buckets + 1)
         self.emergency_state: Optional[FrbcState] = None
+        # print timestep start date and end date
+        # print(f"Timestep start date: {self.start_date}, end date: {self.end_date}")
+        print(f"Forecasted fill level usage: {self.forecasted_fill_level_usage}")
+        if self.fill_level_target is not None:
+            print(f"Fill level start of range: {self.fill_level_target.start_of_range}")
+            print(f"Fill level end of range: {self.fill_level_target.end_of_range}")
 
     def get_nr_of_buckets(self) -> int:
         return self.nr_of_buckets
@@ -118,8 +124,7 @@ class FrbcTimestep:
     def get_final_states(self) -> List[FrbcState]:
         final_states = [state for state in self.state_list if state is not None]
         #print out the position of the states in final_states
-        for i, state in enumerate(final_states):
-            print(f"State {i} at position {state.get_bucket()}")
+
         if not final_states and self.emergency_state is not None:
             return [self.emergency_state]
         return final_states

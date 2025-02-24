@@ -12,7 +12,7 @@ class UsageForecastElement:
         self.usage_rate = usage_rate
 
     def get_usage(self):
-        seconds = (self.end - self.start).total_seconds() + 1
+        seconds = (self.end - self.start).total_seconds() + 0.001 # one milisecond added for the offeset from total_Seconds()
         return seconds * self.usage_rate
 
     def split(self, date):

@@ -151,6 +151,14 @@ class FrbcState:
                     self.actuator_configurations[uuid.UUID(k)] = self.actuator_configurations.pop(k)
 
             self.timestep.add_state(self)
+            print(f">>>>>>>>>>>>>> State added to bucket {self.get_bucket()}")
+            print(f"Fill level {self.get_fill_level()}")
+            print(f"Energy {self.get_timestep_energy()}")
+            print(f"Constraint violation {self.get_sum_squared_constraint_violation()}")
+            print(f"Sum squared distance {self.get_sum_squared_distance()}")
+            print(f"Sum energy cost {self.get_sum_energy_cost()}")
+            print(f"Sum squared energy {self.get_sum_squared_energy()}")
+
         else:
             self.device_state = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper(
                     device_state)
