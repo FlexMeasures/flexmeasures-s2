@@ -156,10 +156,9 @@ def test_connexxion_ev_bus_baseline_byd_225():
 
     plan_due_by_date = target_metadata.get_profile_start() + timedelta(seconds=10)
 
-    print("Start")
     planner = S2FrbcDevicePlanner(device_state, target_metadata, plan_due_by_date)
     planning = planner.create_initial_planning(plan_due_by_date)
-    print(planning.elements)
+    # print(planning.elements)
     assert planning.elements == get_JouleProfileTarget()
 
 

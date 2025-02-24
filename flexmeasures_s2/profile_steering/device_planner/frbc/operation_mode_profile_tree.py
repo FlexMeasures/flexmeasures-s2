@@ -59,8 +59,7 @@ class OperationModeProfileTree:
             time_step_end = (
                     time_step_start + self.profile_metadata.get_timestep_duration()
             )
-            if i == 165:
-                print("CAac")
+
             if i == 0:
                 time_step_start = self.plan_due_by_date
             system_default_timezone = time_step_start.astimezone().tzinfo
@@ -106,7 +105,6 @@ class OperationModeProfileTree:
             usage_forecast = self.get_usage_forecast_for_timestep(
                 current_usage_forecast_profile, time_step_start, time_step_end
             )
-            print(f"Generating timestep {i}")
             self.timesteps.append(
                 FrbcTimestep(
                     time_step_start.astimezone(system_default_timezone),
@@ -195,13 +193,9 @@ class OperationModeProfileTree:
         last_timestep = self.timesteps[-1]
         state_zero = FrbcState(device_state=self.device_state,
                                timestep=first_timestep, present_fill_level=0)
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>> Generating next timestep states for timestep 0")
         state_zero.generate_next_timestep_states(first_timestep)
 
         for i in range(first_timestep_index, len(self.timesteps) - 1):
-            # if i == 98:
-            #     print(f"Generating next timestep states for timestep {i}")
-            print(f">>>>>>>>>>>>>>>>>>>>>>>>>>>> Generating next timestep states for timestep {i}")
             current_timestep = self.timesteps[i]
             next_timestep = self.timesteps[i + 1]
             final_states = current_timestep.get_final_states_within_fill_level_target()

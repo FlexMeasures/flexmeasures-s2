@@ -49,10 +49,10 @@ class FrbcTimestep:
         self.emergency_state: Optional[FrbcState] = None
         # print timestep start date and end date
         # print(f"Timestep start date: {self.start_date}, end date: {self.end_date}")
-        print(f"Forecasted fill level usage: {self.forecasted_fill_level_usage}")
-        if self.fill_level_target is not None:
-            print(f"Fill level start of range: {self.fill_level_target.start_of_range}")
-            print(f"Fill level end of range: {self.fill_level_target.end_of_range}")
+        # print(f"Forecasted fill level usage: {self.forecasted_fill_level_usage}")
+        # if self.fill_level_target is not None:
+        #     print(f"Fill level start of range: {self.fill_level_target.start_of_range}")
+        #     print(f"Fill level end of range: {self.fill_level_target.end_of_range}")
 
     def get_nr_of_buckets(self) -> int:
         return self.nr_of_buckets
