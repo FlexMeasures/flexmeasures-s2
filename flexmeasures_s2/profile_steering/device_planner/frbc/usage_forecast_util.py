@@ -12,7 +12,9 @@ class UsageForecastElement:
         self.usage_rate = usage_rate
 
     def get_usage(self):
-        seconds = (self.end - self.start).total_seconds() + 0.001 # one milisecond added for the offeset from total_Seconds()
+        seconds = (
+            self.end - self.start
+        ).total_seconds() + 0.001  # one milisecond added for the offeset from total_Seconds()
         return seconds * self.usage_rate
 
     def split(self, date):
@@ -54,7 +56,9 @@ class UsageForecastUtil:
         return elements
 
     @staticmethod
-    def sub_profile(usage_forecast: List[UsageForecastElement], time_step_start, time_step_end):
+    def sub_profile(
+        usage_forecast: List[UsageForecastElement], time_step_start, time_step_end
+    ):
         if usage_forecast is None:
             return 0
 

@@ -2,15 +2,15 @@ from typing import List, Any
 from datetime import datetime
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from .congestion_point_planner import CongestionPointPlanner
-from .proposal import Proposal
-
+from flexmeasures_s2.profile_steering.common.proposal import Proposal
+from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 
 class RootPlanner:
     MAX_ITERATIONS = 1000
 
     def __init__(
         self,
-        target: Any,
+        target: TargetProfile,
         energy_iteration_criterion: float,
         cost_iteration_criterion: float,
         context: Any,
@@ -29,15 +29,15 @@ class RootPlanner:
         # Create an empty JouleProfile.
         # We assume that target exposes get_profile_start(), timestep_duration and nr_of_timesteps.
         self.empty_profile = JouleProfile(
-            self.target.get_profile_start(),
-            self.target.timestep_duration,
-            elements=[0] * self.target.nr_of_timesteps,
+            self.target.get_profile_metadata().get_profile_start(),
+            self.target.get_profile_metadata().get_timestep_duration(),
+            elements=[0] * self.target.get_profile_metadata().get_nr_of_timesteps(),
         )
         self.cp_controllers: List[CongestionPointPlanner] = []
         self.root_ctrl_planning = self.empty_profile
 
     def remove_null_values(self, target: Any) -> Any:
-        # Stub: simply return the target.
+        # TODO: Stub: simply return the target.
         # In a full implementation, you would remove or replace null elements.
         return target
 

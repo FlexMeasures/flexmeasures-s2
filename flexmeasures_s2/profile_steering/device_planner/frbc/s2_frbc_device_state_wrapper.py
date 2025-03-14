@@ -13,14 +13,22 @@ from flexmeasures_s2.profile_steering.device_planner.frbc.frbc_timestep import (
 )
 
 from s2python.common.transition import Transition
-from s2python.frbc import FRBCLeakageBehaviourElement, FRBCActuatorDescription, FRBCActuatorStatus, FRBCStorageStatus
-from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import S2FrbcDeviceState
+from s2python.frbc import (
+    FRBCLeakageBehaviourElement,
+    FRBCActuatorDescription,
+    FRBCActuatorStatus,
+    FRBCStorageStatus,
+)
+from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import (
+    S2FrbcDeviceState,
+)
+
 
 class S2FrbcDeviceStateWrapper:
     epsilon = 1e-4
 
     def __init__(self, device_state):
-        self.device_state : S2FrbcDeviceState = device_state
+        self.device_state: S2FrbcDeviceState = device_state
         self.nr_of_buckets: int = (
             device_state.get_computational_parameters().get_nr_of_buckets()
         )
@@ -111,7 +119,10 @@ class S2FrbcDeviceStateWrapper:
         return None
 
     def operation_mode_uses_factor(
-        self, target_timestep: FrbcTimestep, actuator_id: uuid.UUID, operation_mode_id: str
+        self,
+        target_timestep: FrbcTimestep,
+        actuator_id: uuid.UUID,
+        operation_mode_id: str,
     ) -> bool:
         key = f"{actuator_id}-{operation_mode_id}"
         if key not in self.operation_mode_uses_factor_map:
@@ -302,25 +313,17 @@ class S2FrbcDeviceStateWrapper:
             first = leakage.elements[0]
             last = leakage.elements[-1]
             element = (
-                first
-                if fill_level < first.fill_level_range.start_of_range
-                else last
+                first if fill_level < first.fill_level_range.start_of_range else last
             )
         return element
 
     @staticmethod
     def calculate_bucket(target_timestep: FrbcTimestep, fill_level: float) -> int:
         fill_level_lower_limit = (
-            target_timestep.get_system_description()
-            .storage
-            .fill_level_range
-            .start_of_range
+            target_timestep.get_system_description().storage.fill_level_range.start_of_range
         )
         fill_level_upper_limit = (
-            target_timestep.get_system_description()
-            .storage
-            .fill_level_range
-            .end_of_range
+            target_timestep.get_system_description().storage.fill_level_range.end_of_range
         )
         return int(
             (fill_level - fill_level_lower_limit)
@@ -368,8 +371,6 @@ class S2FrbcDeviceStateWrapper:
             ),
             None,
         )
-    
-
 
     def get_energy_in_current_timestep(self) -> CommodityQuantity:
         return self.device_state.get_energy_in_current_timestep()

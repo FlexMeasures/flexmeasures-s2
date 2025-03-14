@@ -133,13 +133,23 @@ class S2FrbcDevicePlanner(DevicePlanner):
         )
         return proposal
 
-    def create_initial_planning(self, plan_due_by_date: datetime) -> JouleProfile:
+    def create_initial_planning(
+        self, plan_due_by_date: datetime, ids: Optional[dict] = None
+    ) -> S2FrbcPlan:
         if self.is_storage_available(self.s2_frbc_state):
-            self.latest_plan = self.state_tree.find_best_plan(
-                TargetProfile.null_profile(self.profile_metadata),
-                self.null_profile,
-                self.null_profile,
-            )
+            if ids is None:
+                self.latest_plan = self.state_tree.find_best_plan(
+                    TargetProfile.null_profile(self.profile_metadata),
+                    self.null_profile,
+                    self.null_profile,
+                )
+            else:
+                self.latest_plan = self.state_tree.find_best_plan(
+                    TargetProfile.null_profile(self.profile_metadata),
+                    self.null_profile,
+                    self.null_profile,
+                    ids,
+                )
         else:
             self.latest_plan = S2FrbcPlan(
                 idle=True,

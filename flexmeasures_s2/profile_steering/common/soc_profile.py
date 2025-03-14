@@ -12,7 +12,9 @@ class SoCProfile(AbstractProfile[float, "SoCProfile"]):
         self.timestep_duration = self.profile_metadata.get_timestep_duration()
         self.profile_start = self.profile_metadata.get_profile_start()
         self.profile_end = self.profile_metadata.get_profile_end()
-        super().__init__(self.profile_metadata, elements if elements is not None else [])
+        super().__init__(
+            self.profile_metadata, elements if elements is not None else []
+        )
 
     def default_value(self) -> Optional[float]:
         return None

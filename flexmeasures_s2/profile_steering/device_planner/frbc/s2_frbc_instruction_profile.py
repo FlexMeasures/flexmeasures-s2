@@ -9,7 +9,9 @@ from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_actuator_confi
 class S2FrbcInstructionProfile:
     class Element:
         def __init__(
-            self, idle: bool, actuator_configuration: Dict[uuid.UUID, S2ActuatorConfiguration]
+            self,
+            idle: bool,
+            actuator_configuration: Dict[uuid.UUID, S2ActuatorConfiguration],
         ):
             self.idle = idle
             self.actuator_configuration = actuator_configuration
@@ -17,7 +19,9 @@ class S2FrbcInstructionProfile:
         def is_idle(self) -> bool:
             return self.idle
 
-        def get_actuator_configuration(self) -> Dict[uuid.UUID, S2ActuatorConfiguration]:
+        def get_actuator_configuration(
+            self,
+        ) -> Dict[uuid.UUID, S2ActuatorConfiguration]:
             return self.actuator_configuration
 
     def __init__(

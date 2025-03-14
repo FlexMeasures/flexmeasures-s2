@@ -4,6 +4,7 @@ from flexmeasures_s2.profile_steering.s2_utils.number_range_wrapper import (
 )
 from s2python.frbc import FRBCOperationModeElement
 
+
 class FrbcOperationModeElementWrapper:
     def __init__(self, frbc_operation_mode_element: FRBCOperationModeElement):
         self.fill_rate = NumberRangeWrapper(
@@ -28,9 +29,10 @@ class FrbcOperationModeElementWrapper:
 
     def get_fill_level_range(self) -> NumberRangeWrapper:
         return self.fill_level_range
-    
+
     def get_power_ranges(self):
         return self.frbc_operation_mode_element.power_ranges
+
 
 class FrbcOperationModeWrapper:
     def __init__(self, frbc_operation_mode):
@@ -59,10 +61,7 @@ class FrbcOperationModeWrapper:
                 return True
             for power_range in element.get_power_ranges():
                 if (
-                    abs(
-                        power_range.start_of_range
-                        - power_range.end_of_range
-                    )
+                    abs(power_range.start_of_range - power_range.end_of_range)
                     > S2FrbcDeviceStateWrapper.epsilon
                 ):
                     return True

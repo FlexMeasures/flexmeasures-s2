@@ -123,7 +123,7 @@ class FrbcTimestep:
 
     def get_final_states(self) -> List[FrbcState]:
         final_states = [state for state in self.state_list if state is not None]
-        #print out the position of the states in final_states
+        # print out the position of the states in final_states
 
         if not final_states and self.emergency_state is not None:
             return [self.emergency_state]
@@ -139,7 +139,7 @@ class FrbcTimestep:
         if final_states:
             return final_states
         best_state = min(
-                self.get_final_states(), key=self.get_fill_level_target_distance
+            self.get_final_states(), key=self.get_fill_level_target_distance
         )
         return [best_state]
 
