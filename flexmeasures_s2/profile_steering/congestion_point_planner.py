@@ -5,7 +5,9 @@ from flexmeasures_s2.profile_steering.common.joule_range_profile import (
     JouleRangeProfile,
 )
 from flexmeasures_s2.profile_steering.common.proposal import Proposal
-from flexmeasures_s2.profile_steering.device_planner.device_planner_abstract import DevicePlanner
+from flexmeasures_s2.profile_steering.device_planner.device_planner_abstract import (
+    DevicePlanner,
+)
 
 
 class CongestionPointPlanner:

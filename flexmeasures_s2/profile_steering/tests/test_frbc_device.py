@@ -1,3 +1,4 @@
+from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 import pytest
 from datetime import datetime, timedelta, timezone
 import uuid
@@ -8,7 +9,8 @@ from s2python.frbc.frbc_actuator_description import FRBCActuatorDescription
 from s2python.frbc.frbc_fill_level_target_profile_element import (
     FRBCFillLevelTargetProfileElement,
 )
-from s2python.frbc.frbc_leakage_behaviour_element import FRBCLeakageBehaviourElement
+from s2python.frbc.frbc_leakage_behaviour_element import \
+    FRBCLeakageBehaviourElement
 from s2python.frbc.frbc_operation_mode import FRBCOperationMode
 from s2python.frbc.frbc_usage_forecast_element import FRBCUsageForecastElement
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_planner import (
@@ -17,13 +19,15 @@ from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_planner
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import (
     S2FrbcDeviceState,
 )
-from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
+from flexmeasures_s2.profile_steering.common.profile_metadata import \
+    ProfileMetadata
 from s2python.frbc import FRBCSystemDescription
 from s2python.frbc import FRBCUsageForecast
 from s2python.frbc import FRBCFillLevelTargetProfile
 from s2python.frbc import FRBCLeakageBehaviour
 from s2python.frbc import FRBCOperationModeElement
-from s2python.frbc import FRBCActuatorStatus, FRBCStorageStatus, FRBCStorageDescription
+from s2python.frbc import FRBCActuatorStatus, FRBCStorageStatus, \
+    FRBCStorageDescription
 from s2python.common import PowerRange, Duration
 from s2python.common import NumberRange
 from s2python.common import CommodityQuantity
@@ -31,8 +35,12 @@ from s2python.common import Transition
 from s2python.common import Timer
 from s2python.common import PowerValue
 from s2python.common import Commodity
-from flexmeasures_s2.profile_steering.tests.joule_profile_example import get_JouleProfileTarget
-from flexmeasures_s2.profile_steering.device_planner.device_planner_abstract import DevicePlanner
+from flexmeasures_s2.profile_steering.tests.joule_profile_example import (
+    get_JouleProfileTarget,
+)
+from flexmeasures_s2.profile_steering.device_planner.device_planner_abstract import (
+    DevicePlanner,
+)
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.planning_service_impl import (
     PlanningServiceImpl,
@@ -45,32 +53,30 @@ from flexmeasures_s2.profile_steering.planning_service_impl import (
 # make a list of tuples with the ids and the names
 ids = []
 
-
 import matplotlib.pyplot as plt
 
 
 def create_ev_device_state(
-    device_id: str,
-    omloop_starts_at: datetime,
-    cet: timezone,
-    charge_power_soc_percentage_per_second_night: float,
-    charging_power_kw_night: float,
-    charge_power_soc_percentage_per_second_day: float,
-    charging_power_kw_day: float,
-    soc_percentage_before_charging1: float,
-    final_fill_level_target1: float,
-    recharge_duration1: timedelta,
-    start_of_recharge1: datetime,
-    drive_duration1: timedelta,
-    start_of_drive1: datetime,
-    drive_consume_soc_per_second1: float,
-    soc_percentage_before_driving1: float,
-    soc_percentage_before_charging2: float,
-    final_fill_level_target2: float,
-    recharge_duration2: timedelta,
-    start_of_recharge2: datetime,
+        device_id: str,
+        omloop_starts_at: datetime,
+        cet: timezone,
+        charge_power_soc_percentage_per_second_night: float,
+        charging_power_kw_night: float,
+        charge_power_soc_percentage_per_second_day: float,
+        charging_power_kw_day: float,
+        soc_percentage_before_charging1: float,
+        final_fill_level_target1: float,
+        recharge_duration1: timedelta,
+        start_of_recharge1: datetime,
+        drive_duration1: timedelta,
+        start_of_drive1: datetime,
+        drive_consume_soc_per_second1: float,
+        soc_percentage_before_driving1: float,
+        soc_percentage_before_charging2: float,
+        final_fill_level_target2: float,
+        recharge_duration2: timedelta,
+        start_of_recharge2: datetime,
 ) -> S2FrbcDeviceState:
-
     # Create system description
     recharge_system_description1, charge_actuator_status1, storage_status1 = (
         create_recharge_system_description(
@@ -151,7 +157,8 @@ def create_ev_device_state(
             recharge_fill_level_target1,
             recharge_fill_level_target2,
         ],
-        computational_parameters=S2FrbcDeviceState.ComputationalParameters(1000, 20),
+        computational_parameters=S2FrbcDeviceState.ComputationalParameters(1000,
+                                                                           20),
         actuator_statuses=[
             off_actuator_status1,
             charge_actuator_status1,
@@ -160,6 +167,7 @@ def create_ev_device_state(
         storage_status=[storage_status1, storage_status2],
     )
     return device_state
+
 
 #
 # def test_connexxion_ev_bus_baseline_byd_225():
@@ -253,12 +261,13 @@ def create_ev_device_state(
 #     assert planning.elements == get_JouleProfileTarget()
 #
 
+
 @staticmethod
 def create_recharge_system_description(
-    start_of_recharge,
-    charge_power_soc_percentage_per_second,
-    charging_power_kw,
-    soc_percentage_before_charging,
+        start_of_recharge,
+        charge_power_soc_percentage_per_second,
+        charging_power_kw,
+        soc_percentage_before_charging,
 ) -> FRBCSystemDescription:
     global charge_actuator_id, id_on_operation_mode, id_off_operation_mode, id_on_to_off_timer, id_off_to_on_timer
     # Create and return a mock system description for recharging
@@ -323,9 +332,11 @@ def create_recharge_system_description(
         duration=Duration(30),
     )
     transition_id_from_on_to_off = str(uuid.uuid4())
-    logging.debug(f"transition_id_from_on_to_off: {transition_id_from_on_to_off}")
+    logging.debug(
+        f"transition_id_from_on_to_off: {transition_id_from_on_to_off}")
     ids.append(
-        (transition_id_from_on_to_off, "transition_from_charge_on_to_charge_off")
+        (
+        transition_id_from_on_to_off, "transition_from_charge_on_to_charge_off")
     )
     transition_from_on_to_off = Transition(
         id=transition_id_from_on_to_off,
@@ -337,9 +348,11 @@ def create_recharge_system_description(
         abnormal_condition_only=False,
     )
     transition_id_from_off_to_on = str(uuid.uuid4())
-    logging.debug(f"transition_id_from_off_to_on: {transition_id_from_off_to_on}")
+    logging.debug(
+        f"transition_id_from_off_to_on: {transition_id_from_off_to_on}")
     ids.append(
-        (transition_id_from_off_to_on, "transition_from_charge_off_to_charge_on")
+        (
+        transition_id_from_off_to_on, "transition_from_charge_off_to_charge_on")
     )
     transition_from_off_to_on = Transition(
         id=transition_id_from_off_to_on,
@@ -372,7 +385,8 @@ def create_recharge_system_description(
     logging.debug(f"storage_status_id: {storage_status_id}")
     ids.append((storage_status_id, "storage_status"))
     storage_status = FRBCStorageStatus(
-        message_id=storage_status_id, present_fill_level=soc_percentage_before_charging
+        message_id=storage_status_id,
+        present_fill_level=soc_percentage_before_charging
     )
 
     frbc_storage_description = FRBCStorageDescription(
@@ -404,7 +418,8 @@ def create_recharge_leakage_behaviour(start_of_recharge):
         valid_from=start_of_recharge,
         elements=[
             FRBCLeakageBehaviourElement(
-                fill_level_range=NumberRange(start_of_range=0, end_of_range=100),
+                fill_level_range=NumberRange(start_of_range=0,
+                                             end_of_range=100),
                 leakage_rate=0,
             )
         ],
@@ -426,10 +441,10 @@ def create_recharge_usage_forecast(start_of_recharge, recharge_duration):
 
 @staticmethod
 def create_recharge_fill_level_target_profile(
-    start_of_recharge,
-    recharge_duration,
-    final_fill_level_target,
-    soc_percentage_before_charging,
+        start_of_recharge,
+        recharge_duration,
+        final_fill_level_target,
+        soc_percentage_before_charging,
 ):
     during_charge = FRBCFillLevelTargetProfileElement(
         duration=max(recharge_duration.total_seconds() - 10, 0),
@@ -454,7 +469,8 @@ def create_recharge_fill_level_target_profile(
 
 
 @staticmethod
-def create_driving_system_description(start_of_drive, soc_percentage_before_driving):
+def create_driving_system_description(start_of_drive,
+                                      soc_percentage_before_driving):
     global off_actuator_id, id_off_operation_mode
     off_operation_element = FRBCOperationModeElement(
         fill_level_range=NumberRange(start_of_range=0, end_of_range=100),
@@ -494,7 +510,8 @@ def create_driving_system_description(start_of_drive, soc_percentage_before_driv
         supported_commodities=[Commodity.ELECTRICITY],
     )
     storage_status = FRBCStorageStatus(
-        message_id=str(uuid.uuid4()), present_fill_level=soc_percentage_before_driving
+        message_id=str(uuid.uuid4()),
+        present_fill_level=soc_percentage_before_driving
     )
     storage_description = FRBCStorageDescription(
         diagnostic_label="battery",
@@ -518,14 +535,15 @@ def create_driving_system_description(start_of_drive, soc_percentage_before_driv
 
 @staticmethod
 def create_driving_usage_forecast(
-    start_of_driving, next_drive_duration, soc_usage_per_second
+        start_of_driving, next_drive_duration, soc_usage_per_second
 ):
     no_usage = FRBCUsageForecastElement(
         duration=int(next_drive_duration.total_seconds()),
         usage_rate_expected=(-1 * soc_usage_per_second),
     )
     return FRBCUsageForecast(
-        message_id=str(uuid.uuid4()), start_time=start_of_driving, elements=[no_usage]
+        message_id=str(uuid.uuid4()), start_time=start_of_driving,
+        elements=[no_usage]
     )
 
 
@@ -535,31 +553,31 @@ def test_planning_service_impl_with_ev_device():
     device_id = "ev-test-01"
     omloop_starts_at = datetime.fromtimestamp(3600)
     cet = timezone(timedelta(hours=1))
-    
+
     # Device charging parameters
     charge_power_soc_percentage_per_second_night = 0.0054012349
     charging_power_kw_night = 28
     charge_power_soc_percentage_per_second_day = 0.01099537114
     charging_power_kw_day = 57
-    
+
     # First recharge period
     start_of_recharge1 = omloop_starts_at.astimezone(cet)
     recharge_duration1 = timedelta(hours=7, minutes=13)
     soc_percentage_before_charging1 = 0
     final_fill_level_target1 = 100
-    
+
     # Driving period
     start_of_drive1 = start_of_recharge1 + recharge_duration1
     drive_duration1 = timedelta(hours=4, minutes=36)
     drive_consume_soc_per_second1 = 0.00375927565821256038647342995169
     soc_percentage_before_driving1 = 100
-    
+
     # Second recharge period
     start_of_recharge2 = start_of_drive1 + drive_duration1
     recharge_duration2 = timedelta(seconds=5360)
     soc_percentage_before_charging2 = 37.7463951
     final_fill_level_target2 = 94.4825134
-    
+
     # Create the device state
     device_state = create_ev_device_state(
         device_id,
@@ -582,7 +600,7 @@ def test_planning_service_impl_with_ev_device():
         recharge_duration2,
         start_of_recharge2,
     )
-    
+
     # Create profile metadata
     epoch_time = datetime(1970, 1, 1, tzinfo=timezone.utc)
     target_metadata = ProfileMetadata(
@@ -590,14 +608,14 @@ def test_planning_service_impl_with_ev_device():
         timestep_duration=timedelta(seconds=300),
         nr_of_timesteps=288,
     )
-    
+    target_profile_elements = get_JouleProfileTarget()
     # Create a target profile
-    global_target_profile = JouleProfile(
+    global_target_profile = TargetProfile(
         profile_start=target_metadata.get_profile_start(),
         timestep_duration=target_metadata.get_timestep_duration(),
-        elements=get_JouleProfileTarget(),
+        elements=target_profile_elements,
     )
-    
+
     # Create planning service config
     config = PlanningServiceConfig(
         energy_improvement_criterion=0.01,
@@ -605,21 +623,23 @@ def test_planning_service_impl_with_ev_device():
         congestion_retry_iterations=5,
         multithreaded=False,
     )
-    
+
     # Create planning service implementation
     service = PlanningServiceImpl(config)
-    
+
     # Create cluster state with device
     cluster_state = ClusterState()
     cluster_state.get_device_states()[device_id] = device_state
     cluster_state.set_congestion_point(device_state.get_connection_id(), "")
-    
+
     # Create cluster target
-    cluster_target = ClusterTarget(datetime.now(), None, None, global_target_profile)
-    
+    cluster_target = ClusterTarget(datetime.now(), None, None,
+                                   global_target_profile=global_target_profile)
+
     # Set due by date for planning
-    plan_due_by_date = target_metadata.get_profile_start() + timedelta(seconds=10)
-    
+    plan_due_by_date = target_metadata.get_profile_start() + timedelta(
+        seconds=10)
+
     # Act - Generate a plan
     start_time = time.time()
     cluster_plan = service.plan(
@@ -633,33 +653,35 @@ def test_planning_service_impl_with_ev_device():
     )
     end_time = time.time()
     execution_time = end_time - start_time
-    
+
     # Log information
     print(f"Plan generated in {execution_time:.2f} seconds")
-    
+
     # Assert
     assert cluster_plan is not None
-    
+    print("Got cluster plan")
     # Get the plan for our device
     device_plans = cluster_plan.get_plan_data().get_device_plans()
-    device_plan = next((p for p in device_plans if p.get_device_id() == device_id), None)
-    
+    device_plan = next(
+        (p for p in device_plans if p.get_device_id() == device_id), None
+    )
+
     # Assert that we got a plan for our device
     assert device_plan is not None
-    
+    print("Got device plan")
     # Print and verify the energy profile
     energy_profile = device_plan.get_profile()
     print(f"Energy profile has {len(energy_profile.elements)} elements")
-    
+
     # Print the first few elements to verify the plan
     print("First 10 energy profile elements:")
     for i in range(min(10, len(energy_profile.elements))):
         print(f"  Timestep {i}: {energy_profile.elements[i]} joules")
-    
+
     # Basic assertion - the energy profile should have the expected number of elements
     assert len(energy_profile.elements) == target_metadata.get_nr_of_timesteps()
-    
-    # You could add more specific assertions based on expected behavior
+
+
 
 # Main function
 if __name__ == "__main__":

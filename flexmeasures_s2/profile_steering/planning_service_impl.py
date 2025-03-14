@@ -13,6 +13,7 @@ from flexmeasures_s2.profile_steering.common.joule_range_profile import (
 )
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
+
 # Device planner imports
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_planner import (
     S2FrbcDevicePlanner,
@@ -72,7 +73,6 @@ class ClusterState:
         return self._congestion_points.get(connection_id)
 
     def set_congestion_point(self, connection_id: str, congestion_point_id: str):
-        
         self._congestion_points[connection_id] = congestion_point_id
 
     def get_congestion_points(self) -> List[str]:
@@ -82,17 +82,29 @@ class ClusterState:
 class ClusterTarget:
     """Class representing a target for a cluster."""
 
-    def __init__(self, generated_at: datetime, parent_id: Any, generated_by: Any, global_target_profile: TargetProfile, congestion_point_targets: Optional[Dict[str, JouleRangeProfile]] = None) -> None:
+    def __init__(
+        self,
+        generated_at: datetime,
+        parent_id: Any,
+        generated_by: Any,
+        global_target_profile: TargetProfile,
+        congestion_point_targets: Optional[Dict[str, JouleRangeProfile]] = None,
+    ) -> None:
         self._generated_at = generated_at
         self._parent_id = parent_id
         self._generated_by = generated_by
         self._global_target_profile = global_target_profile
         self._congestion_point_targets = congestion_point_targets
         if congestion_point_targets is not None:
-            for congestion_point_id, congestion_point_target in congestion_point_targets.items():
+            for (
+                congestion_point_id,
+                congestion_point_target,
+            ) in congestion_point_targets.items():
                 if not congestion_point_target.is_compatible(global_target_profile):
-                    raise ValueError(f"Congestion point target {congestion_point_id} is not compatible with the global target profile")
-    
+                    raise ValueError(
+                        f"Congestion point target {congestion_point_id} is not compatible with the global target profile"
+                    )
+
     def get_global_target_profile(self) -> Any:
         return self._global_target_profile
 
@@ -110,11 +122,18 @@ class ClusterTarget:
         if self._congestion_point_targets is None:
             return {}
         return self._congestion_point_targets
-    
-    def set_congestion_point_target(self, congestion_point_id: str, congestion_point_target: JouleRangeProfile):
+
+    def set_congestion_point_target(
+        self,
+        congestion_point_id: str,
+        congestion_point_target: JouleRangeProfile,
+        elements: Optional[List[Any]] = None,
+    ):
         if self._congestion_point_targets is None:
             self._congestion_point_targets = {}
         self._congestion_point_targets[congestion_point_id] = congestion_point_target
+        if elements is not None:
+            self._congestion_point_targets[congestion_point_id].elements = elements
 
 
 class DevicePlan:
@@ -272,7 +291,9 @@ class PlanningServiceImpl(PlanningService):
                 if congestion_point == self.DEFAULT_CONGESTION_POINT:
                     # This is a dummy congestion point. We will give it an empty profile.
                     congestion_point_target = JouleRangeProfile(
-                        target.get_global_target_profile().get_profile_metadata()
+                        target.get_global_target_profile().get_profile_metadata(),elements=congestion_point_target.get_elements(),
+                        min_value=min(congestion_point_target.get_elements()),
+                        max_value=max(congestion_point_target.get_elements()),
                     )
 
                 cpc = CongestionPointPlanner(congestion_point, congestion_point_target)
@@ -328,14 +349,18 @@ class PlanningServiceImpl(PlanningService):
                 logger.warning(
                     f"CongestionPoint without target! CongestionPoint: {cp}. Generating empty target."
                 )
-                target.set_congestion_point_target_global_target(cp, JouleRangeProfile(
-                    target.get_global_target_profile().get_profile_metadata()
-                ))
+                target.set_congestion_point_target(
+                    congestion_point_id=cp,
+                    congestion_point_target=JouleRangeProfile(
+                        profile_start=target.get_global_target_profile().get_profile_metadata(),
+                    ),
+                    elements=target.get_global_target_profile().get_elements(),
+                )
 
         # Create a tree of controllers and run the planning algorithm
         root_controller = self.create_controller_tree(state, target, plan_due_by_date)
 
-        try: 
+        try:
             root_controller.plan(
                 plan_due_by_date,
                 optimize_for_target,

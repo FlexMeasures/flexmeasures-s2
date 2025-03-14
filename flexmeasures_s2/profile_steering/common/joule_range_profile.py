@@ -61,14 +61,12 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
         """
         if isinstance(profile_start, ProfileMetadata):
             metadata = profile_start
-            if elements is not None:
-                pass  # Use provided elements
-            elif min_value is not None or max_value is not None:
-                elements = self._create_element_array(
-                    metadata.get_nr_of_timesteps(), min_value, max_value
+            if nr_of_timesteps is None:
+                nr_of_timesteps = metadata.get_nr_of_timesteps()
+            elements = self._create_element_array(
+                    nr_of_timesteps, min_value, max_value
                 )
-            else:
-                elements = []
+            
         else:
             if elements is not None:
                 metadata = ProfileMetadata(
@@ -233,11 +231,9 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
 
         Returns:
             True if compatible, False otherwise
-            
+
         """
-        return (
-            self.metadata == other.get_profile_metadata()
-        )
+        return self.metadata == other.get_profile_metadata()
 
     def __str__(self) -> str:
         """Return a string representation of this profile."""

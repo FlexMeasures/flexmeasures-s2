@@ -5,6 +5,7 @@ from .congestion_point_planner import CongestionPointPlanner
 from flexmeasures_s2.profile_steering.common.proposal import Proposal
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 
+
 class RootPlanner:
     MAX_ITERATIONS = 1000
 
@@ -124,15 +125,13 @@ class RootPlanner:
                 best_proposal.get_origin().accept_proposal(best_proposal)
                 i += 1
                 print(
-                    f"Root controller: selected best controller '{best_proposal.get_origin().get_device_name()}' with global energy impr {best_proposal.get_global_improvement_value()}, cost impr {best_proposal.get_cost_improvement_value()}, congestion impr {best_proposal.get_congestion_improvement_value()}, iteration {i}."
+                    f"Root controller: selected best controller '{best_proposal.get_origin().get_device_name()}' with global energy impr {best_proposal.get_global_improvement_value()}, congestion impr {best_proposal.get_congestion_improvement_value()}, iteration {i}."
                 )
 
                 # Check stopping criteria: if improvement values are below thresholds or max iterations reached.
                 if (
                     best_proposal.get_global_improvement_value()
                     <= self.energy_iteration_criterion
-                    and best_proposal.get_cost_improvement_value()
-                    <= self.cost_iteration_criterion
                 ) or i >= self.MAX_ITERATIONS:
                     break
 
