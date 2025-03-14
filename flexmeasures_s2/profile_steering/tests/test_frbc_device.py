@@ -550,7 +550,7 @@ def create_driving_usage_forecast(
 def test_planning_service_impl_with_ev_device():
     """Test the PlanningServiceImpl with an EV device."""
     # Arrange
-    device_id = "ev-test-01"
+    device_id = "bat1"
     omloop_starts_at = datetime.fromtimestamp(3600)
     cet = timezone(timedelta(hours=1))
 
@@ -670,7 +670,7 @@ def test_planning_service_impl_with_ev_device():
     assert device_plan is not None
     print("Got device plan")
     # Print and verify the energy profile
-    energy_profile = device_plan.get_profile()
+    energy_profile = device_plan.get_energy_profile()
     print(f"Energy profile has {len(energy_profile.elements)} elements")
 
     # Print the first few elements to verify the plan
@@ -681,7 +681,7 @@ def test_planning_service_impl_with_ev_device():
     # Basic assertion - the energy profile should have the expected number of elements
     assert len(energy_profile.elements) == target_metadata.get_nr_of_timesteps()
 
-
+    
 
 # Main function
 if __name__ == "__main__":
