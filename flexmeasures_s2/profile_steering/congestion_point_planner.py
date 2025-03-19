@@ -19,6 +19,7 @@ class CongestionPointPlanner:
             congestion_point_id: Unique identifier for this congestion point
             congestion_target: Target profile with range constraints for this congestion point
         """
+        self.MAX_ITERATIONS = 1000
         self.congestion_point_id = congestion_point_id
         self.congestion_target = congestion_target
         self.profile_metadata = congestion_target.get_profile_metadata()
@@ -41,6 +42,7 @@ class CongestionPointPlanner:
         """Add a device controller to this congestion point."""
         self.devices.append(device)
 
+    @staticmethod
     def is_storage_available(self) -> bool:
         """Check if storage is available at this congestion point."""
         # For now, always assume storage is available
@@ -96,7 +98,7 @@ class CongestionPointPlanner:
                                 plan_due_by_date,
                             )
                             print(
-                                f"congestion impr for '{device.get_device_id()}': {proposal.get_congestion_improvement_value()}"
+                                f"congestion point improvement for '{device.get_device_id()}': {proposal.get_congestion_improvement_value()}"
                             )
                             if (
                                 best_proposal is None

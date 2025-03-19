@@ -31,6 +31,11 @@ class TargetProfile(
     ):
         metadata = ProfileMetadata(profile_start, timestep_duration, len(elements))
         super().__init__(metadata, elements)
+        # if elements is a list of ints, convert it to a list of JouleElement
+        if isinstance(elements, list) and all(isinstance(e, int) for e in elements):
+            self.elements = [TargetProfile.JouleElement(e) for e in elements]
+        else:
+            self.elements = elements
 
     def validate(
         self,

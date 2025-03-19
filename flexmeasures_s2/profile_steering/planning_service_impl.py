@@ -14,6 +14,16 @@ from flexmeasures_s2.profile_steering.common.joule_range_profile import (
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 
+# Import from common data structures to avoid circular imports
+from flexmeasures_s2.profile_steering.common_data_structures import (
+    ClusterState,
+    DevicePlan,
+)
+
+# Import cluster related classes
+from flexmeasures_s2.profile_steering.cluster_plan import ClusterPlan, ClusterPlanData
+from flexmeasures_s2.profile_steering.cluster_target import ClusterTarget
+
 # Device planner imports
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_planner import (
     S2FrbcDevicePlanner,
@@ -21,9 +31,6 @@ from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_planner
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import (
     S2FrbcDeviceState,
 )
-
-# Import other device planners as needed
-# Import statements for other device planners would go here
 
 # Logger setup
 import logging
@@ -57,149 +64,6 @@ class PlanningServiceConfig:
 
     def multithreaded(self) -> bool:
         return self._multithreaded
-
-
-class ClusterState:
-    """Class representing the state of a cluster of devices."""
-
-    def __init__(self, device_states: Dict[str, Any] = None):
-        self._device_states = device_states or {}
-        self._congestion_points = {}  # Map from connection ID to congestion point ID
-
-    def get_device_states(self) -> Dict[str, Any]:
-        return self._device_states
-
-    def get_congestion_point(self, connection_id: str) -> Optional[str]:
-        return self._congestion_points.get(connection_id)
-
-    def set_congestion_point(self, connection_id: str, congestion_point_id: str):
-        self._congestion_points[connection_id] = congestion_point_id
-
-    def get_congestion_points(self) -> List[str]:
-        return list(set(self._congestion_points.values()))
-
-
-class ClusterTarget:
-    """Class representing a target for a cluster."""
-
-    def __init__(
-        self,
-        generated_at: datetime,
-        parent_id: Any,
-        generated_by: Any,
-        global_target_profile: TargetProfile,
-        congestion_point_targets: Optional[Dict[str, JouleRangeProfile]] = None,
-    ) -> None:
-        self._generated_at = generated_at
-        self._parent_id = parent_id
-        self._generated_by = generated_by
-        self._global_target_profile = global_target_profile
-        self._congestion_point_targets = congestion_point_targets
-        if congestion_point_targets is not None:
-            for (
-                congestion_point_id,
-                congestion_point_target,
-            ) in congestion_point_targets.items():
-                if not congestion_point_target.is_compatible(global_target_profile):
-                    raise ValueError(
-                        f"Congestion point target {congestion_point_id} is not compatible with the global target profile"
-                    )
-
-    def get_global_target_profile(self) -> Any:
-        return self._global_target_profile
-
-    def get_profile_metadata(self) -> Any:
-        return self._global_target_profile.get_profile_metadata()
-
-    def get_congestion_point_target(
-        self, congestion_point_id: str
-    ) -> Optional[JouleRangeProfile]:
-        if self._congestion_point_targets is None:
-            return None
-        return self._congestion_point_targets.get(congestion_point_id)
-
-    def get_congestion_point_targets(self) -> Dict[str, JouleRangeProfile]:
-        if self._congestion_point_targets is None:
-            return {}
-        return self._congestion_point_targets
-
-    def set_congestion_point_target(
-        self,
-        congestion_point_id: str,
-        congestion_point_target: JouleRangeProfile,
-        elements: Optional[List[Any]] = None,
-    ):
-        if self._congestion_point_targets is None:
-            self._congestion_point_targets = {}
-        self._congestion_point_targets[congestion_point_id] = congestion_point_target
-        if elements is not None:
-            self._congestion_point_targets[congestion_point_id].elements = elements
-
-
-class DevicePlan:
-    """Class representing a plan for a device."""
-
-    def __init__(self, device_id: str, profile: JouleProfile):
-        self._device_id = device_id
-        self._profile = profile
-
-    def get_device_id(self) -> str:
-        return self._device_id
-
-    def get_profile(self) -> JouleProfile:
-        return self._profile
-
-
-class ClusterPlanData:
-    """Class representing planning data for a cluster."""
-
-    def __init__(self, device_plans: List[DevicePlan], profile_metadata: Any):
-        self._device_plans = device_plans
-        self._profile_metadata = profile_metadata
-
-    def get_device_plans(self) -> List[DevicePlan]:
-        return self._device_plans
-
-    def get_profile_metadata(self) -> Any:
-        return self._profile_metadata
-
-
-class ClusterPlan:
-    """Class representing a plan for a cluster."""
-
-    def __init__(
-        self,
-        state: ClusterState,
-        target: ClusterTarget,
-        plan_data: ClusterPlanData,
-        reason: str,
-        plan_due_by_date: datetime,
-        parent_plan: Optional["ClusterPlan"] = None,
-    ):
-        self._state = state
-        self._target = target
-        self._plan_data = plan_data
-        self._reason = reason
-        self._plan_due_by_date = plan_due_by_date
-        self._parent_plan = parent_plan
-
-    def get_state(self) -> ClusterState:
-        return self._state
-
-    def get_target(self) -> ClusterTarget:
-        return self._target
-
-    def get_plan_data(self) -> ClusterPlanData:
-        return self._plan_data
-
-    def get_reason(self) -> str:
-        return self._reason
-
-    def get_plan_due_by_date(self) -> datetime:
-        return self._plan_due_by_date
-
-    def get_parent_plan(self) -> Optional["ClusterPlan"]:
-        return self._parent_plan
 
 
 class PlanningService:
@@ -291,9 +155,8 @@ class PlanningServiceImpl(PlanningService):
                 if congestion_point == self.DEFAULT_CONGESTION_POINT:
                     # This is a dummy congestion point. We will give it an empty profile.
                     congestion_point_target = JouleRangeProfile(
-                        target.get_global_target_profile().get_profile_metadata(),elements=congestion_point_target.get_elements(),
-                        min_value=min(congestion_point_target.get_elements()),
-                        max_value=max(congestion_point_target.get_elements()),
+                        target.get_global_target_profile().get_profile_metadata(),
+                        elements=congestion_point_target.get_elements(),
                     )
 
                 cpc = CongestionPointPlanner(congestion_point, congestion_point_target)
@@ -354,7 +217,6 @@ class PlanningServiceImpl(PlanningService):
                     congestion_point_target=JouleRangeProfile(
                         profile_start=target.get_global_target_profile().get_profile_metadata(),
                     ),
-                    elements=target.get_global_target_profile().get_elements(),
                 )
 
         # Create a tree of controllers and run the planning algorithm

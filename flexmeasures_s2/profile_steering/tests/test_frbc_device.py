@@ -9,8 +9,7 @@ from s2python.frbc.frbc_actuator_description import FRBCActuatorDescription
 from s2python.frbc.frbc_fill_level_target_profile_element import (
     FRBCFillLevelTargetProfileElement,
 )
-from s2python.frbc.frbc_leakage_behaviour_element import \
-    FRBCLeakageBehaviourElement
+from s2python.frbc.frbc_leakage_behaviour_element import FRBCLeakageBehaviourElement
 from s2python.frbc.frbc_operation_mode import FRBCOperationMode
 from s2python.frbc.frbc_usage_forecast_element import FRBCUsageForecastElement
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_planner import (
@@ -19,15 +18,13 @@ from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_planner
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import (
     S2FrbcDeviceState,
 )
-from flexmeasures_s2.profile_steering.common.profile_metadata import \
-    ProfileMetadata
+from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
 from s2python.frbc import FRBCSystemDescription
 from s2python.frbc import FRBCUsageForecast
 from s2python.frbc import FRBCFillLevelTargetProfile
 from s2python.frbc import FRBCLeakageBehaviour
 from s2python.frbc import FRBCOperationModeElement
-from s2python.frbc import FRBCActuatorStatus, FRBCStorageStatus, \
-    FRBCStorageDescription
+from s2python.frbc import FRBCActuatorStatus, FRBCStorageStatus, FRBCStorageDescription
 from s2python.common import PowerRange, Duration
 from s2python.common import NumberRange
 from s2python.common import CommodityQuantity
@@ -48,6 +45,9 @@ from flexmeasures_s2.profile_steering.planning_service_impl import (
     ClusterState,
     ClusterTarget,
 )
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import matplotlib.patches as mpatches
 
 # Global variables to store IDs for debugging
 # make a list of tuples with the ids and the names
@@ -57,25 +57,25 @@ import matplotlib.pyplot as plt
 
 
 def create_ev_device_state(
-        device_id: str,
-        omloop_starts_at: datetime,
-        cet: timezone,
-        charge_power_soc_percentage_per_second_night: float,
-        charging_power_kw_night: float,
-        charge_power_soc_percentage_per_second_day: float,
-        charging_power_kw_day: float,
-        soc_percentage_before_charging1: float,
-        final_fill_level_target1: float,
-        recharge_duration1: timedelta,
-        start_of_recharge1: datetime,
-        drive_duration1: timedelta,
-        start_of_drive1: datetime,
-        drive_consume_soc_per_second1: float,
-        soc_percentage_before_driving1: float,
-        soc_percentage_before_charging2: float,
-        final_fill_level_target2: float,
-        recharge_duration2: timedelta,
-        start_of_recharge2: datetime,
+    device_id: str,
+    omloop_starts_at: datetime,
+    cet: timezone,
+    charge_power_soc_percentage_per_second_night: float,
+    charging_power_kw_night: float,
+    charge_power_soc_percentage_per_second_day: float,
+    charging_power_kw_day: float,
+    soc_percentage_before_charging1: float,
+    final_fill_level_target1: float,
+    recharge_duration1: timedelta,
+    start_of_recharge1: datetime,
+    drive_duration1: timedelta,
+    start_of_drive1: datetime,
+    drive_consume_soc_per_second1: float,
+    soc_percentage_before_driving1: float,
+    soc_percentage_before_charging2: float,
+    final_fill_level_target2: float,
+    recharge_duration2: timedelta,
+    start_of_recharge2: datetime,
 ) -> S2FrbcDeviceState:
     # Create system description
     recharge_system_description1, charge_actuator_status1, storage_status1 = (
@@ -157,8 +157,7 @@ def create_ev_device_state(
             recharge_fill_level_target1,
             recharge_fill_level_target2,
         ],
-        computational_parameters=S2FrbcDeviceState.ComputationalParameters(1000,
-                                                                           20),
+        computational_parameters=S2FrbcDeviceState.ComputationalParameters(1000, 20),
         actuator_statuses=[
             off_actuator_status1,
             charge_actuator_status1,
@@ -264,10 +263,10 @@ def create_ev_device_state(
 
 @staticmethod
 def create_recharge_system_description(
-        start_of_recharge,
-        charge_power_soc_percentage_per_second,
-        charging_power_kw,
-        soc_percentage_before_charging,
+    start_of_recharge,
+    charge_power_soc_percentage_per_second,
+    charging_power_kw,
+    soc_percentage_before_charging,
 ) -> FRBCSystemDescription:
     global charge_actuator_id, id_on_operation_mode, id_off_operation_mode, id_on_to_off_timer, id_off_to_on_timer
     # Create and return a mock system description for recharging
@@ -332,11 +331,9 @@ def create_recharge_system_description(
         duration=Duration(30),
     )
     transition_id_from_on_to_off = str(uuid.uuid4())
-    logging.debug(
-        f"transition_id_from_on_to_off: {transition_id_from_on_to_off}")
+    logging.debug(f"transition_id_from_on_to_off: {transition_id_from_on_to_off}")
     ids.append(
-        (
-        transition_id_from_on_to_off, "transition_from_charge_on_to_charge_off")
+        (transition_id_from_on_to_off, "transition_from_charge_on_to_charge_off")
     )
     transition_from_on_to_off = Transition(
         id=transition_id_from_on_to_off,
@@ -348,11 +345,9 @@ def create_recharge_system_description(
         abnormal_condition_only=False,
     )
     transition_id_from_off_to_on = str(uuid.uuid4())
-    logging.debug(
-        f"transition_id_from_off_to_on: {transition_id_from_off_to_on}")
+    logging.debug(f"transition_id_from_off_to_on: {transition_id_from_off_to_on}")
     ids.append(
-        (
-        transition_id_from_off_to_on, "transition_from_charge_off_to_charge_on")
+        (transition_id_from_off_to_on, "transition_from_charge_off_to_charge_on")
     )
     transition_from_off_to_on = Transition(
         id=transition_id_from_off_to_on,
@@ -385,8 +380,7 @@ def create_recharge_system_description(
     logging.debug(f"storage_status_id: {storage_status_id}")
     ids.append((storage_status_id, "storage_status"))
     storage_status = FRBCStorageStatus(
-        message_id=storage_status_id,
-        present_fill_level=soc_percentage_before_charging
+        message_id=storage_status_id, present_fill_level=soc_percentage_before_charging
     )
 
     frbc_storage_description = FRBCStorageDescription(
@@ -418,8 +412,7 @@ def create_recharge_leakage_behaviour(start_of_recharge):
         valid_from=start_of_recharge,
         elements=[
             FRBCLeakageBehaviourElement(
-                fill_level_range=NumberRange(start_of_range=0,
-                                             end_of_range=100),
+                fill_level_range=NumberRange(start_of_range=0, end_of_range=100),
                 leakage_rate=0,
             )
         ],
@@ -441,10 +434,10 @@ def create_recharge_usage_forecast(start_of_recharge, recharge_duration):
 
 @staticmethod
 def create_recharge_fill_level_target_profile(
-        start_of_recharge,
-        recharge_duration,
-        final_fill_level_target,
-        soc_percentage_before_charging,
+    start_of_recharge,
+    recharge_duration,
+    final_fill_level_target,
+    soc_percentage_before_charging,
 ):
     during_charge = FRBCFillLevelTargetProfileElement(
         duration=max(recharge_duration.total_seconds() - 10, 0),
@@ -469,8 +462,7 @@ def create_recharge_fill_level_target_profile(
 
 
 @staticmethod
-def create_driving_system_description(start_of_drive,
-                                      soc_percentage_before_driving):
+def create_driving_system_description(start_of_drive, soc_percentage_before_driving):
     global off_actuator_id, id_off_operation_mode
     off_operation_element = FRBCOperationModeElement(
         fill_level_range=NumberRange(start_of_range=0, end_of_range=100),
@@ -510,8 +502,7 @@ def create_driving_system_description(start_of_drive,
         supported_commodities=[Commodity.ELECTRICITY],
     )
     storage_status = FRBCStorageStatus(
-        message_id=str(uuid.uuid4()),
-        present_fill_level=soc_percentage_before_driving
+        message_id=str(uuid.uuid4()), present_fill_level=soc_percentage_before_driving
     )
     storage_description = FRBCStorageDescription(
         diagnostic_label="battery",
@@ -535,16 +526,71 @@ def create_driving_system_description(start_of_drive,
 
 @staticmethod
 def create_driving_usage_forecast(
-        start_of_driving, next_drive_duration, soc_usage_per_second
+    start_of_driving, next_drive_duration, soc_usage_per_second
 ):
     no_usage = FRBCUsageForecastElement(
         duration=int(next_drive_duration.total_seconds()),
         usage_rate_expected=(-1 * soc_usage_per_second),
     )
     return FRBCUsageForecast(
-        message_id=str(uuid.uuid4()), start_time=start_of_driving,
-        elements=[no_usage]
+        message_id=str(uuid.uuid4()), start_time=start_of_driving, elements=[no_usage]
     )
+
+
+def plot_planning_results(
+    timestep_duration,
+    nr_of_timesteps,
+    predicted_energy_elements,
+    target_energy_elements,
+):
+    """
+    Plots the energy, fill level, actuator usage, and operation mode ID lists using matplotlib.
+
+    :param timestep_duration: Duration of each timestep.
+    :param nr_of_timesteps: Number of timesteps.
+    :param predicted_energy_elements: List of predicted energy values.
+    :param target_energy_elements: List of target energy values.
+    """
+    # Create a figure with a single subplot
+    fig, ax = plt.subplots(1, 1, figsize=(12, 8))
+
+    # Generate timestep_start_times
+    timestep_start_times = [
+        datetime(1970, 1, 1, tzinfo=timezone.utc)
+        + timedelta(seconds=i * timestep_duration.total_seconds())
+        for i in range(nr_of_timesteps)
+    ]
+
+    # Plot both lines on the same subplot
+    ax.plot(
+        timestep_start_times,
+        predicted_energy_elements,
+        label="Predicted Energy",
+        color="green",
+    )
+    ax.plot(
+        timestep_start_times,
+        target_energy_elements,
+        label="Target Energy",
+        color="red",
+        linestyle="dotted",
+        linewidth=2,
+    )
+
+    # Set labels and grid
+    ax.set_ylabel("Energy (Joules)")
+    ax.set_title("Predicted vs Target Energy")
+    ax.legend(loc="best")
+    ax.grid(True)
+
+    # Format the x-axis to show time and set ticks every 30 minutes
+    ax.xaxis.set_major_locator(mdates.MinuteLocator(interval=30))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M:%S"))
+    fig.autofmt_xdate()
+
+    # Adjust layout
+    plt.tight_layout()
+    plt.show()
 
 
 def test_planning_service_impl_with_ev_device():
@@ -633,12 +679,12 @@ def test_planning_service_impl_with_ev_device():
     cluster_state.set_congestion_point(device_state.get_connection_id(), "")
 
     # Create cluster target
-    cluster_target = ClusterTarget(datetime.now(), None, None,
-                                   global_target_profile=global_target_profile)
+    cluster_target = ClusterTarget(
+        datetime.now(), None, None, global_target_profile=global_target_profile
+    )
 
     # Set due by date for planning
-    plan_due_by_date = target_metadata.get_profile_start() + timedelta(
-        seconds=10)
+    plan_due_by_date = target_metadata.get_profile_start() + timedelta(seconds=10)
 
     # Act - Generate a plan
     start_time = time.time()
@@ -681,7 +727,13 @@ def test_planning_service_impl_with_ev_device():
     # Basic assertion - the energy profile should have the expected number of elements
     assert len(energy_profile.elements) == target_metadata.get_nr_of_timesteps()
 
-    
+    plot_planning_results(
+        timestep_duration=timedelta(seconds=300),
+        nr_of_timesteps=288,
+        predicted_energy_elements=energy_profile.get_elements(),
+        target_energy_elements=target_profile_elements,
+    )
+
 
 # Main function
 if __name__ == "__main__":
