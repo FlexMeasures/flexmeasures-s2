@@ -45,6 +45,9 @@ class TargetProfile(
         super().validate(profile_metadata, elements)
         # Add any TargetProfile-specific validation if needed
 
+    def default_value(self) -> "TargetProfile.Element":
+        return TargetProfile.NULL_ELEMENT
+
     def subprofile(self, new_start_date: datetime) -> "TargetProfile":
         index = self.index_at(new_start_date)
         if index < 0:
@@ -162,4 +165,12 @@ class TargetProfile(
             metadata.get_profile_start(),
             metadata.get_timestep_duration(),
             [TargetProfile.NULL_ELEMENT] * metadata.get_nr_of_timesteps(),
+        )
+
+    @staticmethod
+    def from_joule_profile(joule_profile: JouleProfile) -> "TargetProfile":
+        return TargetProfile(
+            joule_profile.metadata.profile_start,
+            joule_profile.metadata.timestep_duration,
+            [TargetProfile.JouleElement(e) for e in joule_profile.elements],
         )

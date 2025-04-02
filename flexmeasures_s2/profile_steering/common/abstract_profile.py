@@ -100,3 +100,7 @@ class AbstractProfile(ABC, Generic[E, PT]):
     @abstractmethod
     def is_compatible(self, other: PT) -> bool:
         return self.metadata == other.metadata
+
+    @abstractmethod
+    def default_value(self) -> E:
+        pass

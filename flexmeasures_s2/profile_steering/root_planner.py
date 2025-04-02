@@ -93,6 +93,7 @@ class RootPlanner:
 
                 # Get proposals from each congestion point controller
                 for cpc in self.cp_controllers:
+                    # print("Improving")
                     try:
                         proposal = cpc.create_improved_planning(
                             difference_profile,

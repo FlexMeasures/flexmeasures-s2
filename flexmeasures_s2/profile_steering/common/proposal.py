@@ -28,6 +28,10 @@ class Proposal:
 
     def get_global_improvement_value(self) -> float:
         if self.global_improvement_value is None:
+            # print(f"self.old_plan: {self.old_plan}")
+            # print(f"self.proposed_plan: {self.proposed_plan}")
+            # print the quadratic distance of the global diff target
+            # print(f"self.global_diff_target.sum_quadratic_distance(): {self.global_diff_target.sum_quadratic_distance()}")
             self.global_improvement_value = (
                 self.global_diff_target.sum_quadratic_distance()
                 - self.global_diff_target.add(self.old_plan)
@@ -63,21 +67,26 @@ class Proposal:
             exceed_max_target_old = self.diff_to_congestion_max.minimum(
                 zero_profile
             ).sum_quadratic_distance()
+            # print(f"exceed_max_target_old: {exceed_max_target_old}")
+            # print(f"self.diff_to_congestion_max: {self.diff_to_congestion_max}")
             exceed_max_target_proposal = (
                 self.diff_to_congestion_max.add(self.old_plan)
                 .subtract(self.proposed_plan)
                 .minimum(zero_profile)
                 .sum_quadratic_distance()
             )
+            # print(f"exceed_max_target_proposal: {exceed_max_target_proposal}")
             exceed_min_target_old = self.diff_to_congestion_min.maximum(
                 zero_profile
-            ).sum_quadratic_distance()
+            ).sum_quadratic_distance()  
+            # print(f"exceed_min_target_old: {exceed_min_target_old}")
             exceed_min_target_proposal = (
                 self.diff_to_congestion_min.add(self.old_plan)
                 .subtract(self.proposed_plan)
                 .maximum(zero_profile)
                 .sum_quadratic_distance()
             )
+            # print(f"exceed_min_target_proposal: {exceed_min_target_proposal}")
             if (
                 exceed_max_target_old == exceed_max_target_proposal
                 and exceed_min_target_old == exceed_min_target_proposal
@@ -90,6 +99,7 @@ class Proposal:
                     - exceed_max_target_proposal
                     - exceed_min_target_proposal
                 )
+                # print(f"congestion_improvement_value: {self.congestion_improvement_value}")
         return self.congestion_improvement_value
 
     def is_preferred_to(self, other: "Proposal") -> bool:
@@ -116,3 +126,6 @@ class Proposal:
 
     def get_old_plan(self) -> JouleProfile:
         return self.old_plan
+
+    def get_energy(self) -> JouleProfile:
+        return self.proposed_plan

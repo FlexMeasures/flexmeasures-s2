@@ -64,11 +64,16 @@ class CongestionPointPlanner:
             current_planning = current_planning.add(
                 device.create_initial_planning(plan_due_by_date)
             )
-
+        # print(f"Current planning: {current_planning}")
         # Check if the current planning is within the congestion target range
         if self.congestion_target.is_within_range(current_planning):
+            print(f"Current planning is within the congestion target range. Returning it.")
             return current_planning
 
+        # If the current planning is not within the congestion target range, optimize it
+        print(f"Current planning is not within the congestion target range. Optimizing it.")
+        
+        # print(f"Congestion target: {self.congestion_target}")
         i = 0
         best_proposal = None
 
@@ -162,7 +167,8 @@ class CongestionPointPlanner:
         diff_to_min_value = self.congestion_target.difference_with_min_value(
             current_planning
         )
-
+        # print(f"diff_to_max_value: {diff_to_max_value}")
+        # print(f"diff_to_min_value: {diff_to_min_value}")
         # Try to get improved plans from each device controller
         for device in self.devices:
             if device.get_priority_class() <= priority_class:
@@ -170,10 +176,13 @@ class CongestionPointPlanner:
                     # Get an improved plan from this device
                     proposal = device.create_improved_planning(
                         difference_profile,
-                        diff_to_max_value,
+                        diff_to_max_value, 
                         diff_to_min_value,
                         plan_due_by_date,
                     )
+                    # print("Plans old vs New")
+                    # print(f"old: {proposal.get_old_plan()}")
+                    # print(f"new: {proposal.get_proposed_plan()}")
                     if proposal.get_congestion_improvement_value() < 0:
                         print(
                             f"{device.get_device_name()}, congestion improvement: {proposal.get_congestion_improvement_value()}"
@@ -185,6 +194,7 @@ class CongestionPointPlanner:
                     print(
                         f"Error getting proposal from device {device.get_device_id()}: {e}"
                     )
+                    
                     continue
 
         if best_proposal is None:

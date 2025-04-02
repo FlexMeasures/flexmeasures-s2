@@ -168,97 +168,83 @@ def create_ev_device_state(
     return device_state
 
 
-#
-# def test_connexxion_ev_bus_baseline_byd_225():
-#     # Arrange
-#     device_id = "01-01-70.225"
-#     omloop_starts_at = datetime.fromtimestamp(3600)
-#     cet = timezone(timedelta(hours=1))
-#     charge_power_soc_percentage_per_second_night = 0.0054012349
-#     charging_power_kw_night = 28
-#
-#     charge_power_soc_percentage_per_second_day = 0.01099537114
-#     charging_power_kw_day = 57
-#
-#     # Create system descriptions and forecasts
-#
-#     start_of_recharge1 = omloop_starts_at.astimezone(cet)
-#     recharge_duration1 = timedelta(hours=7, minutes=13)
-#     soc_percentage_before_charging1 = 0
-#     final_fill_level_target1 = 100
-#
-#     # Create system description for driving
-#
-#     start_of_drive1 = start_of_recharge1 + recharge_duration1
-#     drive_duration1 = timedelta(hours=4, minutes=36)
-#     drive_consume_soc_per_second1 = 0.00375927565821256038647342995169
-#     soc_percentage_before_driving1 = 100
-#
-#     start_of_recharge2 = start_of_drive1 + drive_duration1
-#     recharge_duration2 = timedelta(seconds=5360)
-#     soc_percentage_before_charging2 = 37.7463951
-#     final_fill_level_target2 = 94.4825134
-#
-#     device_state = create_ev_device_state(
-#         device_id,
-#         omloop_starts_at,
-#         cet,
-#         charge_power_soc_percentage_per_second_night,
-#         charging_power_kw_night,
-#         charge_power_soc_percentage_per_second_day,
-#         charging_power_kw_day,
-#         soc_percentage_before_charging1,
-#         final_fill_level_target1,
-#         recharge_duration1,
-#         start_of_recharge1,
-#         drive_duration1,
-#         start_of_drive1,
-#         drive_consume_soc_per_second1,
-#         soc_percentage_before_driving1,
-#         soc_percentage_before_charging2,
-#         final_fill_level_target2,
-#         recharge_duration2,
-#         start_of_recharge2,
-#     )
-#
-#     epoch_time = datetime(1970, 1, 1, tzinfo=timezone.utc)
-#     target_metadata = ProfileMetadata(
-#         profile_start=epoch_time,
-#         timestep_duration=timedelta(seconds=300),
-#         nr_of_timesteps=288,
-#     )
-#
-#     plan_due_by_date = target_metadata.get_profile_start() + timedelta(seconds=10)
-#
-#     planner = S2FrbcDevicePlanner(device_state, target_metadata, plan_due_by_date)
-#
-#     # Start timing
-#     import time
-#
-#     # Number of iterations
-#     num_iterations = 1
-#     total_time = 0
-#
-#     # Run the function multiple times and measure execution time
-#     for i in range(num_iterations):
-#         start_time = time.time()
-#         planning = planner.create_initial_planning(plan_due_by_date, ids)
-#         end_time = time.time()
-#         execution_time = end_time - start_time
-#         total_time += execution_time
-#
-#         # Print progress every 1000 iterations
-#
-#         print(f"Completed {i + 1} iterations")
-#
-#     # Calculate and print average execution time
-#     average_execution_time = total_time / num_iterations
-#     print(
-#         f"Average execution time over {num_iterations} iterations: {average_execution_time:.6f} seconds"
-#     )
-#     print(planning.elements)
-#     assert planning.elements == get_JouleProfileTarget()
-#
+@pytest.mark.skip(reason="Skipping test_connexxion_ev_bus_baseline_byd_225")
+def test_connexxion_ev_bus_baseline_byd_225():
+    # Arrange
+    device_id = "01-01-70.225"
+    omloop_starts_at = datetime.fromtimestamp(3600)
+    cet = timezone(timedelta(hours=1))
+    charge_power_soc_percentage_per_second_night = 0.0054012349
+    charging_power_kw_night = 28
+
+    charge_power_soc_percentage_per_second_day = 0.01099537114
+    charging_power_kw_day = 57
+
+    # Create system descriptions and forecasts
+
+    start_of_recharge1 = omloop_starts_at.astimezone(cet)
+    recharge_duration1 = timedelta(hours=7, minutes=13)
+    soc_percentage_before_charging1 = 0
+    final_fill_level_target1 = 100
+
+    # Create system description for driving
+
+    start_of_drive1 = start_of_recharge1 + recharge_duration1
+    drive_duration1 = timedelta(hours=4, minutes=36)
+    drive_consume_soc_per_second1 = 0.00375927565821256038647342995169
+    soc_percentage_before_driving1 = 100
+
+    start_of_recharge2 = start_of_drive1 + drive_duration1
+    recharge_duration2 = timedelta(seconds=10000)
+    soc_percentage_before_charging2 = 37.7463951
+    final_fill_level_target2 = 94.4825134
+
+    device_state = create_ev_device_state(
+        device_id,
+        omloop_starts_at,
+        cet,
+        charge_power_soc_percentage_per_second_night,
+        charging_power_kw_night,
+        charge_power_soc_percentage_per_second_day,
+        charging_power_kw_day,
+        soc_percentage_before_charging1,
+        final_fill_level_target1,
+        recharge_duration1,
+        start_of_recharge1,
+        drive_duration1,
+        start_of_drive1,
+        drive_consume_soc_per_second1,
+        soc_percentage_before_driving1,
+        soc_percentage_before_charging2,
+        final_fill_level_target2,
+        recharge_duration2,
+        start_of_recharge2,
+    )
+
+    epoch_time = datetime(1970, 1, 1, tzinfo=timezone.utc)
+    target_metadata = ProfileMetadata(
+        profile_start=epoch_time,
+        timestep_duration=timedelta(seconds=300),
+        nr_of_timesteps=288,
+    )
+
+    plan_due_by_date = target_metadata.get_profile_start() + timedelta(seconds=10)
+
+    planner = S2FrbcDevicePlanner(device_state, target_metadata, plan_due_by_date)
+
+    planning = planner.create_initial_planning(plan_due_by_date, ids)
+    print(planning.get_energy().elements)
+    target = JouleProfile(profile_start=target_metadata.get_profile_start(), timestep_duration=target_metadata.get_timestep_duration(), elements=get_JouleProfileTarget())
+    
+    diff_to_global_target = target.subtract(planning.get_energy())
+    print(diff_to_global_target.elements)
+    target_profile = TargetProfile.from_joule_profile(diff_to_global_target)
+    #create a null profile
+    null_profile = JouleProfile(profile_start=target_metadata.get_profile_start(), timestep_duration=target_metadata.get_timestep_duration(), elements=[None] * target_metadata.get_nr_of_timesteps())
+    improved = planner.create_improved_planning(target_profile, null_profile, null_profile, plan_due_by_date)
+    plot_planning_results(target_metadata.get_timestep_duration(), target_metadata.get_nr_of_timesteps(), improved.get_energy().elements, get_JouleProfileTarget())
+
+    assert improved.get_energy().elements == get_JouleProfileTarget()
 
 
 @staticmethod
@@ -273,12 +259,12 @@ def create_recharge_system_description(
     on_operation_element = FRBCOperationModeElement(
         fill_level_range=NumberRange(start_of_range=0, end_of_range=100),
         fill_rate=NumberRange(
-            start_of_range=charge_power_soc_percentage_per_second,
+            start_of_range = 0,
             end_of_range=charge_power_soc_percentage_per_second,
         ),
         power_ranges=[
             PowerRange(
-                start_of_range=charging_power_kw * 1000,
+                start_of_range=charging_power_kw * 0,
                 end_of_range=charging_power_kw * 1000,
                 commodity_quantity=CommodityQuantity.ELECTRIC_POWER_L1,
             )
@@ -595,6 +581,7 @@ def plot_planning_results(
 
 def test_planning_service_impl_with_ev_device():
     """Test the PlanningServiceImpl with an EV device."""
+    print("Test the PlanningServiceImpl with an EV device.")
     # Arrange
     device_id = "bat1"
     omloop_starts_at = datetime.fromtimestamp(3600)
@@ -620,7 +607,7 @@ def test_planning_service_impl_with_ev_device():
 
     # Second recharge period
     start_of_recharge2 = start_of_drive1 + drive_duration1
-    recharge_duration2 = timedelta(seconds=5360)
+    recharge_duration2 = timedelta(seconds=10000) # 1.5 hours
     soc_percentage_before_charging2 = 37.7463951
     final_fill_level_target2 = 94.4825134
 
@@ -664,11 +651,12 @@ def test_planning_service_impl_with_ev_device():
 
     # Create planning service config
     config = PlanningServiceConfig(
-        energy_improvement_criterion=0.01,
-        cost_improvement_criterion=0.01,
+        energy_improvement_criterion=10.0,
+        cost_improvement_criterion=1.0,
         congestion_retry_iterations=5,
         multithreaded=False,
     )
+    print("Generating plan!")
 
     # Create planning service implementation
     service = PlanningServiceImpl(config)
@@ -685,7 +673,6 @@ def test_planning_service_impl_with_ev_device():
 
     # Set due by date for planning
     plan_due_by_date = target_metadata.get_profile_start() + timedelta(seconds=10)
-
     # Act - Generate a plan
     start_time = time.time()
     cluster_plan = service.plan(
@@ -717,12 +704,7 @@ def test_planning_service_impl_with_ev_device():
     print("Got device plan")
     # Print and verify the energy profile
     energy_profile = device_plan.get_energy_profile()
-    print(f"Energy profile has {len(energy_profile.elements)} elements")
-
-    # Print the first few elements to verify the plan
-    print("First 10 energy profile elements:")
-    for i in range(min(10, len(energy_profile.elements))):
-        print(f"  Timestep {i}: {energy_profile.elements[i]} joules")
+    
 
     # Basic assertion - the energy profile should have the expected number of elements
     assert len(energy_profile.elements) == target_metadata.get_nr_of_timesteps()

@@ -22,6 +22,9 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
         super().validate(profile_metadata, elements)
         # Add any JouleProfile-specific validation here if needed
 
+    def default_value(self) -> None:
+        return None
+
     def subprofile(self, new_start_date: datetime) -> "JouleProfile":
         index = self.index_at(new_start_date)
         if index < 0:
@@ -56,7 +59,12 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
     def add(self, other: "JouleProfile") -> "JouleProfile":
         if not self.is_compatible(other):
             raise ValueError("Profiles are not compatible")
-        summed_elements = [a + b for a, b in zip(self.elements, other.elements)]
+        summed_elements = [0] * len(self.elements)
+        for i in range(len(self.elements)):
+            if self.elements[i] is None or other.elements[i] is None:
+                summed_elements[i] = self.default_value()
+            else:
+                summed_elements[i] = self.elements[i] + other.elements[i]
         return JouleProfile(
             self.metadata.get_profile_start(),
             self.metadata.get_timestep_duration(),
@@ -66,7 +74,12 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
     def subtract(self, other: "JouleProfile") -> "JouleProfile":
         if not self.is_compatible(other):
             raise ValueError("Profiles are not compatible")
-        diff_elements = [a - b for a, b in zip(self.elements, other.elements)]
+        diff_elements = [0] * len(self.elements)
+        for i in range(len(self.elements)):
+            if self.elements[i] is None or other.elements[i] is None:
+                diff_elements[i] = self.default_value()
+            else:
+                diff_elements[i] = self.elements[i] - other.elements[i]
         return JouleProfile(
             self.metadata.get_profile_start(),
             self.metadata.get_timestep_duration(),
@@ -101,7 +114,8 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
     def minimum(self, other: "JouleProfile") -> "JouleProfile":
         if not self.is_compatible(other):
             raise ValueError("Profiles are not compatible")
-        min_elements = [min(a, b) for a, b in zip(self.elements, other.elements)]
+        # skip None values
+        min_elements = [min(a, b) for a, b in zip(self.elements, other.elements) if a is not None and b is not None]
         return JouleProfile(
             self.metadata.get_profile_start(),
             self.metadata.get_timestep_duration(),
@@ -111,7 +125,8 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
     def maximum(self, other: "JouleProfile") -> "JouleProfile":
         if not self.is_compatible(other):
             raise ValueError("Profiles are not compatible")
-        max_elements = [max(a, b) for a, b in zip(self.elements, other.elements)]
+        # skip None values
+        max_elements = [max(a, b) for a, b in zip(self.elements, other.elements) if a is not None and b is not None]
         return JouleProfile(
             self.metadata.get_profile_start(),
             self.metadata.get_timestep_duration(),

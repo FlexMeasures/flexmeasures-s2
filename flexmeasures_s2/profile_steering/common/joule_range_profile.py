@@ -63,10 +63,7 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
             metadata = profile_start
             if nr_of_timesteps is None:
                 nr_of_timesteps = metadata.get_nr_of_timesteps()
-            if min_value is None:
-                min_value = 0
-            if max_value is None:
-                max_value = 8400000
+
             elements = self._create_element_array(nr_of_timesteps, min_value, max_value)
 
         else:
@@ -93,6 +90,9 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
     ) -> List[Element]:
         """Create an array of elements with the given min and max values."""
         return [Element(min_value, max_value) for _ in range(nr_of_elements)]
+
+    def default_value(self) -> Element:
+        return Element(None, None)
 
     def validate(self, profile_metadata: ProfileMetadata, elements: List[Element]):
         """Validate the elements and metadata for this profile."""
