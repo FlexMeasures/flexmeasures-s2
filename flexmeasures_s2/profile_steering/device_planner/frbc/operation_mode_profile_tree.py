@@ -138,6 +138,8 @@ class OperationModeProfileTree:
     def generate_timesteps(self) -> None:
         time_step_start = self.profile_metadata.get_profile_start()
         for i in range(self.profile_metadata.get_nr_of_timesteps()):
+            if i == 187:
+                print("here")
             time_step_end = (
                 time_step_start + self.profile_metadata.get_timestep_duration()
             )
@@ -282,9 +284,13 @@ class OperationModeProfileTree:
         state_zero.generate_next_timestep_states(first_timestep)
 
         for i in range(first_timestep_index, len(self.timesteps) - 1):
+            # print(f"Generating next timestep states for timestep: {i}")
+            # if i == 187:
+                # print("here")
             current_timestep = self.timesteps[i]
             next_timestep = self.timesteps[i + 1]
             final_states = current_timestep.get_final_states_within_fill_level_target()
+            # print(f"There are {len(final_states)} final states")
             for frbc_state in final_states:
                 frbc_state.generate_next_timestep_states(next_timestep)
         end_state = self.find_best_end_state(

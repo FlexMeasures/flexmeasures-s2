@@ -670,16 +670,15 @@ class ClusterPlan:
         Returns:
             The JouleProfile for this plan
         """
-        if self._joule_profile is None:
-            # Initialize the JouleProfile if needed
-            profile_metadata = self.get_profile_metadata()
-            self._joule_profile = JouleProfile(
-                profile_start=profile_metadata.get_profile_start(),
-                timestep_duration=profile_metadata.get_timestep_duration(),
-            )
 
-            # Add all device plans to the profile
-            for device_plan in self._plan_data.get_device_plans():
-                self._joule_profile = self._joule_profile.add(device_plan.get_profile())
+        # Add all device plans to the profile
+        sum_profile = JouleProfile(
+            profile_start=self.get_profile_metadata().get_profile_start(),
+            timestep_duration=self.get_profile_metadata().get_timestep_duration(),
+            profile_length=self.get_profile_metadata().get_nr_of_timesteps(),
+            value=0.0,
+        )
+        for device_plan in self._plan_data.get_device_plans():
+            sum_profile = sum_profile.add(device_plan.get_energy_profile())
 
-        return self._joule_profile
+        return sum_profile
