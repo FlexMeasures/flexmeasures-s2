@@ -29,3 +29,7 @@ or:
 Try it:
 
     pre-commit run --all-files --show-diff-on-failure
+
+For profiling, use:
+
+    pyinstrument -o profiling_results.html test_frbc_device.py

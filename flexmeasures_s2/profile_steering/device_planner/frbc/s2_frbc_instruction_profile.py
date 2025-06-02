@@ -1,4 +1,3 @@
-import uuid
 from typing import Dict, List
 from datetime import datetime, timedelta
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_actuator_configuration import (
@@ -11,7 +10,7 @@ class S2FrbcInstructionProfile:
         def __init__(
             self,
             idle: bool,
-            actuator_configuration: Dict[uuid.UUID, S2ActuatorConfiguration],
+            actuator_configuration: Dict[str, S2ActuatorConfiguration],
         ):
             self.idle = idle
             self.actuator_configuration = actuator_configuration
@@ -21,7 +20,7 @@ class S2FrbcInstructionProfile:
 
         def get_actuator_configuration(
             self,
-        ) -> Dict[uuid.UUID, S2ActuatorConfiguration]:
+        ) -> Dict[str, S2ActuatorConfiguration]:
             return self.actuator_configuration
 
     def __init__(
