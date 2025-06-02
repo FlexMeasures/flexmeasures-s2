@@ -1,5 +1,4 @@
 from datetime import datetime
-import uuid
 from s2python.frbc import (
     FRBCSystemDescription,
 )
@@ -98,15 +97,9 @@ class FrbcState:
                             actuator_id
                         ].get_operation_mode_id()
                     )
-                    if isinstance(previous_operation_mode_id, str):
-                        previous_operation_mode_id = uuid.UUID(
-                            previous_operation_mode_id
-                        )
                     new_operation_mode_id = (
                         actuator_configuration.get_operation_mode_id()
                     )
-                    if isinstance(new_operation_mode_id, str):
-                        new_operation_mode_id = uuid.UUID(new_operation_mode_id)
                     if previous_operation_mode_id != new_operation_mode_id:
                         transition = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_transition(
                             self.timestep,
@@ -114,13 +107,17 @@ class FrbcState:
                             previous_operation_mode_id,
                             new_operation_mode_id,
                         )
+                        last_timer_id = None
+                        new_finished_at = None
                         for timer_id in transition.start_timers:
                             duration = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_timer_duration(
-                                self.timestep, actuator_id, timer_id
+                                self.timestep, actuator_id, str(timer_id)
                             )
                             new_finished_at = self.timestep.get_start_date() + duration
-                        key = FrbcState.timer_key(actuator_id, timer_id)
-                        self.timer_elapse_map[key] = new_finished_at
+                            last_timer_id = timer_id
+                        if last_timer_id is not None:
+                            key = FrbcState.timer_key(actuator_id, str(last_timer_id))
+                            self.timer_elapse_map[key] = new_finished_at
             else:
                 self.timer_elapse_map = (
                     self.get_initial_timer_elapse_map_for_system_description(
@@ -197,8 +194,8 @@ class FrbcState:
                     if actuator.id == a.actuator_id:
                         self.actuator_configurations[
                             str(a.actuator_id)
-                        ] = S2ActuatorConfiguration(  # TODO here was the problem with str and uuid
-                            actuator_status.active_operation_mode_id,
+                        ] = S2ActuatorConfiguration(
+                            str(actuator_status.active_operation_mode_id),
                             actuator_status.operation_mode_factor,
                         )
 
@@ -209,7 +206,7 @@ class FrbcState:
         timer_elapse_map = {}
         for actuator in system_description.actuators:
             for timer in actuator.timers:
-                key = FrbcState.timer_key(actuator.id, timer.id)
+                key = FrbcState.timer_key(str(actuator.id), str(timer.id))
                 timer_elapse_map[key] = datetime.min  # arbitrary day in the past
         return timer_elapse_map
 
@@ -276,8 +273,6 @@ class FrbcState:
                     ].get_operation_mode_id()
                 )
                 new_operation_mode_id = actuator_configuration.get_operation_mode_id()
-                if isinstance(new_operation_mode_id, str):
-                    new_operation_mode_id = uuid.UUID(new_operation_mode_id)
                 if previous_operation_mode_id != new_operation_mode_id:
                     transition = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_transition(
                         self.timestep,
@@ -289,10 +284,10 @@ class FrbcState:
                         continue
                     for timer_id in transition.start_timers:
                         duration = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_timer_duration(
-                            self.timestep, actuator_id, timer_id
+                            self.timestep, actuator_id, str(timer_id)
                         )
                         new_finished_at = self.timestep.get_start_date() + duration
-                        key = FrbcState.timer_key(actuator_id, timer_id)
+                        key = FrbcState.timer_key(actuator_id, str(timer_id))
                         self.timer_elapse_map[key] = new_finished_at
         else:
             self.timer_elapse_map = (
@@ -372,18 +367,12 @@ class FrbcState:
                             actuator_id
                         ].get_operation_mode_id()
                     )
-                    if isinstance(previous_operation_mode_id, str):
-                        previous_operation_mode_id = uuid.UUID(
-                            previous_operation_mode_id
-                        )
                 except KeyError:
                     raise KeyError(
                         f"UUID {actuator_id} not found in actuator configurations"
                     )
 
                 new_operation_mode_id = actuator_configuration.get_operation_mode_id()
-                if isinstance(new_operation_mode_id, str):
-                    new_operation_mode_id = uuid.UUID(new_operation_mode_id)
                 if previous_operation_mode_id != new_operation_mode_id:
                     transition = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_transition(
                         target_timestep,
@@ -396,7 +385,7 @@ class FrbcState:
                     for timer_id in transition.blocking_timers:
                         timer_is_finished_at = (
                             previous_state.get_timer_elapse_map().get(
-                                FrbcState.timer_key(actuator_id, timer_id)
+                                FrbcState.timer_key(actuator_id, str(timer_id))
                             )
                         )
                         if (

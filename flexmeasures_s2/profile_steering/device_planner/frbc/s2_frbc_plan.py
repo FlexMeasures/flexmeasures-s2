@@ -1,5 +1,4 @@
 from typing import List, Dict
-import uuid
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_actuator_configuration import (
     S2ActuatorConfiguration,
 )
@@ -11,7 +10,7 @@ class S2FrbcPlan:
         idle: bool,
         energy,
         fill_level,
-        operation_mode_id: List[Dict[uuid.UUID, S2ActuatorConfiguration]],
+        operation_mode_id: List[Dict[str, S2ActuatorConfiguration]],
     ):
         self.idle = idle
         self.energy = energy
@@ -27,5 +26,5 @@ class S2FrbcPlan:
     def get_fill_level(self):
         return self.fill_level
 
-    def get_operation_mode_id(self) -> List[Dict[uuid.UUID, S2ActuatorConfiguration]]:
+    def get_operation_mode_id(self) -> List[Dict[str, S2ActuatorConfiguration]]:
         return self.operation_mode_id

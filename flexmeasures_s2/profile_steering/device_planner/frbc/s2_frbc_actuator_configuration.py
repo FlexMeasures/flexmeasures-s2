@@ -1,15 +1,14 @@
-import uuid
 from typing import Dict, Any
 
 # TODO: Should this just be an actuator description
 
 
 class S2ActuatorConfiguration:
-    def __init__(self, operation_mode_id: uuid.UUID, factor):
+    def __init__(self, operation_mode_id: str, factor):
         self.operation_mode_id = operation_mode_id
         self.factor = factor
 
-    def get_operation_mode_id(self) -> uuid.UUID:
+    def get_operation_mode_id(self) -> str:
         return self.operation_mode_id
 
     def get_factor(self) -> float:
@@ -20,7 +19,7 @@ class S2ActuatorConfiguration:
 
     @staticmethod
     def from_dict(data: Dict[str, Any]) -> "S2ActuatorConfiguration":
-        return S2ActuatorConfiguration(data["operationModeId"], data["factor"])
+        return S2ActuatorConfiguration(str(data["operationModeId"]), data["factor"])
 
     def __str__(self):
         return f"S2ActuatorConfiguration [operationModeId={self.operation_mode_id}, factor={self.factor}]"

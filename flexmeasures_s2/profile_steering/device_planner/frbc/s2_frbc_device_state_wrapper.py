@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
-import uuid
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_actuator_configuration import (
     S2ActuatorConfiguration,
 )
@@ -29,8 +28,12 @@ class S2FrbcDeviceStateWrapper:
 
     def __init__(self, device_state):
         self.device_state: S2FrbcDeviceState = device_state
-        self.nr_of_buckets: int = self.device_state.get_computational_parameters().get_nr_of_buckets()
-        self.nr_of_stratification_layers: int = self.device_state.get_computational_parameters().get_stratification_layers()
+        self.nr_of_buckets: int = (
+            self.device_state.get_computational_parameters().get_nr_of_buckets()
+        )
+        self.nr_of_stratification_layers: int = (
+            self.device_state.get_computational_parameters().get_stratification_layers()
+        )
         self.actuator_operation_mode_map_per_timestep: Dict[
             datetime, Dict[str, List[str]]
         ] = {}
@@ -95,7 +98,7 @@ class S2FrbcDeviceStateWrapper:
         return actuator_operation_mode_map
 
     def get_operation_mode(
-        self, target_timestep, actuator_id: uuid.UUID, operation_mode_id: str
+        self, target_timestep, actuator_id: str, operation_mode_id: str
     ):
         from flexmeasures_s2.profile_steering.device_planner.frbc.frbc_operation_mode_wrapper import (
             FrbcOperationModeWrapper,
@@ -119,7 +122,7 @@ class S2FrbcDeviceStateWrapper:
     def operation_mode_uses_factor(
         self,
         target_timestep: FrbcTimestep,
-        actuator_id: uuid.UUID,
+        actuator_id: str,
         operation_mode_id: str,
     ) -> bool:
         key = f"{actuator_id}-{operation_mode_id}"
@@ -202,9 +205,9 @@ class S2FrbcDeviceStateWrapper:
     @staticmethod
     def get_transition(
         target_timestep,
-        actuator_id: uuid.UUID,
-        from_operation_mode_id: uuid.UUID,
-        to_operation_mode_id: uuid.UUID,
+        actuator_id: str,
+        from_operation_mode_id: str,
+        to_operation_mode_id: str,
     ) -> Optional[Transition]:
 
         actuator_description = S2FrbcDeviceStateWrapper.get_actuator_description(
@@ -212,21 +215,11 @@ class S2FrbcDeviceStateWrapper:
         )
         if actuator_description is None:
             return None
-        # Make sure from_operation_mode_id and to_operation_mode_id are UUIDs
-        if isinstance(from_operation_mode_id, str):
-            from_operation_mode_id = uuid.UUID(from_operation_mode_id)
-        if isinstance(to_operation_mode_id, str):
-            to_operation_mode_id = uuid.UUID(to_operation_mode_id)
 
         for transition in actuator_description.transitions:
-            # Make sure transition.from_ and transition.to are UUIDs
-            if isinstance(transition.from_, str):
-                transition.from_ = uuid.UUID(transition.from_)
-            if isinstance(transition.to, str):
-                transition.to = uuid.UUID(transition.to)
             if (
-                transition.from_ == from_operation_mode_id
-                and transition.to == to_operation_mode_id
+                str(transition.from_) == from_operation_mode_id
+                and str(transition.to) == to_operation_mode_id
             ):
                 return transition
             else:
@@ -331,7 +324,7 @@ class S2FrbcDeviceStateWrapper:
 
     @staticmethod
     def get_timer_duration_milliseconds(
-        target_timestep: FrbcTimestep, actuator_id: uuid.UUID, timer_id: uuid.UUID
+        target_timestep: FrbcTimestep, actuator_id: str, timer_id: str
     ) -> int:
         actuator_description = S2FrbcDeviceStateWrapper.get_actuator_description(
             target_timestep, actuator_id
@@ -341,7 +334,7 @@ class S2FrbcDeviceStateWrapper:
                 f"Actuator description not found for actuator {actuator_id}"
             )
         timer = next(
-            (t for t in actuator_description.timers if t.id == timer_id),
+            (t for t in actuator_description.timers if str(t.id) == timer_id),
             None,
         )
         # Return the duration in milliseconds directly
@@ -349,7 +342,7 @@ class S2FrbcDeviceStateWrapper:
 
     @staticmethod
     def get_timer_duration(
-        target_timestep: FrbcTimestep, actuator_id: uuid.UUID, timer_id: uuid.UUID
+        target_timestep: FrbcTimestep, actuator_id: str, timer_id: str
     ) -> timedelta:
         return timedelta(
             milliseconds=S2FrbcDeviceStateWrapper.get_timer_duration_milliseconds(
@@ -359,13 +352,13 @@ class S2FrbcDeviceStateWrapper:
 
     @staticmethod
     def get_actuator_description(
-        target_timestep: FrbcTimestep, actuator_id: uuid.UUID
+        target_timestep: FrbcTimestep, actuator_id: str
     ) -> Optional[FRBCActuatorDescription]:
         return next(
             (
                 ad
                 for ad in target_timestep.get_system_description().actuators
-                if ad.id == actuator_id
+                if str(ad.id) == actuator_id
             ),
             None,
         )
