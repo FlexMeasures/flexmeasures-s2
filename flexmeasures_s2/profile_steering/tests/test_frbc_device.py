@@ -42,8 +42,8 @@ import matplotlib.pyplot as plt
 ids = []
 
 
-D = 5  # number of devices
-B = 40  # number of buckets
+D = 10  # number of devices
+B = 20  # number of buckets
 S = 10  # number of stratification layers
 T = 160  # number of time steps
 TIMESTEP_DURATION = 300  # duration of a time step in seconds
