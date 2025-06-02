@@ -251,9 +251,9 @@ class S2FrbcDeviceStateWrapper:
             (
                 e
                 for e in om.get_elements()
-                if e.get_fill_level_range().get_start_of_range()
+                if e.fill_level_range.start_of_range
                 <= fill_level
-                <= e.get_fill_level_range().get_end_of_range()
+                <= e.fill_level_range.end_of_range
             ),
             None,
         )
@@ -261,9 +261,7 @@ class S2FrbcDeviceStateWrapper:
             first = om.get_elements()[0]
             last = om.get_elements()[-1]
             element = (
-                first
-                if fill_level < first.get_fill_level_range().get_start_of_range()
-                else last
+                first if fill_level < first.fill_level_range.start_of_range else last
             )
         return element
 
@@ -272,8 +270,8 @@ class S2FrbcDeviceStateWrapper:
     ) -> float:
         element = self.find_operation_mode_element(om, fill_level)
         fill_rate = element.get_fill_rate()
-        start = fill_rate.get_end_of_range()
-        end = fill_rate.get_start_of_range()
+        start = fill_rate.end_of_range
+        end = fill_rate.start_of_range
         return (start - end) * factor + end
 
     @staticmethod

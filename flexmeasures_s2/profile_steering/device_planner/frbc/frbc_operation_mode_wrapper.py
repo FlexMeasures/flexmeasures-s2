@@ -27,9 +27,6 @@ class FrbcOperationModeElementWrapper:
     def get_power_ranges(self) -> List[NumberRangeWrapper]:
         return self.power_ranges
 
-    def get_fill_level_range(self) -> NumberRangeWrapper:
-        return self.fill_level_range
-
     def get_power_ranges(self):
         return self.frbc_operation_mode_element.power_ranges
 
@@ -53,8 +50,8 @@ class FrbcOperationModeWrapper:
         for element in self.elements:
             if (
                 abs(
-                    element.get_fill_rate().get_start_of_range()
-                    - element.get_fill_rate().get_end_of_range()
+                    element.get_fill_rate().start_of_range
+                    - element.get_fill_rate().end_of_range
                 )
                 > S2FrbcDeviceStateWrapper.epsilon
             ):

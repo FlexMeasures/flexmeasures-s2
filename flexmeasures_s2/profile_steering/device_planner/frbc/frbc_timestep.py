@@ -120,23 +120,23 @@ class FrbcTimestep:
         if self.fill_level_target is None:
             return True
         return (
-            self.fill_level_target.get_start_of_range() is None
-            or state.fill_level >= self.fill_level_target.get_start_of_range()
+            self.fill_level_target.start_of_range is None
+            or state.fill_level >= self.fill_level_target.start_of_range
         ) and (
-            self.fill_level_target.get_end_of_range() is None
-            or state.fill_level <= self.fill_level_target.get_end_of_range()
+            self.fill_level_target.end_of_range is None
+            or state.fill_level <= self.fill_level_target.end_of_range
         )
 
     def get_fill_level_target_distance(self, state: FrbcState) -> float:
         if self.fill_level_target is None:
             return 0
         if (
-            self.fill_level_target.get_end_of_range() is None
-            or state.fill_level < self.fill_level_target.get_start_of_range()
+            self.fill_level_target.end_of_range is None
+            or state.fill_level < self.fill_level_target.start_of_range
         ):
-            return self.fill_level_target.get_start_of_range() - state.fill_level
+            return self.fill_level_target.start_of_range - state.fill_level
         else:
-            return state.fill_level - self.fill_level_target.get_end_of_range()
+            return state.fill_level - self.fill_level_target.end_of_range
 
     def clear(self) -> None:
         self.state_list = [None] * len(self.state_list)
