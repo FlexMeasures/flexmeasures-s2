@@ -1,10 +1,8 @@
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
-import pytest
 from datetime import datetime, timedelta, timezone
 import uuid
 import logging
 import time
-import functools
 from s2python.frbc.frbc_actuator_description import FRBCActuatorDescription
 from s2python.frbc.frbc_fill_level_target_profile_element import (
     FRBCFillLevelTargetProfileElement,
@@ -12,9 +10,6 @@ from s2python.frbc.frbc_fill_level_target_profile_element import (
 from s2python.frbc.frbc_leakage_behaviour_element import FRBCLeakageBehaviourElement
 from s2python.frbc.frbc_operation_mode import FRBCOperationMode
 from s2python.frbc.frbc_usage_forecast_element import FRBCUsageForecastElement
-from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_planner import (
-    S2FrbcDevicePlanner,
-)
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import (
     S2FrbcDeviceState,
 )
@@ -33,25 +28,32 @@ from s2python.common import Timer
 from s2python.common import PowerValue
 from s2python.common import Commodity
 
-from flexmeasures_s2.profile_steering.device_planner.device_planner_abstract import (
-    DevicePlanner,
-)
-from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.planning_service_impl import (
     PlanningServiceImpl,
     PlanningServiceConfig,
     ClusterState,
     ClusterTarget,
 )
-import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
 
 # Global variables to store IDs for debugging
 # make a list of tuples with the ids and the names
 ids = []
 
-import matplotlib.pyplot as plt
+
+D = 10  # number of devices
+B = 20  # number of buckets
+S = 10  # number of stratification layers
+T = 160  # number of time steps
+TIMESTEP_DURATION = 300  # duration of a time step in seconds
+
+"""
+# Ideas for speeding up
+
+- Parallelize device planning
+- Precompute UUIDs
+"""
 
 
 def create_ev_device_state(
@@ -76,13 +78,15 @@ def create_ev_device_state(
     start_of_recharge2: datetime,
 ) -> S2FrbcDeviceState:
     # Create system description
-    recharge_system_description1, charge_actuator_status1, storage_status1 = (
-        create_recharge_system_description(
-            start_of_recharge=start_of_recharge1,
-            charge_power_soc_percentage_per_second=charge_power_soc_percentage_per_second_night,
-            charging_power_kw=charging_power_kw_night,
-            soc_percentage_before_charging=soc_percentage_before_charging1,
-        )
+    (
+        recharge_system_description1,
+        charge_actuator_status1,
+        storage_status1,
+    ) = create_recharge_system_description(
+        start_of_recharge=start_of_recharge1,
+        charge_power_soc_percentage_per_second=charge_power_soc_percentage_per_second_night,
+        charging_power_kw=charging_power_kw_night,
+        soc_percentage_before_charging=soc_percentage_before_charging1,
     )
 
     # Create leakage behaviour
@@ -101,22 +105,26 @@ def create_ev_device_state(
         soc_percentage_before_charging1,
     )
 
-    drive_system_description1, off_actuator_status1, storage_status1 = (
-        create_driving_system_description(
-            start_of_drive1, soc_percentage_before_driving1
-        )
+    (
+        drive_system_description1,
+        off_actuator_status1,
+        storage_status1,
+    ) = create_driving_system_description(
+        start_of_drive1, soc_percentage_before_driving1
     )
     drive_usage_forecast1 = create_driving_usage_forecast(
         start_of_drive1, drive_duration1, drive_consume_soc_per_second1
     )
 
-    recharge_system_description2, charge_actuator_status2, storage_status2 = (
-        create_recharge_system_description(
-            start_of_recharge2,
-            charge_power_soc_percentage_per_second_day,
-            charging_power_kw_day,
-            soc_percentage_before_charging2,
-        )
+    (
+        recharge_system_description2,
+        charge_actuator_status2,
+        storage_status2,
+    ) = create_recharge_system_description(
+        start_of_recharge2,
+        charge_power_soc_percentage_per_second_day,
+        charging_power_kw_day,
+        soc_percentage_before_charging2,
     )
     recharge_leakage2 = create_recharge_leakage_behaviour(start_of_recharge2)
     recharge_usage_forecast2 = create_recharge_usage_forecast(
@@ -133,15 +141,17 @@ def create_ev_device_state(
     done_start = start_of_recharge2 + recharge_duration2
     done_duration = timedelta(hours=4, minutes=10)  # 4 hours & 10 minutes
     done_leakage = create_recharge_leakage_behaviour(done_start)
-    done_system_description, done_actuator_status, done_storage_status = create_driving_system_description(
-        done_start, final_fill_level_target2
-    )
+    (
+        done_system_description,
+        done_actuator_status,
+        done_storage_status,
+    ) = create_driving_system_description(done_start, final_fill_level_target2)
     done_usage_forecast = create_recharge_usage_forecast(done_start, done_duration)
 
     device_state = S2FrbcDeviceState(
         device_id=device_id,
         device_name=device_id,
-        connection_id=device_id+"_cid1",
+        connection_id=device_id + "_cid1",
         priority_class=1,
         timestamp=omloop_starts_at,
         energy_in_current_timestep=PowerValue(
@@ -166,7 +176,7 @@ def create_ev_device_state(
             recharge_fill_level_target1,
             recharge_fill_level_target2,
         ],
-        computational_parameters=S2FrbcDeviceState.ComputationalParameters(100, 20),
+        computational_parameters=S2FrbcDeviceState.ComputationalParameters(B, S),
         actuator_statuses=[
             off_actuator_status1,
             charge_actuator_status1,
@@ -176,6 +186,7 @@ def create_ev_device_state(
         storage_status=[storage_status1, storage_status2, done_storage_status],
     )
     return device_state
+
 
 @staticmethod
 def create_recharge_system_description(
@@ -506,7 +517,7 @@ def plot_planning_results(
 
     # Adjust layout
     plt.tight_layout()
-    plt.show()
+    plt.savefig(f"my plot - D = {D} - B = {B} - S = {S} - T = {T}")
 
 
 def create_device_state(
@@ -561,7 +572,7 @@ def create_device_state(
     return device_state
 
 
-def get_target_profile_elements():
+def get_target_profile_elements(number_of_elements: int):
     """Create target profile elements with the same pattern as the Java code."""
     target_elements = []
     # First 38 elements of 0
@@ -574,41 +585,41 @@ def get_target_profile_elements():
     target_elements.extend([8400000] * 28)
     # Last 115 elements of 176000000
     target_elements.extend([176000000] * 115)
-    return target_elements
+    return target_elements[:number_of_elements]
 
 
 def test_planning_service_impl_with_ev_device():
     """Test the PlanningServiceImpl with an EV device."""
     print("Test the PlanningServiceImpl with an EV device.")
     # Create 10 device states
-    numberOfDevices = 10
+    numberOfDevices = D
 
     # Create profile metadata and target profile
     target_metadata = ProfileMetadata(
         profile_start=datetime(1970, 1, 1, tzinfo=timezone.utc),
-        timestep_duration=timedelta(seconds=300),
-        nr_of_timesteps=288,
+        timestep_duration=timedelta(seconds=TIMESTEP_DURATION),
+        nr_of_timesteps=T,
     )
     plan_due_by_date = target_metadata.get_profile_start() + timedelta(seconds=10)
-    target_profile_elements = get_target_profile_elements()
-    
+    target_profile_elements = get_target_profile_elements(T)
+
     device_states = [
         create_device_state(
             f"battery{i+1}", datetime.fromtimestamp(3600), timezone(timedelta(hours=1))
         )
         for i in range(numberOfDevices)
     ]
-    
+
     # Create Dictionary of device states
     device_states_dict = {
         device_state.device_id: device_state for device_state in device_states
     }
-    
+
     # Create congestion points mapping
     congestion_points_by_connection_id = {
         device_id: "" for device_id in device_states_dict.keys()
     }
-    
+
     # Create a target profile
     global_target_profile = TargetProfile(
         profile_start=target_metadata.get_profile_start(),
@@ -616,14 +627,20 @@ def test_planning_service_impl_with_ev_device():
         elements=target_profile_elements,
     )
     # Create a cluster state using the list of device states
-    cluster_state = ClusterState(datetime.now(), device_states_dict, congestion_points_by_connection_id)
-   
+    cluster_state = ClusterState(
+        datetime.now(), device_states_dict, congestion_points_by_connection_id
+    )
+
     #  Create an empty map for congestion point targets
     congestion_point_targets = {}
 
     # Create a cluster target
     cluster_target = ClusterTarget(
-        datetime.now(), None, None, global_target_profile=global_target_profile, congestion_point_targets=congestion_point_targets
+        datetime.now(),
+        None,
+        None,
+        global_target_profile=global_target_profile,
+        congestion_point_targets=congestion_point_targets,
     )
 
     config = PlanningServiceConfig(
@@ -638,9 +655,13 @@ def test_planning_service_impl_with_ev_device():
     service = PlanningServiceImpl(config)
 
     # Create cluster target
-    
+
     cluster_target = ClusterTarget(
-        datetime.now(), None, None, global_target_profile=global_target_profile, congestion_point_targets=congestion_point_targets
+        datetime.now(),
+        None,
+        None,
+        global_target_profile=global_target_profile,
+        congestion_point_targets=congestion_point_targets,
     )
     # Set due by date for planning
     plan_due_by_date = target_metadata.get_profile_start() + timedelta(seconds=10)
@@ -649,7 +670,7 @@ def test_planning_service_impl_with_ev_device():
     cluster_plan = service.plan(
         state=cluster_state,
         target=cluster_target,
-        planning_window=300 * 288,  # Full planning window in seconds
+        planning_window=TIMESTEP_DURATION * T,  # Full planning window in seconds
         reason="Testing EV planning",
         plan_due_by_date=plan_due_by_date,
         optimize_for_target=True,
@@ -660,7 +681,7 @@ def test_planning_service_impl_with_ev_device():
 
     # Log information
     print(f"Plan generated in {execution_time:.2f} seconds")
-    
+
     # Assert
     assert cluster_plan is not None
     print("Got cluster plan")
@@ -672,11 +693,11 @@ def test_planning_service_impl_with_ev_device():
     energy_profile = cluster_plan.get_joule_profile()
 
     plot_planning_results(
-            timestep_duration=timedelta(seconds=300),
-            nr_of_timesteps=288,
-            predicted_energy_elements=energy_profile.get_elements(),
-            target_energy_elements=target_profile_elements,
-        )
+        timestep_duration=timedelta(seconds=TIMESTEP_DURATION),
+        nr_of_timesteps=T,
+        predicted_energy_elements=energy_profile.get_elements(),
+        target_energy_elements=target_profile_elements,
+    )
 
     # Get only the non-None plans
     device_plans = [plan for plan in device_plans if plan is not None]
@@ -689,7 +710,6 @@ def test_planning_service_impl_with_ev_device():
     # Basic assertion - the energy profile should have the expected number of elements
     assert len(energy_profile.elements) == target_metadata.get_nr_of_timesteps()
 
-    
 
 # Main function
 if __name__ == "__main__":
