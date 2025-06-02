@@ -32,9 +32,7 @@ from s2python.common import Transition
 from s2python.common import Timer
 from s2python.common import PowerValue
 from s2python.common import Commodity
-from flexmeasures_s2.profile_steering.tests.joule_profile_example import (
-    get_JouleProfileTarget,
-)
+
 from flexmeasures_s2.profile_steering.device_planner.device_planner_abstract import (
     DevicePlanner,
 )
@@ -522,19 +520,19 @@ def create_device_state(
 
     # First recharge period
     start_of_recharge1 = omloop_starts_at.astimezone(cet)
-    recharge_duration1 = timedelta(hours=7, minutes=13)
+    recharge_duration1 = timedelta(hours=7, minutes=15)
     soc_percentage_before_charging1 = 0
     final_fill_level_target1 = 100
 
     # Driving period
     start_of_drive1 = start_of_recharge1 + recharge_duration1
-    drive_duration1 = timedelta(hours=4, minutes=36)
+    drive_duration1 = timedelta(hours=4, minutes=35)
     drive_consume_soc_per_second1 = 0.00375927565821256038647342995169
     soc_percentage_before_driving1 = 100
 
     # Second recharge period
     start_of_recharge2 = start_of_drive1 + drive_duration1
-    recharge_duration2 = timedelta(seconds=10000)  # 1.5 hours
+    recharge_duration2 = timedelta(hours=7)
     soc_percentage_before_charging2 = 37.0
     final_fill_level_target2 = 94.4825134
 
@@ -571,9 +569,9 @@ def get_target_profile_elements():
     # Next 62 elements of 8400000
     target_elements.extend([8400000] * 62)
     # Next 55 elements of 0
-    target_elements.extend([0] * 55)
+    target_elements.extend([0] * 45)
     # Next 18 elements of 8400000
-    target_elements.extend([8400000] * 18)
+    target_elements.extend([8400000] * 28)
     # Last 115 elements of 176000000
     target_elements.extend([176000000] * 115)
     return target_elements
