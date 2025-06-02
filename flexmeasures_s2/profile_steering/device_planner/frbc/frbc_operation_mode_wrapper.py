@@ -24,6 +24,7 @@ class FrbcOperationModeElementWrapper:
     def get_fill_rate(self) -> NumberRangeWrapper:
         return self.fill_rate
 
+    # todo: there are two get_power_ranges methods defined
     def get_power_ranges(self) -> List[NumberRangeWrapper]:
         return self.power_ranges
 
