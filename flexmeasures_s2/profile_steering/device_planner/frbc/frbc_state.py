@@ -93,8 +93,6 @@ class FrbcState:
                     actuator_id,
                     actuator_configuration,
                 ) in actuator_configurations.items():
-                    if isinstance(actuator_id, str):
-                        actuator_id = uuid.UUID(actuator_id)
                     previous_operation_mode_id = (
                         previous_state.get_actuator_configurations()[
                             actuator_id
@@ -165,9 +163,8 @@ class FrbcState:
             self.actuator_configurations = actuator_configurations or {}
             for k in list(self.get_actuator_configurations().keys()):
                 if isinstance(k, str):
-                    # Convert strings to UUIDs
-                    self.actuator_configurations[uuid.UUID(k)] = (
-                        self.actuator_configurations.pop(k)
+                    self.actuator_configurations[k] = self.actuator_configurations.pop(
+                        k
                     )
 
             self.timestep.add_state(self)
@@ -198,11 +195,11 @@ class FrbcState:
                 actuators = self.system_description.actuators
                 for actuator in actuators:
                     if actuator.id == a.actuator_id:
-                        self.actuator_configurations[a.actuator_id] = (
-                            S2ActuatorConfiguration(  # TODO here was the problem with str and uuid
-                                actuator_status.active_operation_mode_id,
-                                actuator_status.operation_mode_factor,
-                            )
+                        self.actuator_configurations[
+                            str(a.actuator_id)
+                        ] = S2ActuatorConfiguration(  # TODO here was the problem with str and uuid
+                            actuator_status.active_operation_mode_id,
+                            actuator_status.operation_mode_factor,
                         )
 
     @staticmethod
@@ -273,8 +270,6 @@ class FrbcState:
         ):
             self.timer_elapse_map = previous_state.get_timer_elapse_map().copy()
             for actuator_id, actuator_configuration in actuator_configurations.items():
-                if isinstance(actuator_id, str):
-                    actuator_id = uuid.UUID(actuator_id)
                 previous_operation_mode_id = (
                     previous_state.get_actuator_configurations()[
                         actuator_id
@@ -368,8 +363,6 @@ class FrbcState:
                 actuator_id,
                 actuator_configuration,
             ) in actuator_configs_for_target_timestep.items():
-                if isinstance(actuator_id, str):
-                    actuator_id = uuid.UUID(actuator_id)
 
                 # print all the keys in the previous_state.get_actuator_configurations()
                 # print(previous_state.get_actuator_configurations().keys())
