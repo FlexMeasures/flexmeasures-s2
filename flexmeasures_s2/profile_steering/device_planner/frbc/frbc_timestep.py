@@ -88,38 +88,11 @@ class FrbcTimestep:
         for state in states:
             self.add_state(state)
 
-    def get_start_date(self) -> datetime:
-        return self.start_date
-
-    def get_end_date(self) -> datetime:
-        return self.end_date
-
-    def get_system_description(self) -> FRBCSystemDescription:
-        return self.system_description
-
-    def get_leakage_behaviour(self) -> FRBCLeakageBehaviour:
-        return self.leakage_behaviour
-
-    def get_duration(self) -> timedelta:
-        return self.duration
-
     def get_duration_seconds(self) -> int:
         return int(self.duration.total_seconds())
 
     def get_target(self) -> TargetProfile.JouleElement:
         return self.target
-
-    def get_min_constraint(self) -> float:
-        return self.min_constraint
-
-    def get_max_constraint(self) -> float:
-        return self.max_constraint
-
-    def get_fill_level_target(self) -> Optional[NumberRangeWrapper]:
-        return self.fill_level_target
-
-    def get_state_list(self) -> List[Optional[FrbcState]]:
-        return self.state_list
 
     def get_final_states(self) -> List[FrbcState]:
         final_states = [state for state in self.state_list if state is not None]
@@ -164,9 +137,6 @@ class FrbcTimestep:
             return self.fill_level_target.get_start_of_range() - state.fill_level
         else:
             return state.fill_level - self.fill_level_target.get_end_of_range()
-
-    def get_forecasted_usage(self) -> float:
-        return self.forecasted_fill_level_usage
 
     def clear(self) -> None:
         self.state_list = [None] * len(self.state_list)

@@ -42,7 +42,7 @@ class FrbcState:
                 self.device_state = previous_state.device_state
             self.timestep = timestep
             self.previous_state = previous_state
-            self.system_description = timestep.get_system_description()
+            self.system_description = timestep.system_description
             self.fill_level = present_fill_level
             self.bucket = 0
             self.timestep_energy = 0.0
@@ -52,13 +52,13 @@ class FrbcState:
                 om = self.device_state.get_operation_mode(
                     self.timestep,
                     actuator_id,
-                    actuator_configuration.get_operation_mode_id(),
+                    actuator_configuration.operation_mode_id,
                 )
                 self.timestep_energy += (
                     self.device_state.get_operation_mode_power(
                         om,
                         previous_state.fill_level,
-                        actuator_configuration.get_factor(),
+                        actuator_configuration.factor,
                     )
                     * seconds
                 )
@@ -67,7 +67,7 @@ class FrbcState:
                     self.device_state.get_operation_mode_fill_rate(
                         om,
                         previous_state.fill_level,
-                        actuator_configuration.get_factor(),
+                        actuator_configuration.factor,
                     )
                     * seconds
                 )
@@ -77,7 +77,7 @@ class FrbcState:
                 )
                 * seconds
             )
-            self.fill_level += self.timestep.get_forecasted_usage()
+            self.fill_level += self.timestep.forecasted_fill_level_usage
             self.bucket = (
                 s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.calculate_bucket(
                     self.timestep, self.fill_level
@@ -94,10 +94,8 @@ class FrbcState:
                 ) in actuator_configurations.items():
                     previous_operation_mode_id = previous_state.actuator_configurations[
                         actuator_id
-                    ].get_operation_mode_id()
-                    new_operation_mode_id = (
-                        actuator_configuration.get_operation_mode_id()
-                    )
+                    ].operation_mode_id
+                    new_operation_mode_id = actuator_configuration.operation_mode_id
                     if previous_operation_mode_id != new_operation_mode_id:
                         transition = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_transition(
                             self.timestep,
@@ -111,7 +109,7 @@ class FrbcState:
                             duration = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_timer_duration(
                                 self.timestep, actuator_id, str(timer_id)
                             )
-                            new_finished_at = self.timestep.get_start_date() + duration
+                            new_finished_at = self.timestep.start_date + duration
                             last_timer_id = timer_id
                         if last_timer_id is not None:
                             key = FrbcState.timer_key(actuator_id, str(last_timer_id))
@@ -136,15 +134,15 @@ class FrbcState:
             squared_constraint_violation = (
                 previous_state.sum_squared_constraint_violation
             )
-            if self.timestep.get_max_constraint() is not None:
-                if self.timestep_energy > self.timestep.get_max_constraint():
+            if self.timestep.max_constraint is not None:
+                if self.timestep_energy > self.timestep.max_constraint:
                     squared_constraint_violation += (
-                        self.timestep_energy - self.timestep.get_max_constraint()
+                        self.timestep_energy - self.timestep.max_constraint
                     ) ** 2
-            if self.timestep.get_min_constraint() is not None:
-                if self.timestep_energy < self.timestep.get_min_constraint():
+            if self.timestep.min_constraint is not None:
+                if self.timestep_energy < self.timestep.min_constraint:
                     squared_constraint_violation += (
-                        self.timestep.get_min_constraint() - self.timestep_energy
+                        self.timestep.min_constraint - self.timestep_energy
                     ) ** 2
             self.sum_squared_constraint_violation = (
                 previous_state.sum_squared_constraint_violation
@@ -220,13 +218,13 @@ class FrbcState:
             om = self.device_state.get_operation_mode(
                 self.timestep,
                 actuator_id,
-                actuator_configuration.get_operation_mode_id(),
+                actuator_configuration.operation_mode_id,
             )
             self.timestep_energy += (
                 self.device_state.get_operation_mode_power(
                     om,
                     previous_state.fill_level,
-                    actuator_configuration.get_factor(),
+                    actuator_configuration.factor,
                 )
                 * seconds
             )
@@ -234,7 +232,7 @@ class FrbcState:
                 self.device_state.get_operation_mode_fill_rate(
                     om,
                     previous_state.fill_level,
-                    actuator_configuration.get_factor(),
+                    actuator_configuration.factor,
                 )
                 * seconds
             )
@@ -244,7 +242,7 @@ class FrbcState:
             )
             * seconds
         )
-        self.fill_level += self.timestep.get_forecasted_usage()
+        self.fill_level += self.timestep.forecasted_fill_level_usage
         self.bucket = (
             s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.calculate_bucket(
                 self.timestep, self.fill_level
@@ -267,8 +265,8 @@ class FrbcState:
             for actuator_id, actuator_configuration in actuator_configurations.items():
                 previous_operation_mode_id = previous_state.actuator_configurations[
                     actuator_id
-                ].get_operation_mode_id()
-                new_operation_mode_id = actuator_configuration.get_operation_mode_id()
+                ].operation_mode_id
+                new_operation_mode_id = actuator_configuration.operation_mode_id
                 if previous_operation_mode_id != new_operation_mode_id:
                     transition = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_transition(
                         self.timestep,
@@ -282,7 +280,7 @@ class FrbcState:
                         duration = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_timer_duration(
                             self.timestep, actuator_id, str(timer_id)
                         )
-                        new_finished_at = self.timestep.get_start_date() + duration
+                        new_finished_at = self.timestep.start_date + duration
                         key = FrbcState.timer_key(actuator_id, str(timer_id))
                         self.timer_elapse_map[key] = new_finished_at
         else:
@@ -306,18 +304,18 @@ class FrbcState:
             self.sum_energy_cost = previous_state.sum_energy_cost
         squared_constraint_violation = previous_state.sum_squared_constraint_violation
         if (
-            self.timestep.get_max_constraint() is not None
-            and self.timestep_energy > self.timestep.get_max_constraint()
+            self.timestep.max_constraint is not None
+            and self.timestep_energy > self.timestep.max_constraint
         ):
             squared_constraint_violation += (
-                self.timestep_energy - self.timestep.get_max_constraint()
+                self.timestep_energy - self.timestep.max_constraint
             ) ** 2
         if (
-            self.timestep.get_min_constraint() is not None
-            and self.timestep_energy < self.timestep.get_min_constraint()
+            self.timestep.min_constraint is not None
+            and self.timestep_energy < self.timestep.min_constraint
         ):
             squared_constraint_violation += (
-                self.timestep.get_min_constraint() - self.timestep_energy
+                self.timestep.min_constraint - self.timestep_energy
             ) ** 2
         self.sum_squared_constraint_violation = (
             previous_state.sum_squared_constraint_violation
@@ -358,13 +356,13 @@ class FrbcState:
                 try:
                     previous_operation_mode_id = previous_state.actuator_configurations[
                         actuator_id
-                    ].get_operation_mode_id()
+                    ].operation_mode_id
                 except KeyError:
                     raise KeyError(
                         f"UUID {actuator_id} not found in actuator configurations"
                     )
 
-                new_operation_mode_id = actuator_configuration.get_operation_mode_id()
+                new_operation_mode_id = actuator_configuration.operation_mode_id
                 if previous_operation_mode_id != new_operation_mode_id:
                     transition = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_transition(
                         target_timestep,
@@ -381,9 +379,9 @@ class FrbcState:
                         if (
                             timer_is_finished_at
                             and timer_is_finished_at.year != 1
-                            and target_timestep.get_start_date()
+                            and target_timestep.start_date
                             < timer_is_finished_at.astimezone(
-                                target_timestep.get_start_date().tzinfo
+                                target_timestep.start_date.tzinfo
                             )
                         ):
                             return False
@@ -441,12 +439,3 @@ class FrbcState:
 
     def set_selection_reason(self, selection_reason):
         self.selection_reason = selection_reason
-
-    def get_selection_reason(self) -> Optional[SelectionReason]:
-        return self.selection_reason
-
-    def get_system_description(self) -> FRBCSystemDescription:
-        return self.system_description
-
-    def get_timestep(self):
-        return self.timestep

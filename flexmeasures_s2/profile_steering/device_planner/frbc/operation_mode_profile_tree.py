@@ -271,7 +271,7 @@ class OperationModeProfileTree:
                 diff_to_max_profile.get_elements()[i],
             )
         first_timestep_index = next(
-            (i for i, ts in enumerate(self.timesteps) if ts.get_system_description()),
+            (i for i, ts in enumerate(self.timesteps) if ts.system_description),
             -1,
         )
         first_timestep = self.timesteps[first_timestep_index]
@@ -298,7 +298,7 @@ class OperationModeProfileTree:
         )
         plan = self.convert_to_plan(first_timestep_index, end_state)
         # Extract only the time component from each datetime object
-        timestep_start_times = [ts.get_start_date() for ts in self.timesteps]
+        timestep_start_times = [ts.start_date for ts in self.timesteps]
 
         # Now use this list in the plot function
         # plot_planning_results(timestep_start_times, plan.get_energy().elements, plan.get_fill_level().elements, plan.get_operation_mode_id(), ids)
@@ -329,9 +329,7 @@ class OperationModeProfileTree:
                 energy[i] = int(state.timestep_energy)
                 fill_level[i] = state.fill_level
                 actuators[i] = state.actuator_configurations
-                state_selection_reasons[
-                    i
-                ] = state.get_selection_reason()  # type: ignore
+                state_selection_reasons[i] = state.selection_reason  # type: ignore
                 state = state.previous_state
             else:
                 energy[i] = 0
@@ -352,6 +350,3 @@ class OperationModeProfileTree:
             ),
             actuators,
         )
-
-    def get_timestep_duration_seconds(self) -> int:
-        return self.timestep_duration_seconds

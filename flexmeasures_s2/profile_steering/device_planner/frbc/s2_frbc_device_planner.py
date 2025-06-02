@@ -182,9 +182,6 @@ class S2FrbcDevicePlanner(DevicePlanner):
             raise ValueError("No accepted plan found")
         return self.accepted_plan.get_energy()
 
-    def get_latest_plan(self) -> Optional[S2FrbcPlan]:
-        return self.latest_plan
-
     def get_device_plan(self) -> Optional[DevicePlan]:
         if self.accepted_plan is None:
             return None

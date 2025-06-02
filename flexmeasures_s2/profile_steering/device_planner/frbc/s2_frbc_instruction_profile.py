@@ -18,11 +18,6 @@ class S2FrbcInstructionProfile:
         def is_idle(self) -> bool:
             return self.idle
 
-        def get_actuator_configuration(
-            self,
-        ) -> Dict[str, S2ActuatorConfiguration]:
-            return self.actuator_configuration
-
     def __init__(
         self,
         profile_start: datetime,

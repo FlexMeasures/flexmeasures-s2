@@ -64,7 +64,7 @@ class S2FrbcDeviceStateWrapper:
 
     def get_actuators(self, target_timestep: FrbcTimestep) -> List[str]:
         actuator_operation_mode_map = self.actuator_operation_mode_map_per_timestep.get(
-            target_timestep.get_start_date()
+            target_timestep.start_date
         )
         if actuator_operation_mode_map is None:
             actuator_operation_mode_map = self.create_actuator_operation_mode_map(
@@ -76,7 +76,7 @@ class S2FrbcDeviceStateWrapper:
         self, target_timestep: FrbcTimestep, actuator_id: str
     ) -> List[str]:
         actuator_operation_mode_map = self.actuator_operation_mode_map_per_timestep.get(
-            target_timestep.get_start_date()
+            target_timestep.start_date
         )
         if actuator_operation_mode_map is None:
             actuator_operation_mode_map = self.create_actuator_operation_mode_map(
@@ -88,12 +88,12 @@ class S2FrbcDeviceStateWrapper:
         self, target_timestep: FrbcTimestep
     ) -> Dict[str, List[str]]:
         actuator_operation_mode_map = {}
-        for a in target_timestep.get_system_description().actuators:
+        for a in target_timestep.system_description.actuators:
             actuator_operation_mode_map[str(a.id)] = [
                 str(om.id) for om in a.operation_modes if not om.abnormal_condition_only
             ]
         self.actuator_operation_mode_map_per_timestep[
-            target_timestep.get_start_date()
+            target_timestep.start_date
         ] = actuator_operation_mode_map
         return actuator_operation_mode_map
 
@@ -107,7 +107,7 @@ class S2FrbcDeviceStateWrapper:
         om_key = f"{actuator_id}-{operation_mode_id}"
         if om_key in self.operation_modes:
             return self.operation_modes[om_key]
-        actuators = target_timestep.get_system_description().actuators
+        actuators = target_timestep.system_description.actuators
         found_actuator_description = next(
             (ad for ad in actuators if str(ad.id) == actuator_id), None
         )
@@ -136,7 +136,7 @@ class S2FrbcDeviceStateWrapper:
     def get_all_possible_actuator_configurations(
         self, target_timestep: FrbcTimestep
     ) -> List[Dict[Any, S2ActuatorConfiguration]]:
-        timestep_date = target_timestep.get_start_date()
+        timestep_date = target_timestep.start_date
         if timestep_date not in self.all_actions:
             possible_actuator_configs = {}
             for actuator_id in self.get_actuators(target_timestep):
@@ -278,7 +278,7 @@ class S2FrbcDeviceStateWrapper:
 
     @staticmethod
     def get_leakage_rate(target_timestep: FrbcTimestep, fill_level: float) -> float:
-        if target_timestep.get_leakage_behaviour() is None:
+        if target_timestep.leakage_behaviour is None:
             return 0
         else:
             return S2FrbcDeviceStateWrapper.find_leakage_element(
@@ -289,7 +289,7 @@ class S2FrbcDeviceStateWrapper:
     def find_leakage_element(
         target_timestep: FrbcTimestep, fill_level: float
     ) -> FRBCLeakageBehaviourElement:
-        leakage = target_timestep.get_leakage_behaviour()
+        leakage = target_timestep.leakage_behaviour
         element = next(
             (
                 e
@@ -311,10 +311,10 @@ class S2FrbcDeviceStateWrapper:
     @staticmethod
     def calculate_bucket(target_timestep: FrbcTimestep, fill_level: float) -> int:
         fill_level_lower_limit = (
-            target_timestep.get_system_description().storage.fill_level_range.start_of_range
+            target_timestep.system_description.storage.fill_level_range.start_of_range
         )
         fill_level_upper_limit = (
-            target_timestep.get_system_description().storage.fill_level_range.end_of_range
+            target_timestep.system_description.storage.fill_level_range.end_of_range
         )
         return int(
             (fill_level - fill_level_lower_limit)
@@ -357,7 +357,7 @@ class S2FrbcDeviceStateWrapper:
         return next(
             (
                 ad
-                for ad in target_timestep.get_system_description().actuators
+                for ad in target_timestep.system_description.actuators
                 if str(ad.id) == actuator_id
             ),
             None,
