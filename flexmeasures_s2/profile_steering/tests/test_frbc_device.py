@@ -671,12 +671,12 @@ def test_planning_service_impl_with_ev_device():
     device_plans = cluster_plan.get_plan_data().get_device_plans()
     energy_profile = cluster_plan.get_joule_profile()
 
-    plot_planning_results(
-            timestep_duration=timedelta(seconds=300),
-            nr_of_timesteps=288,
-            predicted_energy_elements=energy_profile.get_elements(),
-            target_energy_elements=target_profile_elements,
-        )
+    # plot_planning_results(
+    #         timestep_duration=timedelta(seconds=300),
+    #         nr_of_timesteps=288,
+    #         predicted_energy_elements=energy_profile.get_elements(),
+    #         target_energy_elements=target_profile_elements,
+    #     )
 
     # Get only the non-None plans
     device_plans = [plan for plan in device_plans if plan is not None]
