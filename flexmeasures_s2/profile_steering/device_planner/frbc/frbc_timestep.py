@@ -66,15 +66,15 @@ class FrbcTimestep:
 
     def add_state(self, state: FrbcState) -> None:
         if state and state.is_within_fill_level_range():
-            stored_state = self.state_list[state.get_bucket()]
+            stored_state = self.state_list[state.bucket]
             if stored_state is None:
-                self.state_list[state.get_bucket()] = state
+                self.state_list[state.bucket] = state
                 state.set_selection_reason(SelectionReason.NO_ALTERNATIVE)
             else:
                 selection_result = state.is_preferable_than(stored_state)
                 if selection_result.result:
-                    self.state_list[state.get_bucket()] = state
-                self.state_list[state.get_bucket()].set_selection_reason(selection_result.reason)  # type: ignore
+                    self.state_list[state.bucket] = state
+                self.state_list[state.bucket].set_selection_reason(selection_result.reason)  # type: ignore
         else:
             if (
                 self.emergency_state is None
@@ -148,10 +148,10 @@ class FrbcTimestep:
             return True
         return (
             self.fill_level_target.get_start_of_range() is None
-            or state.get_fill_level() >= self.fill_level_target.get_start_of_range()
+            or state.fill_level >= self.fill_level_target.get_start_of_range()
         ) and (
             self.fill_level_target.get_end_of_range() is None
-            or state.get_fill_level() <= self.fill_level_target.get_end_of_range()
+            or state.fill_level <= self.fill_level_target.get_end_of_range()
         )
 
     def get_fill_level_target_distance(self, state: FrbcState) -> float:
@@ -159,11 +159,11 @@ class FrbcTimestep:
             return 0
         if (
             self.fill_level_target.get_end_of_range() is None
-            or state.get_fill_level() < self.fill_level_target.get_start_of_range()
+            or state.fill_level < self.fill_level_target.get_start_of_range()
         ):
-            return self.fill_level_target.get_start_of_range() - state.get_fill_level()
+            return self.fill_level_target.get_start_of_range() - state.fill_level
         else:
-            return state.get_fill_level() - self.fill_level_target.get_end_of_range()
+            return state.fill_level - self.fill_level_target.get_end_of_range()
 
     def get_forecasted_usage(self) -> float:
         return self.forecasted_fill_level_usage

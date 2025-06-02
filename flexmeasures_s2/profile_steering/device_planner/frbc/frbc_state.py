@@ -87,16 +87,14 @@ class FrbcState:
                 previous_state.system_description.valid_from
                 == self.system_description.valid_from
             ):
-                self.timer_elapse_map = previous_state.get_timer_elapse_map().copy()
+                self.timer_elapse_map = previous_state.timer_elapse_map.copy()
                 for (
                     actuator_id,
                     actuator_configuration,
                 ) in actuator_configurations.items():
-                    previous_operation_mode_id = (
-                        previous_state.get_actuator_configurations()[
-                            actuator_id
-                        ].get_operation_mode_id()
-                    )
+                    previous_operation_mode_id = previous_state.actuator_configurations[
+                        actuator_id
+                    ].get_operation_mode_id()
                     new_operation_mode_id = (
                         actuator_configuration.get_operation_mode_id()
                     )
@@ -128,15 +126,15 @@ class FrbcState:
             target = self.timestep.get_target()
             if isinstance(target, TargetProfile.JouleElement):
                 self.sum_squared_distance = (
-                    previous_state.get_sum_squared_distance()
+                    previous_state.sum_squared_distance
                     + (target.get_joules() - self.timestep_energy) ** 2
                 )
-                self.sum_energy_cost = previous_state.get_sum_energy_cost()
+                self.sum_energy_cost = previous_state.sum_energy_cost
             else:
-                self.sum_squared_distance = previous_state.get_sum_squared_distance()
-                self.sum_energy_cost = previous_state.get_sum_energy_cost()
+                self.sum_squared_distance = previous_state.sum_squared_distance
+                self.sum_energy_cost = previous_state.sum_energy_cost
             squared_constraint_violation = (
-                previous_state.get_sum_squared_constraint_violation()
+                previous_state.sum_squared_constraint_violation
             )
             if self.timestep.get_max_constraint() is not None:
                 if self.timestep_energy > self.timestep.get_max_constraint():
@@ -149,16 +147,16 @@ class FrbcState:
                         self.timestep.get_min_constraint() - self.timestep_energy
                     ) ** 2
             self.sum_squared_constraint_violation = (
-                previous_state.get_sum_squared_constraint_violation()
+                previous_state.sum_squared_constraint_violation
                 + squared_constraint_violation
             )
             self.sum_squared_energy = (
-                previous_state.get_sum_squared_energy() + self.timestep_energy**2
+                previous_state.sum_squared_energy + self.timestep_energy**2
             )
 
             self.selection_reason: Optional[SelectionReason] = None
             self.actuator_configurations = actuator_configurations or {}
-            for k in list(self.get_actuator_configurations().keys()):
+            for k in list(self.actuator_configurations.keys()):
                 if isinstance(k, str):
                     self.actuator_configurations[k] = self.actuator_configurations.pop(
                         k
@@ -172,7 +170,7 @@ class FrbcState:
             )
             self.timestep = timestep
             self.previous_state = None
-            self.system_description = timestep.get_system_description()
+            self.system_description = timestep.system_description
             self.fill_level = present_fill_level
             self.bucket = 0
             self.timestep_energy = 0.0
@@ -216,7 +214,7 @@ class FrbcState:
         actuator_configurations: Dict[str, S2ActuatorConfiguration],
     ):
         self.timestep_energy = 0.0
-        self.fill_level = previous_state.get_fill_level()
+        self.fill_level = previous_state.fill_level
         seconds = self.timestep.get_duration_seconds()
         for actuator_id, actuator_configuration in actuator_configurations.items():
             om = self.device_state.get_operation_mode(
@@ -227,7 +225,7 @@ class FrbcState:
             self.timestep_energy += (
                 self.device_state.get_operation_mode_power(
                     om,
-                    previous_state.get_fill_level(),
+                    previous_state.fill_level,
                     actuator_configuration.get_factor(),
                 )
                 * seconds
@@ -235,7 +233,7 @@ class FrbcState:
             self.fill_level += (
                 self.device_state.get_operation_mode_fill_rate(
                     om,
-                    previous_state.get_fill_level(),
+                    previous_state.fill_level,
                     actuator_configuration.get_factor(),
                 )
                 * seconds
@@ -265,13 +263,11 @@ class FrbcState:
             previous_state.system_description.valid_from
             == self.system_description.valid_from
         ):
-            self.timer_elapse_map = previous_state.get_timer_elapse_map().copy()
+            self.timer_elapse_map = previous_state.timer_elapse_map.copy()
             for actuator_id, actuator_configuration in actuator_configurations.items():
-                previous_operation_mode_id = (
-                    previous_state.get_actuator_configurations()[
-                        actuator_id
-                    ].get_operation_mode_id()
-                )
+                previous_operation_mode_id = previous_state.actuator_configurations[
+                    actuator_id
+                ].get_operation_mode_id()
                 new_operation_mode_id = actuator_configuration.get_operation_mode_id()
                 if previous_operation_mode_id != new_operation_mode_id:
                     transition = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_transition(
@@ -300,17 +296,15 @@ class FrbcState:
         target = self.timestep.get_target()
         if isinstance(target, TargetProfile.JouleElement):
             self.sum_squared_distance = (
-                previous_state.get_sum_squared_distance()
+                previous_state.sum_squared_distance
                 + (target.get_joules() - self.timestep_energy) ** 2
             )
-            self.sum_energy_cost = previous_state.get_sum_energy_cost()
+            self.sum_energy_cost = previous_state.sum_energy_cost
 
         else:
-            self.sum_squared_distance = previous_state.get_sum_squared_distance()
-            self.sum_energy_cost = previous_state.get_sum_energy_cost()
-        squared_constraint_violation = (
-            previous_state.get_sum_squared_constraint_violation()
-        )
+            self.sum_squared_distance = previous_state.sum_squared_distance
+            self.sum_energy_cost = previous_state.sum_energy_cost
+        squared_constraint_violation = previous_state.sum_squared_constraint_violation
         if (
             self.timestep.get_max_constraint() is not None
             and self.timestep_energy > self.timestep.get_max_constraint()
@@ -326,11 +320,11 @@ class FrbcState:
                 self.timestep.get_min_constraint() - self.timestep_energy
             ) ** 2
         self.sum_squared_constraint_violation = (
-            previous_state.get_sum_squared_constraint_violation()
+            previous_state.sum_squared_constraint_violation
             + squared_constraint_violation
         )
         self.sum_squared_energy = (
-            previous_state.get_sum_squared_energy() + self.timestep_energy**2
+            previous_state.sum_squared_energy + self.timestep_energy**2
         )
 
     @staticmethod
@@ -359,14 +353,12 @@ class FrbcState:
                 actuator_configuration,
             ) in actuator_configs_for_target_timestep.items():
 
-                # print all the keys in the previous_state.get_actuator_configurations()
-                # print(previous_state.get_actuator_configurations().keys())
+                # print all the keys in the previous_state.actuator_configurations
+                # print(previous_state.actuator_configurations.keys())
                 try:
-                    previous_operation_mode_id = (
-                        previous_state.get_actuator_configurations()[
-                            actuator_id
-                        ].get_operation_mode_id()
-                    )
+                    previous_operation_mode_id = previous_state.actuator_configurations[
+                        actuator_id
+                    ].get_operation_mode_id()
                 except KeyError:
                     raise KeyError(
                         f"UUID {actuator_id} not found in actuator configurations"
@@ -383,10 +375,8 @@ class FrbcState:
                     if transition is None:
                         return False
                     for timer_id in transition.blocking_timers:
-                        timer_is_finished_at = (
-                            previous_state.get_timer_elapse_map().get(
-                                FrbcState.timer_key(actuator_id, str(timer_id))
-                            )
+                        timer_is_finished_at = previous_state.timer_elapse_map.get(
+                            FrbcState.timer_key(actuator_id, str(timer_id))
                         )
                         if (
                             timer_is_finished_at
@@ -406,38 +396,32 @@ class FrbcState:
         return True
 
     def is_preferable_than(self, other_state: "FrbcState") -> SelectionResult:
+        other_violation = other_state.sum_squared_constraint_violation
+        other_distance = other_state.sum_squared_distance
+        other_cost = other_state.sum_energy_cost
+        other_energy = other_state.sum_squared_energy
+
         if (
-            abs(
-                self.sum_squared_constraint_violation
-                - other_state.get_sum_squared_constraint_violation()
-            )
+            abs(self.sum_squared_constraint_violation - other_violation)
             >= self.constraint_epsilon
         ):
             return SelectionResult(
-                result=self.sum_squared_constraint_violation
-                < other_state.get_sum_squared_constraint_violation(),
+                result=self.sum_squared_constraint_violation < other_violation,
                 reason=SelectionReason.CONGESTION_CONSTRAINT,
             )
-        elif (
-            abs(self.sum_squared_distance - other_state.get_sum_squared_distance())
-            >= self.constraint_epsilon
-        ):
+        elif abs(self.sum_squared_distance - other_distance) >= self.constraint_epsilon:
             return SelectionResult(
-                result=self.sum_squared_distance
-                < other_state.get_sum_squared_distance(),
+                result=self.sum_squared_distance < other_distance,
                 reason=SelectionReason.ENERGY_TARGET,
             )
-        elif (
-            abs(self.sum_energy_cost - other_state.get_sum_energy_cost())
-            >= self.tariff_epsilon
-        ):
+        elif abs(self.sum_energy_cost - other_cost) >= self.tariff_epsilon:
             return SelectionResult(
-                result=self.sum_energy_cost < other_state.get_sum_energy_cost(),
+                result=self.sum_energy_cost < other_cost,
                 reason=SelectionReason.TARIFF_TARGET,
             )
         else:
             return SelectionResult(
-                result=self.sum_squared_energy < other_state.get_sum_squared_energy(),
+                result=self.sum_squared_energy < other_energy,
                 reason=SelectionReason.MIN_ENERGY,
             )
 
@@ -454,39 +438,6 @@ class FrbcState:
             return fill_level_range.start_of_range - self.fill_level
         else:
             return self.fill_level - fill_level_range.end_of_range
-
-    def get_device_state(self):
-        return self.device_state
-
-    def get_previous_state(self):
-        return self.previous_state
-
-    def get_actuator_configurations(self):
-        return self.actuator_configurations
-
-    def get_fill_level(self) -> float:
-        return self.fill_level
-
-    def get_bucket(self) -> int:
-        return self.bucket
-
-    def get_timestep_energy(self) -> float:
-        return self.timestep_energy
-
-    def get_sum_squared_distance(self) -> float:
-        return self.sum_squared_distance
-
-    def get_sum_squared_constraint_violation(self) -> float:
-        return self.sum_squared_constraint_violation
-
-    def get_sum_energy_cost(self) -> float:
-        return self.sum_energy_cost
-
-    def get_sum_squared_energy(self) -> float:
-        return self.sum_squared_energy
-
-    def get_timer_elapse_map(self) -> Dict[tuple, datetime]:
-        return self.timer_elapse_map
 
     def set_selection_reason(self, selection_reason):
         self.selection_reason = selection_reason

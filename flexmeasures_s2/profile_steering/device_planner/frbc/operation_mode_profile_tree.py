@@ -286,7 +286,7 @@ class OperationModeProfileTree:
         for i in range(first_timestep_index, len(self.timesteps) - 1):
             # print(f"Generating next timestep states for timestep: {i}")
             # if i == 187:
-                # print("here")
+            # print("here")
             current_timestep = self.timesteps[i]
             next_timestep = self.timesteps[i + 1]
             final_states = current_timestep.get_final_states_within_fill_level_target()
@@ -326,13 +326,13 @@ class OperationModeProfileTree:
         state = end_state
         for i in range(self.profile_metadata.get_nr_of_timesteps() - 1, -1, -1):
             if i >= first_timestep_index_with_state:
-                energy[i] = int(state.get_timestep_energy())
-                fill_level[i] = state.get_fill_level()
-                actuators[i] = state.get_actuator_configurations()
+                energy[i] = int(state.timestep_energy)
+                fill_level[i] = state.fill_level
+                actuators[i] = state.actuator_configurations
                 state_selection_reasons[
                     i
                 ] = state.get_selection_reason()  # type: ignore
-                state = state.get_previous_state()
+                state = state.previous_state
             else:
                 energy[i] = 0
                 fill_level[i] = 0.0
