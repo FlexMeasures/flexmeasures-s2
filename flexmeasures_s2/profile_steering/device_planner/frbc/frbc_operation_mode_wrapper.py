@@ -12,8 +12,7 @@ class FrbcOperationModeElementWrapper:
             frbc_operation_mode_element.fill_rate.end_of_range,
         )
         self.power_ranges = [
-            NumberRangeWrapper(pr.start_of_range, pr.end_of_range)
-            for pr in frbc_operation_mode_element.power_ranges
+            NumberRangeWrapper(pr.start_of_range, pr.end_of_range) for pr in frbc_operation_mode_element.power_ranges
         ]
         self.fill_level_range = NumberRangeWrapper(
             frbc_operation_mode_element.fill_level_range.start_of_range,
@@ -37,10 +36,7 @@ class FrbcOperationModeWrapper:
         self.id = frbc_operation_mode.id
         self.diagnostic_label = frbc_operation_mode.diagnostic_label
         self.abnormal_condition_only = frbc_operation_mode.abnormal_condition_only
-        self.elements = [
-            FrbcOperationModeElementWrapper(element)
-            for element in frbc_operation_mode.elements
-        ]
+        self.elements = [FrbcOperationModeElementWrapper(element) for element in frbc_operation_mode.elements]
         self.uses_factor = self.calculate_uses_factor()
 
     def calculate_uses_factor(self) -> bool:
@@ -50,18 +46,12 @@ class FrbcOperationModeWrapper:
 
         for element in self.elements:
             if (
-                abs(
-                    element.fill_rate.start_of_range
-                    - element.fill_rate.end_of_range
-                )
+                abs(element.fill_rate.start_of_range - element.fill_rate.end_of_range)
                 > S2FrbcDeviceStateWrapper.epsilon
             ):
                 return True
             for power_range in element.frbc_operation_mode_element.power_ranges:
-                if (
-                    abs(power_range.start_of_range - power_range.end_of_range)
-                    > S2FrbcDeviceStateWrapper.epsilon
-                ):
+                if abs(power_range.start_of_range - power_range.end_of_range) > S2FrbcDeviceStateWrapper.epsilon:
                     return True
         return False
 
