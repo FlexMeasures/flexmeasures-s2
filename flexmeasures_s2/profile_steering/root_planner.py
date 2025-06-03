@@ -30,9 +30,9 @@ class RootPlanner:
         # Create an empty JouleProfile.
         # We assume that target exposes get_profile_start(), timestep_duration and nr_of_timesteps.
         self.empty_profile = JouleProfile(
-            self.target.get_profile_metadata().get_profile_start(),
-            self.target.get_profile_metadata().get_timestep_duration(),
-            elements=[0] * self.target.get_profile_metadata().get_nr_of_timesteps(),
+            self.target.metadata.profile_start,
+            self.target.metadata.timestep_duration,
+            elements=[0] * self.target.metadata.nr_of_timesteps,
         )
         self.cp_controllers: List[CongestionPointPlanner] = []
         self.root_ctrl_planning = self.empty_profile
@@ -71,17 +71,11 @@ class RootPlanner:
             return
 
         # Determine maximum and minimum priority classes across congestion points.
-        max_priority_class = max(
-            cpc.max_priority_class() for cpc in self.cp_controllers
-        )
-        min_priority_class = min(
-            cpc.min_priority_class() for cpc in self.cp_controllers
-        )
+        max_priority_class = max(cpc.max_priority_class() for cpc in self.cp_controllers)
+        min_priority_class = min(cpc.min_priority_class() for cpc in self.cp_controllers)
 
         # Iterate over the priority classes.
-        for priority_class in range(
-            min_priority_class, min(max_priority_class, max_priority_class_external) + 1
-        ):
+        for priority_class in range(min_priority_class, min(max_priority_class, max_priority_class_external) + 1):
             i = 0
             best_proposal = None
 
@@ -97,14 +91,12 @@ class RootPlanner:
                     try:
                         proposal = cpc.create_improved_planning(
                             difference_profile,
-                            self.target.get_profile_metadata(),
+                            self.target.metadata,
                             priority_class,
                             plan_due_by_date,
                         )
                         if proposal is not None:
-                            if best_proposal is None or proposal.is_preferred_to(
-                                best_proposal
-                            ):
+                            if best_proposal is None or proposal.is_preferred_to(best_proposal):
                                 best_proposal = proposal
                     except Exception as e:
                         print(f"Error getting proposal from controller: {e}")
@@ -115,12 +107,8 @@ class RootPlanner:
                     break
 
                 # Update the root controller's planning based on the best proposal.
-                self.root_ctrl_planning = self.root_ctrl_planning.subtract(
-                    best_proposal.get_old_plan()
-                )
-                self.root_ctrl_planning = self.root_ctrl_planning.add(
-                    best_proposal.get_proposed_plan()
-                )
+                self.root_ctrl_planning = self.root_ctrl_planning.subtract(best_proposal.get_old_plan())
+                self.root_ctrl_planning = self.root_ctrl_planning.add(best_proposal.get_proposed_plan())
 
                 # Let the origin device/controller accept the proposal.
                 best_proposal.get_origin().accept_proposal(best_proposal)
@@ -131,14 +119,11 @@ class RootPlanner:
 
                 # Check stopping criteria: if improvement values are below thresholds or max iterations reached.
                 if (
-                    best_proposal.get_global_improvement_value()
-                    <= self.energy_iteration_criterion
+                    best_proposal.get_global_improvement_value() <= self.energy_iteration_criterion
                 ) or i >= self.MAX_ITERATIONS:
                     break
 
-            print(
-                f"Optimizing priority class {priority_class} was done after {i} iterations."
-            )
+            print(f"Optimizing priority class {priority_class} was done after {i} iterations.")
             if i >= self.MAX_ITERATIONS:
                 print(
                     f"Warning: Optimization stopped due to iteration limit. Priority class: {priority_class}, Iterations: {i}"

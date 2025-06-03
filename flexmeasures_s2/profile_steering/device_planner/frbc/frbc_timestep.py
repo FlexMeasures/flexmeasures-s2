@@ -66,15 +66,15 @@ class FrbcTimestep:
 
     def add_state(self, state: FrbcState) -> None:
         if state and state.is_within_fill_level_range():
-            stored_state = self.state_list[state.get_bucket()]
+            stored_state = self.state_list[state.bucket]
             if stored_state is None:
-                self.state_list[state.get_bucket()] = state
+                self.state_list[state.bucket] = state
                 state.set_selection_reason(SelectionReason.NO_ALTERNATIVE)
             else:
                 selection_result = state.is_preferable_than(stored_state)
                 if selection_result.result:
-                    self.state_list[state.get_bucket()] = state
-                self.state_list[state.get_bucket()].set_selection_reason(selection_result.reason)  # type: ignore
+                    self.state_list[state.bucket] = state
+                self.state_list[state.bucket].set_selection_reason(selection_result.reason)  # type: ignore
         else:
             if (
                 self.emergency_state is None

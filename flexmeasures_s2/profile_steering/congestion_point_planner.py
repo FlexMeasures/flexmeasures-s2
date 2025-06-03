@@ -22,17 +22,17 @@ class CongestionPointPlanner:
         self.MAX_ITERATIONS = 1000
         self.congestion_point_id = congestion_point_id
         self.congestion_target = congestion_target
-        self.profile_metadata = congestion_target.get_profile_metadata()
+        self.profile_metadata = congestion_target.metadata
 
         # Create an empty profile (using all zeros)
         self.empty_profile = JouleProfile(
-            self.profile_metadata.get_profile_start(),
-            self.profile_metadata.get_timestep_duration(),
+            self.profile_metadata.profile_start,
+            self.profile_metadata.timestep_duration,
             elements=[0] * self.profile_metadata.nr_of_timesteps,
         )
 
         # List of device controllers that can be used for planning
-        self.devices = []
+        self.devices: List[DevicePlanner] = []
 
         # Keep track of accepted and latest plans
         self.accepted_plan = self.empty_profile
