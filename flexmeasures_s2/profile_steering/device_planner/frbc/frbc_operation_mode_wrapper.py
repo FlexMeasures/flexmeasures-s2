@@ -53,13 +53,13 @@ class FrbcOperationModeWrapper:
         for element in self.elements:
             if (
                 abs(
-                    element.get_fill_rate().get_start_of_range()
-                    - element.get_fill_rate().get_end_of_range()
+                    element.fill_rate.start_of_range
+                    - element.fill_rate.end_of_range
                 )
                 > S2FrbcDeviceStateWrapper.epsilon
             ):
                 return True
-            for power_range in element.get_power_ranges():
+            for power_range in element.frbc_operation_mode_element.power_ranges:
                 if (
                     abs(power_range.start_of_range - power_range.end_of_range)
                     > S2FrbcDeviceStateWrapper.epsilon

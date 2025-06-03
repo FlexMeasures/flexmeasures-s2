@@ -147,23 +147,23 @@ class FrbcTimestep:
         if self.fill_level_target is None:
             return True
         return (
-            self.fill_level_target.get_start_of_range() is None
-            or state.get_fill_level() >= self.fill_level_target.get_start_of_range()
+            self.fill_level_target.start_of_range is None
+            or state.get_fill_level() >= self.fill_level_target.start_of_range
         ) and (
-            self.fill_level_target.get_end_of_range() is None
-            or state.get_fill_level() <= self.fill_level_target.get_end_of_range()
+            self.fill_level_target.end_of_range is None
+            or state.get_fill_level() <= self.fill_level_target.end_of_range
         )
 
     def get_fill_level_target_distance(self, state: FrbcState) -> float:
         if self.fill_level_target is None:
             return 0
         if (
-            self.fill_level_target.get_end_of_range() is None
-            or state.get_fill_level() < self.fill_level_target.get_start_of_range()
+            self.fill_level_target.end_of_range is None
+            or state.get_fill_level() < self.fill_level_target.start_of_range
         ):
-            return self.fill_level_target.get_start_of_range() - state.get_fill_level()
+            return self.fill_level_target.start_of_range - state.get_fill_level()
         else:
-            return state.get_fill_level() - self.fill_level_target.get_end_of_range()
+            return state.get_fill_level() - self.fill_level_target.end_of_range
 
     def get_forecasted_usage(self) -> float:
         return self.forecasted_fill_level_usage
