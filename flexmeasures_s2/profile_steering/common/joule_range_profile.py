@@ -62,125 +62,36 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
         if isinstance(profile_start, ProfileMetadata):
             metadata = profile_start
             if nr_of_timesteps is None:
-                nr_of_timesteps = metadata.get_nr_of_timesteps()
+                nr_of_timesteps = metadata.nr_of_timesteps
 
             elements = self._create_element_array(nr_of_timesteps, min_value, max_value)
 
         else:
             if elements is not None:
-                metadata = ProfileMetadata(
-                    profile_start, timestep_duration, len(elements)
-                )
+                metadata = ProfileMetadata(profile_start, timestep_duration or timedelta(), len(elements))
             elif nr_of_timesteps is not None:
-                metadata = ProfileMetadata(
-                    profile_start, timestep_duration, nr_of_timesteps
-                )
-                elements = self._create_element_array(
-                    nr_of_timesteps, min_value, max_value
-                )
+                metadata = ProfileMetadata(profile_start, timestep_duration or timedelta(), nr_of_timesteps)
+                elements = self._create_element_array(nr_of_timesteps, min_value, max_value)
             else:
-                metadata = ProfileMetadata(profile_start, timestep_duration, 0)
+                metadata = ProfileMetadata(profile_start, timestep_duration or timedelta(), 0)
                 elements = []
 
         super().__init__(metadata, elements)
 
-    @staticmethod
     def _create_element_array(
-        nr_of_elements: int, min_value: Optional[int], max_value: Optional[int]
+        self, nr_of_timesteps: int, min_value: Optional[int], max_value: Optional[int]
     ) -> List[Element]:
-        """Create an array of elements with the given min and max values."""
-        return [Element(min_value, max_value) for _ in range(nr_of_elements)]
-
-    def default_value(self) -> Element:
-        return Element(None, None)
+        if min_value is None and max_value is None:
+            return [Element(None, None)] * nr_of_timesteps
+        return [Element(min_value, max_value)] * nr_of_timesteps
 
     def validate(self, profile_metadata: ProfileMetadata, elements: List[Element]):
         """Validate the elements and metadata for this profile."""
         super().validate(profile_metadata, elements)
         # Add any JouleRangeProfile-specific validation here if needed
 
-    def is_within_range(self, other: JouleProfile) -> bool:
-        """
-        Check if the given JouleProfile is within the range defined by this profile.
-
-        Args:
-            other: JouleProfile to check
-
-        Returns:
-            True if other is within the range, False otherwise
-        """
-        if not self.is_compatible(other):
-            raise ValueError("Profiles are not compatible")
-
-        for i in range(self.metadata.get_nr_of_timesteps()):
-            element = self.elements[i]
-            other_value = other.get_energy_for_timestep(i)
-
-            if element.min_joule is not None and other_value < element.min_joule:
-                return False
-
-            if element.max_joule is not None and other_value > element.max_joule:
-                return False
-
-        return True
-
-    def difference_with_max_value(self, other: JouleProfile) -> JouleProfile:
-        """
-        Calculate the difference between this profile's max values and the other profile.
-
-        Args:
-            other: JouleProfile to compare against
-
-        Returns:
-            JouleProfile containing the differences
-        """
-        if not self.is_compatible(other):
-            raise ValueError("Profiles are not compatible")
-
-        return_values = []
-
-        for i in range(self.metadata.get_nr_of_timesteps()):
-            if self.elements[i].max_joule is None:
-                return_values.append(None)
-            else:
-                return_values.append(
-                    self.elements[i].max_joule - other.get_energy_for_timestep(i)
-                )
-
-        return JouleProfile(
-            self.metadata.get_profile_start(),
-            self.metadata.get_timestep_duration(),
-            return_values,
-        )
-
-    def difference_with_min_value(self, other: JouleProfile) -> JouleProfile:
-        """
-        Calculate the difference between this profile's min values and the other profile.
-
-        Args:
-            other: JouleProfile to compare against
-
-        Returns:
-            JouleProfile containing the differences
-        """
-        if not self.is_compatible(other):
-            raise ValueError("Profiles are not compatible")
-
-        return_values = []
-
-        for i in range(self.metadata.get_nr_of_timesteps()):
-            if self.elements[i].min_joule is None:
-                return_values.append(None)
-            else:
-                return_values.append(
-                    self.elements[i].min_joule - other.get_energy_for_timestep(i)
-                )
-
-        return JouleProfile(
-            self.metadata.get_profile_start(),
-            self.metadata.get_timestep_duration(),
-            return_values,
-        )
+    def default_value(self) -> Element:
+        return Element(None, None)
 
     def subprofile(self, new_start_date: datetime) -> "JouleRangeProfile":
         """
@@ -195,11 +106,8 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
         index = self.index_at(new_start_date)
         if index < 0:
             raise ValueError("New start date is outside profile range")
-
         new_elements = self.elements[index:]
-        return JouleRangeProfile(
-            new_start_date, self.metadata.get_timestep_duration(), new_elements
-        )
+        return JouleRangeProfile(new_start_date, self.metadata.timestep_duration, new_elements)
 
     def adjust_nr_of_elements(self, nr_of_elements: int) -> "JouleRangeProfile":
         """
@@ -214,13 +122,10 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
         if nr_of_elements < len(self.elements):
             new_elements = self.elements[:nr_of_elements]
         else:
-            new_elements = self.elements + [Element.NULL] * (
-                nr_of_elements - len(self.elements)
-            )
-
+            new_elements = self.elements + [Element(None, None)] * (nr_of_elements - len(self.elements))
         return JouleRangeProfile(
-            self.metadata.get_profile_start(),
-            self.metadata.get_timestep_duration(),
+            self.metadata.profile_start,
+            self.metadata.timestep_duration,
             new_elements,
         )
 
@@ -235,12 +140,65 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
             True if compatible, False otherwise
 
         """
-        return self.metadata == other.get_profile_metadata()
+        return self.metadata.timestep_duration == other.metadata.timestep_duration and len(self.elements) == len(
+            other.elements
+        )
+
+    def get_energy_for_timestep(self, index: int) -> Optional[int]:
+        if 0 <= index < len(self.elements):
+            return self.elements[index].max_joule
+        return None
+
+    def get_min_energy_for_timestep(self, index: int) -> Optional[int]:
+        if 0 <= index < len(self.elements):
+            return self.elements[index].min_joule
+        return None
+
+    def get_max_energy_for_timestep(self, index: int) -> Optional[int]:
+        if 0 <= index < len(self.elements):
+            return self.elements[index].max_joule
+        return None
+
+    def add(self, other: "JouleRangeProfile") -> "JouleRangeProfile":
+        if not self.is_compatible(other):
+            raise ValueError("Profiles are not compatible")
+        summed_elements = [Element(None, None)] * len(self.elements)
+        for i in range(len(self.elements)):
+            if self.elements[i].min_joule is None or other.elements[i].min_joule is None:
+                summed_elements[i] = Element(None, None)
+            else:
+                summed_elements[i] = Element(
+                    self.elements[i].min_joule + other.elements[i].min_joule,
+                    self.elements[i].max_joule + other.elements[i].max_joule,
+                )
+        return JouleRangeProfile(
+            self.metadata.profile_start,
+            self.metadata.timestep_duration,
+            summed_elements,
+        )
+
+    def subtract(self, other: "JouleRangeProfile") -> "JouleRangeProfile":
+        if not self.is_compatible(other):
+            raise ValueError("Profiles are not compatible")
+        diff_elements = [Element(None, None)] * len(self.elements)
+        for i in range(len(self.elements)):
+            if self.elements[i].min_joule is None or other.elements[i].min_joule is None:
+                diff_elements[i] = Element(None, None)
+            else:
+                diff_elements[i] = Element(
+                    self.elements[i].min_joule - other.elements[i].max_joule,
+                    self.elements[i].max_joule - other.elements[i].min_joule,
+                )
+        return JouleRangeProfile(
+            self.metadata.profile_start,
+            self.metadata.timestep_duration,
+            diff_elements,
+        )
 
     def __str__(self) -> str:
         """Return a string representation of this profile."""
         return (
             f"JouleRangeProfile(elements={self.elements}, "
-            f"profile_start={self.metadata.get_profile_start()}, "
-            f"timestep_duration={self.metadata.get_timestep_duration()})"
+            f"profile_start={self.metadata.profile_start}, "
+            f"timestep_duration={self.metadata.timestep_duration})"
         )

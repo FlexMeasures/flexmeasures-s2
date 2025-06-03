@@ -13,11 +13,11 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
         metadata: Optional[ProfileMetadata] = None,
         value: Optional[int] = None,
         profile_length: Optional[int] = None,
-        other_profile: Optional['JouleProfile'] = None
+        other_profile: Optional["JouleProfile"] = None,
     ):
         """
         Initialize a JouleProfile with various parameter combinations.
-        
+
         Args:
             profile_start: Start time of the profile
             timestep_duration: Duration of each timestep
@@ -30,8 +30,7 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
         # Case 1: Copy from another profile
         if other_profile is not None:
             super().__init__(
-                profile_metadata=other_profile.get_profile_metadata(),
-                elements=other_profile.get_elements().copy()
+                profile_metadata=other_profile.metadata, elements=other_profile.elements.copy()
             )
             return
 
@@ -49,11 +48,7 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
         # Case 3: Initialize with single value and profile length
         if value is not None and profile_length is not None:
             elements = [value] * profile_length
-            super().__init__(
-                profile_start=profile_start,
-                timestep_duration=timestep_duration,
-                elements=elements
-            )
+            super().__init__(profile_start=profile_start, timestep_duration=timestep_duration, elements=elements)
             return
 
         # Case 4: Basic initialization
@@ -61,7 +56,7 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
             super().__init__(
                 profile_start=profile_start,
                 timestep_duration=timestep_duration,
-                elements=elements if elements is not None else []
+                elements=elements if elements is not None else [],
             )
             return
 
@@ -72,19 +67,15 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
         super().validate(profile_metadata, elements)
         # Add any JouleProfile-specific validation here if needed
 
-    def default_value(self) -> None:
-        return None
+    def default_value(self) -> int:
+        return 0
 
     def subprofile(self, new_start_date: datetime) -> "JouleProfile":
         index = self.index_at(new_start_date)
         if index < 0:
             raise ValueError("New start date is outside profile range")
         new_elements = self.elements[index:]
-        return JouleProfile(
-            new_start_date,
-            self.get_profile_metadata().get_timestep_duration(),
-            new_elements
-        )
+        return JouleProfile(new_start_date, self.metadata.timestep_duration, new_elements)
 
     def adjust_nr_of_elements(self, nr_of_elements: int) -> "JouleProfile":
         if nr_of_elements < len(self.elements):
@@ -92,20 +83,17 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
         else:
             new_elements = self.elements + [0] * (nr_of_elements - len(self.elements))
         return JouleProfile(
-            self.get_profile_metadata().get_profile_start(),
-            self.get_profile_metadata().get_timestep_duration(),
+            self.metadata.profile_start,
+            self.metadata.timestep_duration,
             new_elements,
         )
 
     def is_compatible(self, other: AbstractProfile) -> bool:
-        return (
-            self.get_profile_metadata()
-            == other.get_profile_metadata()
-        )
+        return self.metadata == other.metadata
 
     def avg_power_at(self, date: datetime) -> Optional[float]:
         element = self.element_at(date)
-        return element / self.get_profile_metadata().get_timestep_duration().total_seconds()
+        return element / self.metadata.timestep_duration.total_seconds()
 
     def add(self, other: "JouleProfile") -> "JouleProfile":
         if not self.is_compatible(other):
@@ -117,8 +105,8 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
             else:
                 summed_elements[i] = self.elements[i] + other.elements[i]
         return JouleProfile(
-            self.get_profile_metadata().get_profile_start(),
-            self.get_profile_metadata().get_timestep_duration(),
+            self.metadata.profile_start,
+            self.metadata.timestep_duration,
             summed_elements,
         )
 
@@ -132,16 +120,16 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
             else:
                 diff_elements[i] = self.elements[i] - other.elements[i]
         return JouleProfile(
-            self.get_profile_metadata().get_profile_start(),
-            self.get_profile_metadata().get_timestep_duration(),
+            self.metadata.profile_start,
+            self.metadata.timestep_duration,
             diff_elements,
         )
 
     def absolute_values(self) -> "JouleProfile":
         abs_elements = [abs(e) for e in self.elements]
         return JouleProfile(
-            self.get_profile_metadata().get_profile_start(),
-            self.get_profile_metadata().get_timestep_duration(),
+            self.metadata.profile_start,
+            self.metadata.timestep_duration,
             abs_elements,
         )
 
@@ -151,16 +139,12 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
     def is_below_or_equal(self, other: "JouleProfile") -> bool:
         if not self.is_compatible(other):
             raise ValueError("Profiles are not compatible")
-        return all(
-            a <= b for a, b in zip(self.elements, other.elements) if b is not None
-        )
+        return all(a <= b for a, b in zip(self.elements, other.elements) if b is not None)
 
     def is_above_or_equal(self, other: "JouleProfile") -> bool:
         if not self.is_compatible(other):
             raise ValueError("Profiles are not compatible")
-        return all(
-            a >= b for a, b in zip(self.elements, other.elements) if b is not None
-        )
+        return all(a >= b for a, b in zip(self.elements, other.elements) if b is not None)
 
     def minimum(self, other: "JouleProfile") -> "JouleProfile":
         if not self.is_compatible(other):
@@ -168,8 +152,8 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
         # skip None values
         min_elements = [min(a, b) for a, b in zip(self.elements, other.elements) if a is not None and b is not None]
         return JouleProfile(
-            self.get_profile_metadata().get_profile_start(),
-            self.get_profile_metadata().get_timestep_duration(),
+            self.metadata.profile_start,
+            self.metadata.timestep_duration,
             min_elements,
         )
 
@@ -179,8 +163,8 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
         # skip None values
         max_elements = [max(a, b) for a, b in zip(self.elements, other.elements) if a is not None and b is not None]
         return JouleProfile(
-            self.get_profile_metadata().get_profile_start(),
-            self.get_profile_metadata().get_timestep_duration(),
+            self.metadata.profile_start,
+            self.metadata.timestep_duration,
             max_elements,
         )
 
@@ -199,4 +183,4 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
         return None
 
     def __str__(self) -> str:
-        return f"JouleProfile(elements={self.elements}, profile_start={self.get_profile_metadata().get_profile_start()}, timestep_duration={self.get_profile_metadata().get_timestep_duration()})"
+        return f"JouleProfile(elements={self.elements}, profile_start={self.metadata.profile_start}, timestep_duration={self.metadata.timestep_duration})"

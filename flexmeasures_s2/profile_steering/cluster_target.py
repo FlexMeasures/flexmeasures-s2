@@ -24,7 +24,7 @@ class ClusterTarget:
 
     def __init__(
         self,
-        generated_at: datetime,     
+        generated_at: datetime,
         parent_id: Any,
         generated_by: Any,
         global_target_profile: TargetProfile,
@@ -56,8 +56,8 @@ class ClusterTarget:
                 if not cp_target.is_compatible(global_target_profile):
                     raise ValueError(
                         f"Congestion point target {cp_id} is not compatible with the global target profile. "
-                        f"Expected global metadata: {global_target_profile.get_profile_metadata()}, "
-                        f"but congestion profile had {cp_target.get_profile_metadata()}"
+                        f"Expected global metadata: {global_target_profile.metadata}, "
+                        f"but congestion profile had {cp_target.metadata}"
                     )
 
     def get_id(self) -> str:
@@ -113,9 +113,7 @@ class ClusterTarget:
         """
         return self._congestion_point_targets
 
-    def get_congestion_point_target(
-        self, congestion_point_id: str
-    ) -> Optional[JouleRangeProfile]:
+    def get_congestion_point_target(self, congestion_point_id: str) -> Optional[JouleRangeProfile]:
         """
         Get the target for a specific congestion point.
 
@@ -134,7 +132,7 @@ class ClusterTarget:
         Returns:
             The profile metadata
         """
-        return self._global_target_profile.get_profile_metadata()
+        return self._global_target_profile.metadata
 
     def get_target_energy(self) -> float:
         """

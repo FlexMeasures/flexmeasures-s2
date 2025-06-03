@@ -261,7 +261,9 @@ class S2FrbcDeviceStateWrapper:
             first = om.get_elements()[0]
             last = om.get_elements()[-1]
             element = (
-                first if fill_level < first.fill_level_range.start_of_range else last
+                first
+                if fill_level < first.fill_level_range.start_of_range
+                else last
             )
         return element
 
@@ -269,7 +271,7 @@ class S2FrbcDeviceStateWrapper:
         self, om: FrbcOperationModeWrapper, fill_level: float, factor: float
     ) -> float:
         element = self.find_operation_mode_element(om, fill_level)
-        fill_rate = element.get_fill_rate()
+        fill_rate = element.fill_rate
         start = fill_rate.end_of_range
         end = fill_rate.start_of_range
         return (start - end) * factor + end
