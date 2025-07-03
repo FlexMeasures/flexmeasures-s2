@@ -364,7 +364,7 @@ class ClusterPlanData:
             profile_metadata.profile_start.timestamp() * 1000
         )  # Convert to milliseconds
         timestep_duration = (
-            profile_metadata.get_timestep_duration().total_seconds() * 1000
+            profile_metadata.timestep_duration.total_seconds() * 1000
         )  # Convert to milliseconds
 
         # Get scores, defaulting to 1.0 if they're NaN
@@ -674,7 +674,7 @@ class ClusterPlan:
         # Add all device plans to the profile
         sum_profile = JouleProfile(
             profile_start=self.get_profile_metadata().profile_start,
-            timestep_duration=self.get_profile_metadata().get_timestep_duration(),
+            timestep_duration=self.get_profile_metadata().timestep_duration,
             profile_length=self.get_profile_metadata().nr_of_timesteps,
             value=0.0,
         )

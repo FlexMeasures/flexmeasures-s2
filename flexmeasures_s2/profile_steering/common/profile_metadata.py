@@ -18,9 +18,6 @@ class ProfileMetadata:
         self.profile_end = profile_start + timestep_duration * nr_of_timesteps
         self.profile_duration = self.profile_end - self.profile_start
 
-    def get_timestep_duration(self) -> timedelta:
-        return self.timestep_duration
-
     def get_profile_start_at_timestep(self, i: int) -> datetime:
         if i >= self.nr_of_timesteps or i < 0:
             raise ValueError(

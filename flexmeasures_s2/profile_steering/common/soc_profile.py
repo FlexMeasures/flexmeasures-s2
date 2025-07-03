@@ -9,7 +9,7 @@ class SoCProfile(AbstractProfile[float, "SoCProfile"]):
         self, profile_metadata: ProfileMetadata, elements: Optional[List[float]] = None
     ):
         self.profile_metadata = profile_metadata
-        self.timestep_duration = self.profile_metadata.get_timestep_duration()
+        self.timestep_duration = self.profile_metadata.timestep_duration
         self.profile_start = self.profile_metadata.profile_start
         self.profile_end = self.profile_metadata.profile_end
         super().__init__(
@@ -24,8 +24,8 @@ class SoCProfile(AbstractProfile[float, "SoCProfile"]):
 
     def is_compatible(self, other: AbstractProfile) -> bool:
         return (
-            self.metadata.get_timestep_duration()
-            == other.get_profile_metadata().get_timestep_duration()
+            self.metadata.timestep_duration
+            == other.get_profile_metadata().timestep_duration
             and len(self.elements) == len(other.get_elements())
         )
 
@@ -37,9 +37,7 @@ class SoCProfile(AbstractProfile[float, "SoCProfile"]):
         if index < 0:
             raise ValueError("New start date is outside profile range")
         new_elements = self.elements[index:]
-        return SoCProfile(
-            new_start_date, self.metadata.get_timestep_duration(), new_elements
-        )
+        return SoCProfile(new_start_date, self.metadata.timestep_duration, new_elements)
 
     def adjust_nr_of_elements(self, nr_of_elements: int) -> "SoCProfile":
         if nr_of_elements < len(self.elements):
@@ -48,6 +46,6 @@ class SoCProfile(AbstractProfile[float, "SoCProfile"]):
             new_elements = self.elements + [0.0] * (nr_of_elements - len(self.elements))
         return SoCProfile(
             self.metadata.profile_start,
-            self.metadata.get_timestep_duration(),
+            self.metadata.timestep_duration,
             new_elements,
         )

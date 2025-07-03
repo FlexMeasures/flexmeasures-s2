@@ -623,7 +623,7 @@ def test_planning_service_impl_with_ev_device():
     # Create a target profile
     global_target_profile = TargetProfile(
         profile_start=target_metadata.profile_start,
-        timestep_duration=target_metadata.get_timestep_duration(),
+        timestep_duration=target_metadata.timestep_duration,
         elements=target_profile_elements,
     )
     # Create a cluster state using the list of device states

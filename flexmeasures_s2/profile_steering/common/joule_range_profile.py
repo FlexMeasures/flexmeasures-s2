@@ -149,7 +149,7 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
 
         return JouleProfile(
             self.metadata.profile_start,
-            self.metadata.get_timestep_duration(),
+            self.metadata.timestep_duration,
             return_values,
         )
 
@@ -178,7 +178,7 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
 
         return JouleProfile(
             self.metadata.profile_start,
-            self.metadata.get_timestep_duration(),
+            self.metadata.timestep_duration,
             return_values,
         )
 
@@ -198,7 +198,7 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
 
         new_elements = self.elements[index:]
         return JouleRangeProfile(
-            new_start_date, self.metadata.get_timestep_duration(), new_elements
+            new_start_date, self.metadata.timestep_duration, new_elements
         )
 
     def adjust_nr_of_elements(self, nr_of_elements: int) -> "JouleRangeProfile":
@@ -220,7 +220,7 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
 
         return JouleRangeProfile(
             self.metadata.profile_start,
-            self.metadata.get_timestep_duration(),
+            self.metadata.timestep_duration,
             new_elements,
         )
 
@@ -242,5 +242,5 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
         return (
             f"JouleRangeProfile(elements={self.elements}, "
             f"profile_start={self.metadata.profile_start}, "
-            f"timestep_duration={self.metadata.get_timestep_duration()})"
+            f"timestep_duration={self.metadata.timestep_duration})"
         )

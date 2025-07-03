@@ -72,12 +72,12 @@ class AbstractProfile(ABC, Generic[E, PT]):
             raise ValueError("elements cannot be null")
         if (
             24 * 60 * 60 * 1000
-        ) % profile_metadata.get_timestep_duration().total_seconds() * 1000 != 0:
+        ) % profile_metadata.timestep_duration.total_seconds() * 1000 != 0:
             raise ValueError("A day should be dividable by the timeStepDuration")
         if (
             not self.start_of_current_aligned_date(
                 profile_metadata.profile_start,
-                profile_metadata.get_timestep_duration(),
+                profile_metadata.timestep_duration,
             )
             == profile_metadata.profile_start
         ):

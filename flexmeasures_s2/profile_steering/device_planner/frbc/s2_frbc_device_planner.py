@@ -40,12 +40,12 @@ class S2FrbcDevicePlanner(DevicePlanner):
         self.profile_metadata = profile_metadata
         self.zero_profile = JouleProfile(
             profile_metadata.profile_start,
-            profile_metadata.get_timestep_duration(),
+            profile_metadata.timestep_duration,
             [0] * profile_metadata.nr_of_timesteps,
         )
         self.null_profile = JouleProfile(
             profile_metadata.profile_start,
-            profile_metadata.get_timestep_duration(),
+            profile_metadata.timestep_duration,
             elements=[None] * profile_metadata.nr_of_timesteps,
         )
         if self.is_storage_available(self.s2_frbc_state):
@@ -212,7 +212,7 @@ class S2FrbcDevicePlanner(DevicePlanner):
             elements = [None] * profile_metadata.nr_of_timesteps
         return S2FrbcInstructionProfile(
             profile_start=profile_metadata.profile_start,
-            timestep_duration=profile_metadata.get_timestep_duration(),
+            timestep_duration=profile_metadata.timestep_duration,
             elements=elements,
         )
 

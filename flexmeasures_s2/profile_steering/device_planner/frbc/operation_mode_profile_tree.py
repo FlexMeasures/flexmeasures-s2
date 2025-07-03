@@ -130,7 +130,7 @@ class OperationModeProfileTree:
         self.profile_metadata = profile_metadata
         self.plan_due_by_date = plan_due_by_date
         self.timestep_duration_seconds = int(
-            profile_metadata.get_timestep_duration().total_seconds()
+            profile_metadata.timestep_duration.total_seconds()
         )
         self.timesteps: List[FrbcTimestep] = []
         self.generate_timesteps()
@@ -140,9 +140,7 @@ class OperationModeProfileTree:
         for i in range(self.profile_metadata.nr_of_timesteps):
             if i == 187:
                 print("here")
-            time_step_end = (
-                time_step_start + self.profile_metadata.get_timestep_duration()
-            )
+            time_step_end = time_step_start + self.profile_metadata.timestep_duration
 
             if i == 0:
                 time_step_start = self.plan_due_by_date
@@ -341,7 +339,7 @@ class OperationModeProfileTree:
             False,
             JouleProfile(
                 self.profile_metadata.profile_start,
-                self.profile_metadata.get_timestep_duration(),
+                self.profile_metadata.timestep_duration,
                 energy,
             ),
             SoCProfile(

@@ -54,7 +54,7 @@ class TargetProfile(
             raise ValueError("New start date is outside profile range")
         new_elements = self.elements[index:]
         return TargetProfile(
-            new_start_date, self.metadata.get_timestep_duration(), new_elements
+            new_start_date, self.metadata.timestep_duration, new_elements
         )
 
     def adjust_nr_of_elements(self, nr_of_elements: int) -> "TargetProfile":
@@ -66,14 +66,14 @@ class TargetProfile(
             )
         return TargetProfile(
             self.metadata.profile_start,
-            self.metadata.get_timestep_duration(),
+            self.metadata.timestep_duration,
             new_elements,
         )
 
     def is_compatible(self, other: AbstractProfile) -> bool:
         return (
-            self.metadata.get_timestep_duration()
-            == other.get_profile_metadata().get_timestep_duration()
+            self.metadata.timestep_duration
+            == other.get_profile_metadata().timestep_duration
             and len(self.elements) == len(other.get_elements())
         )
 
@@ -92,7 +92,7 @@ class TargetProfile(
         ]
         return JouleProfile(
             self.metadata.profile_start,
-            self.metadata.get_timestep_duration(),
+            self.metadata.timestep_duration,
             joules,
         )
 
@@ -118,7 +118,7 @@ class TargetProfile(
                 diff_elements.append(self.NULL_ELEMENT)
         return TargetProfile(
             self.metadata.profile_start,
-            self.metadata.get_timestep_duration(),
+            self.metadata.timestep_duration,
             diff_elements,
         )
 
@@ -139,7 +139,7 @@ class TargetProfile(
                 sum_elements.append(self.NULL_ELEMENT)
         return TargetProfile(
             self.metadata.profile_start,
-            self.metadata.get_timestep_duration(),
+            self.metadata.timestep_duration,
             sum_elements,
         )
 
@@ -151,7 +151,7 @@ class TargetProfile(
         )
 
     def __str__(self) -> str:
-        return f"TargetProfile(elements={self.elements}, profile_start={self.metadata.profile_start}, timestep_duration={self.metadata.get_timestep_duration()})"
+        return f"TargetProfile(elements={self.elements}, profile_start={self.metadata.profile_start}, timestep_duration={self.metadata.timestep_duration})"
 
     def get_profile_metadata(self) -> ProfileMetadata:
         return self.metadata
@@ -163,7 +163,7 @@ class TargetProfile(
     def null_profile(metadata: ProfileMetadata) -> "TargetProfile":
         return TargetProfile(
             metadata.profile_start,
-            metadata.get_timestep_duration(),
+            metadata.timestep_duration,
             [TargetProfile.NULL_ELEMENT] * metadata.nr_of_timesteps,
         )
 

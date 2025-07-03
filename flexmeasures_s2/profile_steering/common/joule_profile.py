@@ -82,7 +82,7 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
         new_elements = self.elements[index:]
         return JouleProfile(
             new_start_date,
-            self.get_profile_metadata().get_timestep_duration(),
+            self.get_profile_metadata().timestep_duration,
             new_elements,
         )
 
@@ -93,7 +93,7 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
             new_elements = self.elements + [0] * (nr_of_elements - len(self.elements))
         return JouleProfile(
             self.get_profile_metadata().profile_start,
-            self.get_profile_metadata().get_timestep_duration(),
+            self.get_profile_metadata().timestep_duration,
             new_elements,
         )
 
@@ -102,10 +102,7 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
 
     def avg_power_at(self, date: datetime) -> Optional[float]:
         element = self.element_at(date)
-        return (
-            element
-            / self.get_profile_metadata().get_timestep_duration().total_seconds()
-        )
+        return element / self.get_profile_metadata().timestep_duration.total_seconds()
 
     def add(self, other: "JouleProfile") -> "JouleProfile":
         if not self.is_compatible(other):
@@ -118,7 +115,7 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
                 summed_elements[i] = self.elements[i] + other.elements[i]
         return JouleProfile(
             self.get_profile_metadata().profile_start,
-            self.get_profile_metadata().get_timestep_duration(),
+            self.get_profile_metadata().timestep_duration,
             summed_elements,
         )
 
@@ -133,7 +130,7 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
                 diff_elements[i] = self.elements[i] - other.elements[i]
         return JouleProfile(
             self.get_profile_metadata().profile_start,
-            self.get_profile_metadata().get_timestep_duration(),
+            self.get_profile_metadata().timestep_duration,
             diff_elements,
         )
 
@@ -141,7 +138,7 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
         abs_elements = [abs(e) for e in self.elements]
         return JouleProfile(
             self.get_profile_metadata().profile_start,
-            self.get_profile_metadata().get_timestep_duration(),
+            self.get_profile_metadata().timestep_duration,
             abs_elements,
         )
 
@@ -173,7 +170,7 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
         ]
         return JouleProfile(
             self.get_profile_metadata().profile_start,
-            self.get_profile_metadata().get_timestep_duration(),
+            self.get_profile_metadata().timestep_duration,
             min_elements,
         )
 
@@ -188,7 +185,7 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
         ]
         return JouleProfile(
             self.get_profile_metadata().profile_start,
-            self.get_profile_metadata().get_timestep_duration(),
+            self.get_profile_metadata().timestep_duration,
             max_elements,
         )
 
@@ -207,4 +204,4 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
         return None
 
     def __str__(self) -> str:
-        return f"JouleProfile(elements={self.elements}, profile_start={self.get_profile_metadata().profile_start}, timestep_duration={self.get_profile_metadata().get_timestep_duration()})"
+        return f"JouleProfile(elements={self.elements}, profile_start={self.get_profile_metadata().profile_start}, timestep_duration={self.get_profile_metadata().timestep_duration})"

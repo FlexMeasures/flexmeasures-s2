@@ -27,7 +27,7 @@ class CongestionPointPlanner:
         # Create an empty profile (using all zeros)
         self.empty_profile = JouleProfile(
             self.profile_metadata.profile_start,
-            self.profile_metadata.get_timestep_duration(),
+            self.profile_metadata.timestep_duration,
             elements=[0] * self.profile_metadata.nr_of_timesteps,
         )
 
