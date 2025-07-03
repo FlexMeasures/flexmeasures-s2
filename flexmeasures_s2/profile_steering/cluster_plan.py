@@ -333,7 +333,7 @@ class ClusterPlanData:
             joule_profile = cluster_plan.get_joule_profile()
             current_plan = [
                 element if element is not None else 0.0
-                for element in joule_profile.get_elements()
+                for element in joule_profile.elements
             ]
         else:
             # Use the active plan, adjusting it to the profile metadata
@@ -348,7 +348,7 @@ class ClusterPlanData:
             adjusted_profile = subprofile.adjust_nr_of_elements(nr_of_timesteps)
             current_plan = [
                 element if element is not None else 0.0
-                for element in adjusted_profile.get_elements()
+                for element in adjusted_profile.elements
             ]
 
         # Get the profile metadata
@@ -496,15 +496,15 @@ class ClusterPlan:
             joule_target_segment = (
                 self._target.get_global_target_profile().target_elements_to_joule_profile()
             )
-            if not joule_target_segment.get_elements():
+            if not joule_target_segment.elements:
                 # No joule target, so that's by default a perfect score!
                 return 0.0
 
-            target = joule_target_segment.get_elements()
+            target = joule_target_segment.elements
             plan_segment = self.get_joule_profile().subprofile(
                 joule_target_segment.get_profile_metadata().profile_start
             )
-            plan = plan_segment.get_elements()
+            plan = plan_segment.elements
 
             sum_squared_distance = 0.0
             for i in range(len(target)):
@@ -530,14 +530,14 @@ class ClusterPlan:
             violation_sum = 0.0
 
             for cp_id, cp_profile in self.get_profile_per_congestion_point().items():
-                plan = cp_profile.get_elements()
+                plan = cp_profile.elements
                 congestion_point_target = self._target.get_congestion_point_target(
                     cp_id
                 )
 
                 if congestion_point_target is not None:
                     # If there is no target, we don't need to calculate it for the violation sum
-                    target_elements = congestion_point_target.get_elements()
+                    target_elements = congestion_point_target.elements
 
                     for i in range(len(target_elements)):
                         element = target_elements[i]
@@ -565,12 +565,12 @@ class ClusterPlan:
             True if there are constraint violations, False otherwise
         """
         for cp_id, cp_profile in self.get_profile_per_congestion_point().items():
-            plan = cp_profile.get_elements()
+            plan = cp_profile.elements
             congestion_point_target = self._target.get_congestion_point_target(cp_id)
 
             if congestion_point_target is not None:
                 # If there is no target, we don't need to check for violations
-                target_elements = congestion_point_target.get_elements()
+                target_elements = congestion_point_target.elements
 
                 for i in range(len(target_elements)):
                     element = target_elements[i]

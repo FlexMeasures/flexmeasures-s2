@@ -74,7 +74,7 @@ class TargetProfile(
         return (
             self.metadata.timestep_duration
             == other.get_profile_metadata().timestep_duration
-            and len(self.elements) == len(other.get_elements())
+            and len(self.elements) == len(other.elements)
         )
 
     def get_total_energy(self) -> int:

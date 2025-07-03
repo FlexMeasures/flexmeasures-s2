@@ -250,7 +250,7 @@ class S2FrbcDeviceStateWrapper:
         element = next(
             (
                 e
-                for e in om.get_elements()
+                for e in om.elements
                 if e.fill_level_range.start_of_range
                 <= fill_level
                 <= e.fill_level_range.end_of_range
@@ -258,8 +258,8 @@ class S2FrbcDeviceStateWrapper:
             None,
         )
         if element is None:
-            first = om.get_elements()[0]
-            last = om.get_elements()[-1]
+            first = om.elements[0]
+            last = om.elements[-1]
             element = (
                 first if fill_level < first.fill_level_range.start_of_range else last
             )

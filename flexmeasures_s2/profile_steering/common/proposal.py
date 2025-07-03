@@ -62,7 +62,7 @@ class Proposal:
             zero_profile = JouleProfile(
                 self.old_plan.get_profile_metadata().profile_start,
                 self.old_plan.get_profile_metadata().timestep_duration,
-                [0] * len(self.old_plan.get_elements()),
+                [0] * len(self.old_plan.elements),
             )
             exceed_max_target_old = self.diff_to_congestion_max.minimum(
                 zero_profile

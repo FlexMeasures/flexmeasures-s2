@@ -701,7 +701,7 @@ def test_planning_service_impl_with_ev_device():
     plot_planning_results(
         timestep_duration=timedelta(seconds=TIMESTEP_DURATION),
         nr_of_timesteps=T,
-        predicted_energy_elements=energy_profile.get_elements(),
+        predicted_energy_elements=energy_profile.elements,
         target_energy_elements=target_profile_elements,
     )
 

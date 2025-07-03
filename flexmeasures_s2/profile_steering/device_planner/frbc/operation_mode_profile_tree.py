@@ -264,9 +264,9 @@ class OperationModeProfileTree:
         for i, ts in enumerate(self.timesteps):
             ts.clear()
             ts.set_targets(
-                target_profile.get_elements()[i],
-                diff_to_min_profile.get_elements()[i],
-                diff_to_max_profile.get_elements()[i],
+                target_profile.elements[i],
+                diff_to_min_profile.elements[i],
+                diff_to_max_profile.elements[i],
             )
         first_timestep_index = next(
             (i for i, ts in enumerate(self.timesteps) if ts.system_description),

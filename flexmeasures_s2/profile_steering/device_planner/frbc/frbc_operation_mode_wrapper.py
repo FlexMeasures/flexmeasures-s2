@@ -65,8 +65,5 @@ class FrbcOperationModeWrapper:
                     return True
         return False
 
-    def get_elements(self) -> List[FrbcOperationModeElementWrapper]:
-        return self.elements
-
     def is_uses_factor(self) -> bool:
         return self.uses_factor

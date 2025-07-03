@@ -26,7 +26,7 @@ class SoCProfile(AbstractProfile[float, "SoCProfile"]):
         return (
             self.metadata.timestep_duration
             == other.get_profile_metadata().timestep_duration
-            and len(self.elements) == len(other.get_elements())
+            and len(self.elements) == len(other.elements)
         )
 
     def validate(self, profile_metadata: ProfileMetadata, elements: List[float]):

@@ -156,7 +156,7 @@ class PlanningServiceImpl(PlanningService):
                     # This is a dummy congestion point. We will give it an empty profile.
                     congestion_point_target = JouleRangeProfile(
                         target.get_global_target_profile().get_profile_metadata(),
-                        elements=congestion_point_target.get_elements(),
+                        elements=congestion_point_target.elements,
                     )
 
                 cpc = CongestionPointPlanner(congestion_point, congestion_point_target)
