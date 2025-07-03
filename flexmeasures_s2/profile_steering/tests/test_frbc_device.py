@@ -42,9 +42,9 @@ import matplotlib.pyplot as plt
 # make a list of tuples with the ids and the names
 ids = []
 
-
-D = 10  # number of devices
-B = 20  # number of buckets
+# -> todo: plot of run time vs D, vs B, vs S and vs T
+D = 10  # number of devices  -> todo: multiprocessing on create_improved_planning
+B = 20  # number of buckets  -> todo: vectorize computation of next state from current state
 S = 10  # number of stratification layers
 PLANNING_WINDOW = pd.Timedelta("PT13H20M")
 PLANNING_RESOLUTION = pd.Timedelta("PT5M")
