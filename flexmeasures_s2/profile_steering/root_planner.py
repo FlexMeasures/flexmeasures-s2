@@ -1,9 +1,11 @@
-from typing import List, Any
+from typing import List, Any, Optional
 from datetime import datetime
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from .congestion_point_planner import CongestionPointPlanner
 from flexmeasures_s2.profile_steering.common.proposal import Proposal
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
+import multiprocessing
+from functools import partial
 
 
 class RootPlanner:
@@ -56,7 +58,7 @@ class RootPlanner:
         plan_due_by_date: datetime,
         optimize_for_target: bool,
         max_priority_class_external: int,
-        multithreaded: bool = False,
+        multithreaded: bool = True,
     ):
         # Compute an initial plan by summing each congestion point's initial planning.
         self.root_ctrl_planning = self.empty_profile
@@ -86,21 +88,43 @@ class RootPlanner:
                 best_proposal = None
 
                 # Get proposals from each congestion point controller
-                for cpc in self.cp_controllers:
-                    print("Improving------------------------->")
-                    try:
-                        proposal = cpc.create_improved_planning(
-                            difference_profile,
-                            self.target.metadata,
-                            priority_class,
-                            plan_due_by_date,
-                        )
-                        if proposal is not None:
-                            if best_proposal is None or proposal.is_preferred_to(best_proposal):
-                                best_proposal = proposal
-                    except Exception as e:
-                        print(f"Error getting proposal from controller: {e}")
-                        continue
+                print(multithreaded)
+                if multithreaded:
+                    print("Multithreaded------------------------->")
+                    # Create a partial function with the common arguments
+                    get_proposal = partial(
+                        self._get_proposal_from_controller,
+                        difference_profile=difference_profile,
+                        target_metadata=self.target.metadata,
+                        priority_class=priority_class,
+                        plan_due_by_date=plan_due_by_date,
+                    )
+
+                    # Use multiprocessing to get proposals in parallel
+                    with multiprocessing.Pool() as pool:
+                        proposals = pool.map(get_proposal, self.cp_controllers)
+
+                    # Filter out None proposals and find the best one
+                    valid_proposals = [p for p in proposals if p is not None]
+                    if valid_proposals:
+                        best_proposal = max(valid_proposals, key=lambda p: p.get_global_improvement_value())
+                else:
+                    # Original sequential code
+                    for cpc in self.cp_controllers:
+                        print("Improving------------------------->")
+                        try:
+                            proposal = cpc.create_improved_planning(
+                                difference_profile,
+                                self.target.metadata,
+                                priority_class,
+                                plan_due_by_date,
+                            )
+                            if proposal is not None:
+                                if best_proposal is None or proposal.is_preferred_to(best_proposal):
+                                    best_proposal = proposal
+                        except Exception as e:
+                            print(f"Error getting proposal from controller: {e}")
+                            continue
 
                 if best_proposal is None:
                     # No proposal could be generated; exit inner loop.
@@ -128,3 +152,24 @@ class RootPlanner:
                 print(
                     f"Warning: Optimization stopped due to iteration limit. Priority class: {priority_class}, Iterations: {i}"
                 )
+
+    def _get_proposal_from_controller(
+        self,
+        cpc: CongestionPointPlanner,
+        difference_profile: TargetProfile,
+        target_metadata: Any,
+        priority_class: int,
+        plan_due_by_date: datetime,
+    ) -> Optional[Proposal]:
+        """Helper method to get a proposal from a controller in a multiprocessing context."""
+        try:
+            print("Improving------------------------->")
+            return cpc.create_improved_planning(
+                difference_profile,
+                target_metadata,
+                priority_class,
+                plan_due_by_date,
+            )
+        except Exception as e:
+            print(f"Error getting proposal from controller: {e}")
+            return None

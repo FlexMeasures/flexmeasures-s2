@@ -42,8 +42,8 @@ import matplotlib.pyplot as plt
 ids = []
 
 
-D = 5  # number of devices
-B = 40  # number of buckets
+D = 10  # number of devices
+B = 20  # number of buckets
 S = 10  # number of stratification layers
 T = 160  # number of time steps (5 minutes * 160 = 800 minutes = 13.33 hours)
 TIMESTEP_DURATION = 300  # duration of a time step in seconds (5 minutes)
@@ -653,7 +653,7 @@ def test_planning_service_impl_with_ev_device():
         energy_improvement_criterion=10.0,
         cost_improvement_criterion=1.0,
         congestion_retry_iterations=10,
-        multithreaded=False,
+        multithreaded=True,
     )
     print("Generating plan!")
 

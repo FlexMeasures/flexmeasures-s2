@@ -223,6 +223,7 @@ class PlanningServiceImpl(PlanningService):
         root_controller = self.create_controller_tree(state, target, plan_due_by_date)
 
         try:
+            print(self.config.multithreaded())
             root_controller.plan(
                 plan_due_by_date,
                 optimize_for_target,
