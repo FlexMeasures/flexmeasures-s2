@@ -137,7 +137,7 @@ class OperationModeProfileTree:
 
     def generate_timesteps(self) -> None:
         time_step_start = self.profile_metadata.profile_start
-        for i in range(self.profile_metadata.get_nr_of_timesteps()):
+        for i in range(self.profile_metadata.nr_of_timesteps):
             if i == 187:
                 print("here")
             time_step_end = (
@@ -316,15 +316,15 @@ class OperationModeProfileTree:
     def convert_to_plan(
         self, first_timestep_index_with_state: int, end_state: FrbcState
     ) -> S2FrbcPlan:
-        energy: List[int] = [0] * self.profile_metadata.get_nr_of_timesteps()
-        fill_level: List[float] = [0.0] * self.profile_metadata.get_nr_of_timesteps()
-        actuators: List[dict] = [{}] * self.profile_metadata.get_nr_of_timesteps()
-        insight_elements = [None] * self.profile_metadata.get_nr_of_timesteps()
+        energy: List[int] = [0] * self.profile_metadata.nr_of_timesteps
+        fill_level: List[float] = [0.0] * self.profile_metadata.nr_of_timesteps
+        actuators: List[dict] = [{}] * self.profile_metadata.nr_of_timesteps
+        insight_elements = [None] * self.profile_metadata.nr_of_timesteps
         state_selection_reasons: List[str] = [
             ""
-        ] * self.profile_metadata.get_nr_of_timesteps()
+        ] * self.profile_metadata.nr_of_timesteps
         state = end_state
-        for i in range(self.profile_metadata.get_nr_of_timesteps() - 1, -1, -1):
+        for i in range(self.profile_metadata.nr_of_timesteps - 1, -1, -1):
             if i >= first_timestep_index_with_state:
                 energy[i] = int(state.timestep_energy)
                 fill_level[i] = state.fill_level

@@ -32,7 +32,7 @@ class RootPlanner:
         self.empty_profile = JouleProfile(
             self.target.get_profile_metadata().profile_start,
             self.target.get_profile_metadata().get_timestep_duration(),
-            elements=[0] * self.target.get_profile_metadata().get_nr_of_timesteps(),
+            elements=[0] * self.target.get_profile_metadata().nr_of_timesteps,
         )
         self.cp_controllers: List[CongestionPointPlanner] = []
         self.root_ctrl_planning = self.empty_profile

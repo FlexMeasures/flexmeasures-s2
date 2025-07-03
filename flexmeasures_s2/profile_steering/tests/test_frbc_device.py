@@ -708,7 +708,7 @@ def test_planning_service_impl_with_ev_device():
     # Print and verify the energy profile
 
     # Basic assertion - the energy profile should have the expected number of elements
-    assert len(energy_profile.elements) == target_metadata.get_nr_of_timesteps()
+    assert len(energy_profile.elements) == target_metadata.nr_of_timesteps
 
 
 # Main function

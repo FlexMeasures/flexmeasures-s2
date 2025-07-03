@@ -118,7 +118,7 @@ class ClusterPlanData:
             Returns:
                 An empty CpData instance
             """
-            timesteps = profile_metadata.get_nr_of_timesteps()
+            timesteps = profile_metadata.nr_of_timesteps
             return cls(
                 cp_id,
                 [0.0] * timesteps,
@@ -341,9 +341,7 @@ class ClusterPlanData:
                 cluster_plan.get_plan_data().get_profile_metadata().profile_start
             )
             nr_of_timesteps = (
-                cluster_plan.get_plan_data()
-                .get_profile_metadata()
-                .get_nr_of_timesteps()
+                cluster_plan.get_plan_data().get_profile_metadata().nr_of_timesteps
             )
 
             subprofile = active_plan.subprofile(profile_start)
@@ -405,7 +403,7 @@ def to_float_array(profile: JouleProfile) -> List[float]:
     Returns:
         A list of floats
     """
-    result = [0.0] * profile.get_profile_metadata().get_nr_of_timesteps()
+    result = [0.0] * profile.get_profile_metadata().nr_of_timesteps
     for i, element in enumerate(profile.get_elements()):
         result[i] = 0.0 if element is None else float(element)
     return result
@@ -677,7 +675,7 @@ class ClusterPlan:
         sum_profile = JouleProfile(
             profile_start=self.get_profile_metadata().profile_start,
             timestep_duration=self.get_profile_metadata().get_timestep_duration(),
-            profile_length=self.get_profile_metadata().get_nr_of_timesteps(),
+            profile_length=self.get_profile_metadata().nr_of_timesteps,
             value=0.0,
         )
         for device_plan in self._plan_data.get_device_plans():

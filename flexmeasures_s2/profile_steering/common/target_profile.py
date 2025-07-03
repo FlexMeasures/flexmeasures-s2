@@ -164,7 +164,7 @@ class TargetProfile(
         return TargetProfile(
             metadata.profile_start,
             metadata.get_timestep_duration(),
-            [TargetProfile.NULL_ELEMENT] * metadata.get_nr_of_timesteps(),
+            [TargetProfile.NULL_ELEMENT] * metadata.nr_of_timesteps,
         )
 
     @staticmethod

@@ -62,7 +62,7 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
         if isinstance(profile_start, ProfileMetadata):
             metadata = profile_start
             if nr_of_timesteps is None:
-                nr_of_timesteps = metadata.get_nr_of_timesteps()
+                nr_of_timesteps = metadata.nr_of_timesteps
 
             elements = self._create_element_array(nr_of_timesteps, min_value, max_value)
 
@@ -112,7 +112,7 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
         if not self.is_compatible(other):
             raise ValueError("Profiles are not compatible")
 
-        for i in range(self.metadata.get_nr_of_timesteps()):
+        for i in range(self.metadata.nr_of_timesteps):
             element = self.elements[i]
             other_value = other.get_energy_for_timestep(i)
 
@@ -139,7 +139,7 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
 
         return_values = []
 
-        for i in range(self.metadata.get_nr_of_timesteps()):
+        for i in range(self.metadata.nr_of_timesteps):
             if self.elements[i].max_joule is None:
                 return_values.append(None)
             else:
@@ -168,7 +168,7 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
 
         return_values = []
 
-        for i in range(self.metadata.get_nr_of_timesteps()):
+        for i in range(self.metadata.nr_of_timesteps):
             if self.elements[i].min_joule is None:
                 return_values.append(None)
             else:
