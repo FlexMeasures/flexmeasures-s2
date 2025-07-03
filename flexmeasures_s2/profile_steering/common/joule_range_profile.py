@@ -148,7 +148,7 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
                 )
 
         return JouleProfile(
-            self.metadata.get_profile_start(),
+            self.metadata.profile_start,
             self.metadata.get_timestep_duration(),
             return_values,
         )
@@ -177,7 +177,7 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
                 )
 
         return JouleProfile(
-            self.metadata.get_profile_start(),
+            self.metadata.profile_start,
             self.metadata.get_timestep_duration(),
             return_values,
         )
@@ -219,7 +219,7 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
             )
 
         return JouleRangeProfile(
-            self.metadata.get_profile_start(),
+            self.metadata.profile_start,
             self.metadata.get_timestep_duration(),
             new_elements,
         )
@@ -241,6 +241,6 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
         """Return a string representation of this profile."""
         return (
             f"JouleRangeProfile(elements={self.elements}, "
-            f"profile_start={self.metadata.get_profile_start()}, "
+            f"profile_start={self.metadata.profile_start}, "
             f"timestep_duration={self.metadata.get_timestep_duration()})"
         )

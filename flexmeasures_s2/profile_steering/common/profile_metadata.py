@@ -18,17 +18,11 @@ class ProfileMetadata:
         self.profile_end = profile_start + timestep_duration * nr_of_timesteps
         self.profile_duration = self.profile_end - self.profile_start
 
-    def get_profile_start(self) -> datetime:
-        return self.profile_start
-
     def get_timestep_duration(self) -> timedelta:
         return self.timestep_duration
 
     def get_nr_of_timesteps(self) -> int:
         return self.nr_of_timesteps
-
-    def get_profile_end(self) -> datetime:
-        return self.profile_end
 
     def get_profile_duration(self) -> timedelta:
         return self.profile_duration

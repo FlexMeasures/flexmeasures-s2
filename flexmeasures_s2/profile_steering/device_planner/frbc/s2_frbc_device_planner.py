@@ -39,12 +39,12 @@ class S2FrbcDevicePlanner(DevicePlanner):
         self.s2_frbc_state = s2_frbc_state
         self.profile_metadata = profile_metadata
         self.zero_profile = JouleProfile(
-            profile_metadata.get_profile_start(),
+            profile_metadata.profile_start,
             profile_metadata.get_timestep_duration(),
             [0] * profile_metadata.get_nr_of_timesteps(),
         )
         self.null_profile = JouleProfile(
-            profile_metadata.get_profile_start(),
+            profile_metadata.profile_start,
             profile_metadata.get_timestep_duration(),
             elements=[None] * profile_metadata.get_nr_of_timesteps(),
         )
@@ -60,7 +60,7 @@ class S2FrbcDevicePlanner(DevicePlanner):
 
     def is_storage_available(self, storage_state: S2FrbcDeviceState) -> bool:
         latest_before_first_ptu = OperationModeProfileTree.get_latest_before(
-            self.profile_metadata.get_profile_start().replace(tzinfo=None),
+            self.profile_metadata.profile_start.replace(tzinfo=None),
             storage_state.get_system_descriptions(),
             lambda sd: sd.valid_from.replace(tzinfo=None),
         )
@@ -69,14 +69,14 @@ class S2FrbcDevicePlanner(DevicePlanner):
         if latest_before_first_ptu is None:
             active_and_upcoming_system_descriptions_has_active_storage = any(
                 # TODO: ask if TypeError: can't compare offset-naive and offset-aware datetimes could be solved differently
-                self.profile_metadata.get_profile_end().replace(tzinfo=None)
+                self.profile_metadata.profile_end.replace(tzinfo=None)
                 >= sd.valid_from.replace(tzinfo=None)
-                >= self.profile_metadata.get_profile_start().replace(tzinfo=None)
+                >= self.profile_metadata.profile_start.replace(tzinfo=None)
                 for sd in storage_state.get_system_descriptions()
             )
         else:
             active_and_upcoming_system_descriptions_has_active_storage = any(
-                self.profile_metadata.get_profile_end().replace(tzinfo=None)
+                self.profile_metadata.profile_end.replace(tzinfo=None)
                 >= sd.valid_from.replace(tzinfo=None)
                 >= latest_before_first_ptu.valid_from.replace(tzinfo=None)
                 for sd in storage_state.get_system_descriptions()
@@ -211,7 +211,7 @@ class S2FrbcDevicePlanner(DevicePlanner):
         else:
             elements = [None] * profile_metadata.get_nr_of_timesteps()
         return S2FrbcInstructionProfile(
-            profile_start=profile_metadata.get_profile_start(),
+            profile_start=profile_metadata.profile_start,
             timestep_duration=profile_metadata.get_timestep_duration(),
             elements=elements,
         )

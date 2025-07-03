@@ -600,7 +600,7 @@ def test_planning_service_impl_with_ev_device():
         timestep_duration=timedelta(seconds=TIMESTEP_DURATION),
         nr_of_timesteps=T,
     )
-    plan_due_by_date = target_metadata.get_profile_start() + timedelta(seconds=10)
+    plan_due_by_date = target_metadata.profile_start + timedelta(seconds=10)
     target_profile_elements = get_target_profile_elements(T)
 
     device_states = [
@@ -622,7 +622,7 @@ def test_planning_service_impl_with_ev_device():
 
     # Create a target profile
     global_target_profile = TargetProfile(
-        profile_start=target_metadata.get_profile_start(),
+        profile_start=target_metadata.profile_start,
         timestep_duration=target_metadata.get_timestep_duration(),
         elements=target_profile_elements,
     )
@@ -664,7 +664,7 @@ def test_planning_service_impl_with_ev_device():
         congestion_point_targets=congestion_point_targets,
     )
     # Set due by date for planning
-    plan_due_by_date = target_metadata.get_profile_start() + timedelta(seconds=10)
+    plan_due_by_date = target_metadata.profile_start + timedelta(seconds=10)
     # Act - Generate a plan
     start_time = time.time()
     cluster_plan = service.plan(

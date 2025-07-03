@@ -10,8 +10,8 @@ class SoCProfile(AbstractProfile[float, "SoCProfile"]):
     ):
         self.profile_metadata = profile_metadata
         self.timestep_duration = self.profile_metadata.get_timestep_duration()
-        self.profile_start = self.profile_metadata.get_profile_start()
-        self.profile_end = self.profile_metadata.get_profile_end()
+        self.profile_start = self.profile_metadata.profile_start
+        self.profile_end = self.profile_metadata.profile_end
         super().__init__(
             self.profile_metadata, elements if elements is not None else []
         )
@@ -47,7 +47,7 @@ class SoCProfile(AbstractProfile[float, "SoCProfile"]):
         else:
             new_elements = self.elements + [0.0] * (nr_of_elements - len(self.elements))
         return SoCProfile(
-            self.metadata.get_profile_start(),
+            self.metadata.profile_start,
             self.metadata.get_timestep_duration(),
             new_elements,
         )

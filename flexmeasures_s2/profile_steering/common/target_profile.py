@@ -65,7 +65,7 @@ class TargetProfile(
                 nr_of_elements - len(self.elements)
             )
         return TargetProfile(
-            self.metadata.get_profile_start(),
+            self.metadata.profile_start,
             self.metadata.get_timestep_duration(),
             new_elements,
         )
@@ -91,7 +91,7 @@ class TargetProfile(
             if isinstance(e, TargetProfile.JouleElement)
         ]
         return JouleProfile(
-            self.metadata.get_profile_start(),
+            self.metadata.profile_start,
             self.metadata.get_timestep_duration(),
             joules,
         )
@@ -117,7 +117,7 @@ class TargetProfile(
             else:
                 diff_elements.append(self.NULL_ELEMENT)
         return TargetProfile(
-            self.metadata.get_profile_start(),
+            self.metadata.profile_start,
             self.metadata.get_timestep_duration(),
             diff_elements,
         )
@@ -138,7 +138,7 @@ class TargetProfile(
             else:
                 sum_elements.append(self.NULL_ELEMENT)
         return TargetProfile(
-            self.metadata.get_profile_start(),
+            self.metadata.profile_start,
             self.metadata.get_timestep_duration(),
             sum_elements,
         )
@@ -151,7 +151,7 @@ class TargetProfile(
         )
 
     def __str__(self) -> str:
-        return f"TargetProfile(elements={self.elements}, profile_start={self.metadata.get_profile_start()}, timestep_duration={self.metadata.get_timestep_duration()})"
+        return f"TargetProfile(elements={self.elements}, profile_start={self.metadata.profile_start}, timestep_duration={self.metadata.get_timestep_duration()})"
 
     def get_profile_metadata(self) -> ProfileMetadata:
         return self.metadata
@@ -162,7 +162,7 @@ class TargetProfile(
     @staticmethod
     def null_profile(metadata: ProfileMetadata) -> "TargetProfile":
         return TargetProfile(
-            metadata.get_profile_start(),
+            metadata.profile_start,
             metadata.get_timestep_duration(),
             [TargetProfile.NULL_ELEMENT] * metadata.get_nr_of_timesteps(),
         )

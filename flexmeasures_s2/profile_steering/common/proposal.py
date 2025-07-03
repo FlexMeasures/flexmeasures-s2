@@ -60,7 +60,7 @@ class Proposal:
     def get_congestion_improvement_value(self) -> float:
         if self.congestion_improvement_value is None:
             zero_profile = JouleProfile(
-                self.old_plan.get_profile_metadata().get_profile_start(),
+                self.old_plan.get_profile_metadata().profile_start,
                 self.old_plan.get_profile_metadata().get_timestep_duration(),
                 [0] * len(self.old_plan.get_elements()),
             )
@@ -78,7 +78,7 @@ class Proposal:
             # print(f"exceed_max_target_proposal: {exceed_max_target_proposal}")
             exceed_min_target_old = self.diff_to_congestion_min.maximum(
                 zero_profile
-            ).sum_quadratic_distance()  
+            ).sum_quadratic_distance()
             # print(f"exceed_min_target_old: {exceed_min_target_old}")
             exceed_min_target_proposal = (
                 self.diff_to_congestion_min.add(self.old_plan)

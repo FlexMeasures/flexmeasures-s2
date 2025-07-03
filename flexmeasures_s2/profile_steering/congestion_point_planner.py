@@ -26,7 +26,7 @@ class CongestionPointPlanner:
 
         # Create an empty profile (using all zeros)
         self.empty_profile = JouleProfile(
-            self.profile_metadata.get_profile_start(),
+            self.profile_metadata.profile_start,
             self.profile_metadata.get_timestep_duration(),
             elements=[0] * self.profile_metadata.nr_of_timesteps,
         )
@@ -65,16 +65,19 @@ class CongestionPointPlanner:
                 device.create_initial_planning(plan_due_by_date)
             )
             # print(f"Initial planning after adding device {device.get_device_id()}: {current_planning}")
-        
-        
+
         # Check if the current planning is within the congestion target range
         if self.congestion_target.is_within_range(current_planning):
-            print(f"Current planning is within the congestion target range. Returning it.")
+            print(
+                f"Current planning is within the congestion target range. Returning it."
+            )
             return current_planning
 
         # If the current planning is not within the congestion target range, optimize it
-        print(f"Current planning is not within the congestion target range. Optimizing it.")
-        
+        print(
+            f"Current planning is not within the congestion target range. Optimizing it."
+        )
+
         # print(f"Congestion target: {self.congestion_target}")
         i = 0
         best_proposal = None
@@ -178,7 +181,7 @@ class CongestionPointPlanner:
                     # Get an improved plan from this device
                     proposal = device.create_improved_planning(
                         difference_profile,
-                        diff_to_max_value, 
+                        diff_to_max_value,
                         diff_to_min_value,
                         plan_due_by_date,
                     )
@@ -197,7 +200,7 @@ class CongestionPointPlanner:
                     print(
                         f"Error getting proposal from device {device.get_device_id()}: {e}"
                     )
-                    
+
                     continue
 
         if best_proposal is None:

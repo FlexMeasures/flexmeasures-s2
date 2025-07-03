@@ -4,7 +4,9 @@ import uuid
 
 # Common data types
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
-from flexmeasures_s2.profile_steering.common.joule_range_profile import JouleRangeProfile
+from flexmeasures_s2.profile_steering.common.joule_range_profile import (
+    JouleRangeProfile,
+)
 
 # Import from common data structures to avoid circular imports
 from flexmeasures_s2.profile_steering.common_data_structures import (
@@ -336,7 +338,7 @@ class ClusterPlanData:
         else:
             # Use the active plan, adjusting it to the profile metadata
             profile_start = (
-                cluster_plan.get_plan_data().get_profile_metadata().get_profile_start()
+                cluster_plan.get_plan_data().get_profile_metadata().profile_start
             )
             nr_of_timesteps = (
                 cluster_plan.get_plan_data()
@@ -361,7 +363,7 @@ class ClusterPlanData:
 
         # Calculate timestamps
         start_time = (
-            profile_metadata.get_profile_start().timestamp() * 1000
+            profile_metadata.profile_start.timestamp() * 1000
         )  # Convert to milliseconds
         timestep_duration = (
             profile_metadata.get_timestep_duration().total_seconds() * 1000
@@ -502,7 +504,7 @@ class ClusterPlan:
 
             target = joule_target_segment.get_elements()
             plan_segment = self.get_joule_profile().subprofile(
-                joule_target_segment.get_profile_metadata().get_profile_start()
+                joule_target_segment.get_profile_metadata().profile_start
             )
             plan = plan_segment.get_elements()
 
@@ -673,7 +675,7 @@ class ClusterPlan:
 
         # Add all device plans to the profile
         sum_profile = JouleProfile(
-            profile_start=self.get_profile_metadata().get_profile_start(),
+            profile_start=self.get_profile_metadata().profile_start,
             timestep_duration=self.get_profile_metadata().get_timestep_duration(),
             profile_length=self.get_profile_metadata().get_nr_of_timesteps(),
             value=0.0,

@@ -136,7 +136,7 @@ class OperationModeProfileTree:
         self.generate_timesteps()
 
     def generate_timesteps(self) -> None:
-        time_step_start = self.profile_metadata.get_profile_start()
+        time_step_start = self.profile_metadata.profile_start
         for i in range(self.profile_metadata.get_nr_of_timesteps()):
             if i == 187:
                 print("here")
@@ -340,7 +340,7 @@ class OperationModeProfileTree:
         return S2FrbcPlan(
             False,
             JouleProfile(
-                self.profile_metadata.get_profile_start(),
+                self.profile_metadata.profile_start,
                 self.profile_metadata.get_timestep_duration(),
                 energy,
             ),

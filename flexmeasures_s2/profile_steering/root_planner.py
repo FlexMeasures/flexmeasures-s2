@@ -30,7 +30,7 @@ class RootPlanner:
         # Create an empty JouleProfile.
         # We assume that target exposes get_profile_start(), timestep_duration and nr_of_timesteps.
         self.empty_profile = JouleProfile(
-            self.target.get_profile_metadata().get_profile_start(),
+            self.target.get_profile_metadata().profile_start,
             self.target.get_profile_metadata().get_timestep_duration(),
             elements=[0] * self.target.get_profile_metadata().get_nr_of_timesteps(),
         )
