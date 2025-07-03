@@ -333,6 +333,7 @@ class FrbcState:
         all_actions = self.device_state.get_all_possible_actuator_configurations(
             target_timestep
         )
+        # todo: try vectorizing this
         for action in all_actions:
             self.try_create_next_state(self, target_timestep, action)
 
