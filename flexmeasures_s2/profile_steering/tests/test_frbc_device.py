@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 import uuid
 import logging
 import time
+import pandas as pd
 from s2python.frbc.frbc_actuator_description import FRBCActuatorDescription
 from s2python.frbc.frbc_fill_level_target_profile_element import (
     FRBCFillLevelTargetProfileElement,
@@ -45,8 +46,13 @@ ids = []
 D = 10  # number of devices
 B = 20  # number of buckets
 S = 10  # number of stratification layers
-T = 160  # number of time steps
-TIMESTEP_DURATION = 300  # duration of a time step in seconds
+PLANNING_WINDOW = pd.Timedelta("PT13H20M")
+PLANNING_RESOLUTION = pd.Timedelta("PT5M")
+
+T = PLANNING_WINDOW // PLANNING_RESOLUTION  # number of time steps
+TIMESTEP_DURATION = PLANNING_RESOLUTION / pd.Timedelta(
+    "PT1S"
+)  # duration of a time step in seconds
 
 """
 # Ideas for speeding up
