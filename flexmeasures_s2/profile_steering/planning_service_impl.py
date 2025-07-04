@@ -231,7 +231,7 @@ class PlanningServiceImpl(PlanningService):
             # Collect device plans
             device_plans = []
             for cpc in root_controller.cp_controllers:
-                for device in cpc.get_device_controllers():
+                for device in cpc.devices:
                     device_plans.append(device.get_device_plan())
 
             # Create and return the cluster plan

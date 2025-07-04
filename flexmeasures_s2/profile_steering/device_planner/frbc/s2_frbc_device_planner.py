@@ -216,6 +216,3 @@ class S2FrbcDevicePlanner(DevicePlanner):
             timestep_duration=profile_metadata.timestep_duration,
             elements=elements,
         )
-
-    def get_priority_class(self) -> int:
-        return self.priority_class

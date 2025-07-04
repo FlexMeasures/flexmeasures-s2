@@ -99,7 +99,7 @@ class CongestionPointPlanner:
 
                 # Try to get improved plans from each device controller
                 for device in self.devices:
-                    if device.get_priority_class() <= priority_class:
+                    if device.priority_class <= priority_class:
                         try:
                             proposal = device.create_improved_planning(
                                 self.empty_profile,  # Assuming empty global target
@@ -176,7 +176,7 @@ class CongestionPointPlanner:
         # print(f"diff_to_min_value: {diff_to_min_value}")
         # Try to get improved plans from each device controller
         for device in self.devices:
-            if device.get_priority_class() <= priority_class:
+            if device.priority_class <= priority_class:
                 try:
                     # Get an improved plan from this device
                     proposal = device.create_improved_planning(
@@ -229,18 +229,14 @@ class CongestionPointPlanner:
         """Add a device controller to this congestion point."""
         self.devices.append(device)
 
-    def get_device_controllers(self) -> List[DevicePlanner]:
-        """Get the list of device controllers."""
-        return self.devices
-
     def max_priority_class(self) -> int:
         """Get the maximum priority class among all devices."""
         if not self.devices:
             return 1
-        return max(device.get_priority_class() for device in self.devices)
+        return max(device.priority_class for device in self.devices)
 
     def min_priority_class(self) -> int:
         """Get the minimum priority class among all devices."""
         if not self.devices:
             return 1
-        return min(device.get_priority_class() for device in self.devices)
+        return min(device.priority_class for device in self.devices)

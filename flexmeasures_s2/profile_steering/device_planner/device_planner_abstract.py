@@ -78,8 +78,3 @@ class DevicePlanner(ABC):
     def get_device_plan(self) -> Optional[DevicePlan]:
         """Get the device plan."""
         pass
-
-    @abstractmethod
-    def get_priority_class(self) -> int:
-        """Get the priority class of the device."""
-        pass
