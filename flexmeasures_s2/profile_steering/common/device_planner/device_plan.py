@@ -22,9 +22,6 @@ class DevicePlan:
         self.fill_level_profile = fill_level_profile
         self.instruction_profile = instruction_profile
 
-    def get_instruction_profile(self) -> S2FrbcInstructionProfile:
-        return self.instruction_profile
-
     def __str__(self) -> str:
         return (
             f"DevicePlan(device_id={self.device_id}, device_name={self.device_name}, "
