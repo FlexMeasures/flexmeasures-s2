@@ -116,10 +116,10 @@ class RootPlanner:
 
                 # Update the root controller's planning based on the best proposal.
                 self.root_ctrl_planning = self.root_ctrl_planning.subtract(
-                    best_proposal.get_old_plan()
+                    best_proposal.old_plan
                 )
                 self.root_ctrl_planning = self.root_ctrl_planning.add(
-                    best_proposal.get_proposed_plan()
+                    best_proposal.proposed_plan
                 )
 
                 # Let the origin device/controller accept the proposal.

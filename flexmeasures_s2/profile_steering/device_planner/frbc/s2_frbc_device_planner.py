@@ -108,10 +108,10 @@ class S2FrbcDevicePlanner(DevicePlanner):
         if self.accepted_plan is None:
             raise ValueError("No accepted plan found")
 
-        target = diff_to_global_target.add(self.accepted_plan.get_energy())
+        target = diff_to_global_target.add(self.accepted_plan.energy)
 
-        max_profile = diff_to_max.add(self.accepted_plan.get_energy())
-        min_profile = diff_to_min.add(self.accepted_plan.get_energy())
+        max_profile = diff_to_max.add(self.accepted_plan.energy)
+        min_profile = diff_to_min.add(self.accepted_plan.energy)
 
         if self.is_storage_available(self.s2_frbc_state):
             self.latest_plan = self.state_tree.find_best_plan(
@@ -130,8 +130,8 @@ class S2FrbcDevicePlanner(DevicePlanner):
             global_diff_target=diff_to_global_target,
             diff_to_congestion_max=diff_to_max,
             diff_to_congestion_min=diff_to_min,
-            proposed_plan=self.latest_plan.get_energy(),
-            old_plan=self.accepted_plan.get_energy(),
+            proposed_plan=self.latest_plan.energy,
+            old_plan=self.accepted_plan.energy,
             origin=self,
         )
         return proposal
@@ -161,7 +161,7 @@ class S2FrbcDevicePlanner(DevicePlanner):
                 operation_mode_id=[],
             )
         self.accepted_plan = self.latest_plan
-        return self.latest_plan.get_energy()  # type: ignore
+        return self.latest_plan.energy  # type: ignore
 
     def accept_proposal(self, accepted_proposal: Proposal) -> None:
         if self.latest_plan is None:
@@ -170,7 +170,7 @@ class S2FrbcDevicePlanner(DevicePlanner):
             raise ValueError(
                 f"Storage controller '{self.get_device_id()}' received a proposal that he did not send."
             )
-        if not accepted_proposal.get_proposed_plan() == self.latest_plan.get_energy():
+        if not accepted_proposal.proposed_plan == self.latest_plan.energy:
             raise ValueError(
                 f"Storage controller '{self.get_device_id()}' received a proposal that he did not send."
             )
@@ -184,7 +184,7 @@ class S2FrbcDevicePlanner(DevicePlanner):
     def current_profile(self) -> JouleProfile:
         if self.accepted_plan is None:
             raise ValueError("No accepted plan found")
-        return self.accepted_plan.get_energy()
+        return self.accepted_plan.energy
 
     def get_device_plan(self) -> Optional[DevicePlan]:
         if self.accepted_plan is None:
@@ -193,7 +193,7 @@ class S2FrbcDevicePlanner(DevicePlanner):
             device_id=self.device_id,
             device_name=self.device_name,
             connection_id=self.connection_id,
-            energy_profile=self.accepted_plan.get_energy(),
+            energy_profile=self.accepted_plan.energy,
             fill_level_profile=self.accepted_plan.get_fill_level(),
             instruction_profile=self.convert_plan_to_instructions(
                 self.profile_metadata, self.accepted_plan

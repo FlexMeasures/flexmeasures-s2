@@ -130,8 +130,8 @@ class CongestionPointPlanner:
 
                 # Update the current planning based on the best proposal
                 current_planning = current_planning.subtract(
-                    best_proposal.get_old_plan()
-                ).add(best_proposal.get_proposed_plan())
+                    best_proposal.old_plan
+                ).add(best_proposal.proposed_plan)
                 best_proposal.get_origin().accept_proposal(best_proposal)
                 i += 1
 
@@ -187,8 +187,8 @@ class CongestionPointPlanner:
                     )
                     # print("Plans old vs New")
                     # print(f"device: {device.get_device_name()}")
-                    # print(f"old: {proposal.get_old_plan()}")
-                    # print(f"new: {proposal.get_proposed_plan()}")
+                    # print(f"old: {proposal.old_plan}")
+                    # print(f"new: {proposal.proposed_plan}")
                     if proposal.get_congestion_improvement_value() < 0:
                         print(
                             f"{device.device_name}, congestion improvement: {proposal.get_congestion_improvement_value()}"

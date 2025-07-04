@@ -120,12 +120,3 @@ class Proposal:
 
     def get_origin(self) -> DevicePlanner:
         return self.origin
-
-    def get_proposed_plan(self) -> JouleProfile:
-        return self.proposed_plan
-
-    def get_old_plan(self) -> JouleProfile:
-        return self.old_plan
-
-    def get_energy(self) -> JouleProfile:
-        return self.proposed_plan
