@@ -158,7 +158,7 @@ class OperationModeProfileTree:
             )
             current_fill_level = self.get_latest_before(
                 time_step_start_dt,
-                self.device_state.get_fill_level_target_profiles(),
+                self.device_state.fill_level_target_profiles,
                 lambda fl: fl.start_time,
             )
             current_fill_level_target = None

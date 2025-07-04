@@ -56,8 +56,9 @@ class S2FrbcDeviceStateWrapper:
     def get_usage_forecasts(self) -> Any:
         return self.device_state.get_usage_forecasts()
 
-    def get_fill_level_target_profiles(self) -> Any:
-        return self.device_state.get_fill_level_target_profiles()
+    @property
+    def fill_level_target_profiles(self) -> Any:
+        return self.device_state.fill_level_target_profiles
 
     def get_computational_parameters(self) -> Any:
         return self.device_state.get_computational_parameters()
