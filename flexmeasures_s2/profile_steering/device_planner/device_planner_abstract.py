@@ -70,7 +70,7 @@ class DevicePlanner(ABC):
         pass
 
     @abstractmethod
-    def get_current_profile(self) -> JouleProfile:
+    def current_profile(self) -> JouleProfile:
         """Get the current profile of the device."""
         pass
 

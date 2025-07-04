@@ -222,7 +222,7 @@ class CongestionPointPlanner:
         # Return the latest accepted plan as the current planning
         current_planning = self.empty_profile
         for device in self.devices:
-            current_planning = current_planning.add(device.get_current_profile())
+            current_planning = current_planning.add(device.current_profile)
         return current_planning
 
     def add_device_controller(self, device):

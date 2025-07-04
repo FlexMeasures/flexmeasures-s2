@@ -86,14 +86,14 @@ class S2FrbcDevicePlanner(DevicePlanner):
             and active_and_upcoming_system_descriptions_has_active_storage
         )
 
-    def get_device_id(self) -> str:
-        return self.s2_frbc_state.get_device_id()
+    def device_id(self) -> str:
+        return self.s2_frbc_state.device_id
 
-    def get_connection_id(self) -> str:
-        return self.s2_frbc_state.get_connection_id()
+    def connection_id(self) -> str:
+        return self.s2_frbc_state.connection_id
 
-    def get_device_name(self) -> str:
-        return self.s2_frbc_state.get_device_name()
+    def device_name(self) -> str:
+        return self.s2_frbc_state.device_name
 
     def create_improved_planning(
         self,
@@ -177,7 +177,8 @@ class S2FrbcDevicePlanner(DevicePlanner):
             )
         self.accepted_plan = self.latest_plan
 
-    def get_current_profile(self) -> JouleProfile:
+    @property
+    def current_profile(self) -> JouleProfile:
         if self.accepted_plan is None:
             raise ValueError("No accepted plan found")
         return self.accepted_plan.get_energy()
@@ -186,9 +187,9 @@ class S2FrbcDevicePlanner(DevicePlanner):
         if self.accepted_plan is None:
             return None
         return DevicePlan(
-            device_id=self.get_device_id(),
-            device_name=self.get_device_name(),
-            connection_id=self.get_connection_id(),
+            device_id=self.device_id,
+            device_name=self.device_name,
+            connection_id=self.connection_id,
             energy_profile=self.accepted_plan.get_energy(),
             fill_level_profile=self.accepted_plan.get_fill_level(),
             instruction_profile=self.convert_plan_to_instructions(
