@@ -221,9 +221,7 @@ class ClusterPlanData:
         new_device_plans = []
         for device_plan in self._device_plans:
             new_profile = device_plan.get_profile().subprofile(new_start_date)
-            new_device_plans.append(
-                DevicePlan(device_plan.get_device_id(), new_profile)
-            )
+            new_device_plans.append(DevicePlan(device_plan.device_id, new_profile))
 
         # Create new profile metadata with adjusted start date
         new_profile_metadata = self._profile_metadata.subprofile(new_start_date)
@@ -259,9 +257,7 @@ class ClusterPlanData:
             new_profile = device_plan.get_profile().adjust_nr_of_elements(
                 nr_of_elements
             )
-            new_device_plans.append(
-                DevicePlan(device_plan.get_device_id(), new_profile)
-            )
+            new_device_plans.append(DevicePlan(device_plan.device_id, new_profile))
 
         # Create new profile metadata with adjusted number of elements
         new_profile_metadata = self._profile_metadata.adjust_nr_of_elements(
@@ -325,7 +321,7 @@ class ClusterPlanData:
                 )
 
             congestion_points[cp_id] = congestion_points[cp_id].add_der_plan(
-                device_plan.get_device_id(), device_plan.get_profile()
+                device_plan.device_id, device_plan.get_profile()
             )
 
         # Create the current plan

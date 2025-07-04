@@ -108,7 +108,7 @@ class CongestionPointPlanner:
                                 plan_due_by_date,
                             )
                             print(
-                                f"congestion point improvement for '{device.get_device_id()}': {proposal.get_congestion_improvement_value()}"
+                                f"congestion point improvement for '{device.device_id}': {proposal.get_congestion_improvement_value()}"
                             )
                             if (
                                 best_proposal is None
@@ -118,7 +118,7 @@ class CongestionPointPlanner:
                                 best_proposal = proposal
                         except Exception as e:
                             print(
-                                f"Error getting proposal from device {device.get_device_id()}: {e}"
+                                f"Error getting proposal from device {device.device_id}: {e}"
                             )
                             continue
 
@@ -136,7 +136,7 @@ class CongestionPointPlanner:
                 i += 1
 
                 print(
-                    f"Initial planning '{self.congestion_point_id}': best controller '{best_proposal.get_origin().get_device_id()}' with congestion improvement of {best_proposal.get_congestion_improvement_value()}. Iteration {i}."
+                    f"Initial planning '{self.congestion_point_id}': best controller '{best_proposal.get_origin().device_id}' with congestion improvement of {best_proposal.get_congestion_improvement_value()}. Iteration {i}."
                 )
 
                 if i >= self.MAX_ITERATIONS:
@@ -197,9 +197,7 @@ class CongestionPointPlanner:
                     if best_proposal is None or proposal.is_preferred_to(best_proposal):
                         best_proposal = proposal
                 except Exception as e:
-                    print(
-                        f"Error getting proposal from device {device.get_device_id()}: {e}"
-                    )
+                    print(f"Error getting proposal from device {device.device_id}: {e}")
 
                     continue
 
