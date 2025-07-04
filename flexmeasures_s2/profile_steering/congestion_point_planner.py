@@ -191,7 +191,7 @@ class CongestionPointPlanner:
                     # print(f"new: {proposal.get_proposed_plan()}")
                     if proposal.get_congestion_improvement_value() < 0:
                         print(
-                            f"{device.get_device_name()}, congestion improvement: {proposal.get_congestion_improvement_value()}"
+                            f"{device.device_name}, congestion improvement: {proposal.get_congestion_improvement_value()}"
                         )
 
                     if best_proposal is None or proposal.is_preferred_to(best_proposal):
@@ -212,7 +212,7 @@ class CongestionPointPlanner:
                 )
 
             print(
-                f"CP '{self.congestion_point_id}': Selected best controller '{best_proposal.get_origin().get_device_name()}' with improvement of {best_proposal.get_global_improvement_value()}."
+                f"CP '{self.congestion_point_id}': Selected best controller '{best_proposal.get_origin().device_name}' with improvement of {best_proposal.get_global_improvement_value()}."
             )
 
         return best_proposal

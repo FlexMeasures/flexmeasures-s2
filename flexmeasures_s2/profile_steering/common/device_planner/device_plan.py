@@ -22,9 +22,6 @@ class DevicePlan:
         self.fill_level_profile = fill_level_profile
         self.instruction_profile = instruction_profile
 
-    def get_device_name(self) -> str:
-        return self.device_name
-
     def get_connection_id(self) -> str:
         return self.connection_id
 
