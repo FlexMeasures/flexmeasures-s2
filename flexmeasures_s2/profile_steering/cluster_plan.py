@@ -673,6 +673,6 @@ class ClusterPlan:
             value=0.0,
         )
         for device_plan in self._plan_data.get_device_plans():
-            sum_profile = sum_profile.add(device_plan.get_energy_profile())
+            sum_profile = sum_profile.add(device_plan.energy_profile)
 
         return sum_profile
