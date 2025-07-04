@@ -189,12 +189,15 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
             max_elements,
         )
 
+    @property
     def get_total_energy(self) -> int:
         return sum(self.elements)
 
+    @property
     def get_total_energy_production(self) -> int:
         return sum(min(0, e) for e in self.elements)
 
+    @property
     def get_total_energy_consumption(self) -> int:
         return sum(max(0, e) for e in self.elements)
 
