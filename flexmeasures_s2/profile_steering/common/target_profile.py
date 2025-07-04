@@ -69,8 +69,7 @@ class TargetProfile(
 
     def is_compatible(self, other: AbstractProfile) -> bool:
         return (
-            self.metadata.timestep_duration
-            == other.get_profile_metadata().timestep_duration
+            self.metadata.timestep_duration == other.metadata.timestep_duration
             and len(self.elements) == len(other.elements)
         )
 
@@ -145,9 +144,6 @@ class TargetProfile(
 
     def __str__(self) -> str:
         return f"TargetProfile(elements={self.elements}, profile_start={self.metadata.profile_start}, timestep_duration={self.metadata.timestep_duration})"
-
-    def get_profile_metadata(self) -> ProfileMetadata:
-        return self.metadata
 
     def get_elements(self) -> List["TargetProfile.Element | None"]:
         return self.elements

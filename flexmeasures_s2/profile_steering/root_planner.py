@@ -30,9 +30,9 @@ class RootPlanner:
         # Create an empty JouleProfile.
         # We assume that target exposes get_profile_start(), timestep_duration and nr_of_timesteps.
         self.empty_profile = JouleProfile(
-            self.target.get_profile_metadata().profile_start,
-            self.target.get_profile_metadata().timestep_duration,
-            elements=[0] * self.target.get_profile_metadata().nr_of_timesteps,
+            self.target.metadata.profile_start,
+            self.target.metadata.timestep_duration,
+            elements=[0] * self.target.metadata.nr_of_timesteps,
         )
         self.cp_controllers: List[CongestionPointPlanner] = []
         self.root_ctrl_planning = self.empty_profile
@@ -97,7 +97,7 @@ class RootPlanner:
                     try:
                         proposal = cpc.create_improved_planning(
                             difference_profile,
-                            self.target.get_profile_metadata(),
+                            self.target.metadata,
                             priority_class,
                             plan_due_by_date,
                         )

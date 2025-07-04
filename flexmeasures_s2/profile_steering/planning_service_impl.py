@@ -155,7 +155,7 @@ class PlanningServiceImpl(PlanningService):
                 if congestion_point == self.DEFAULT_CONGESTION_POINT:
                     # This is a dummy congestion point. We will give it an empty profile.
                     congestion_point_target = JouleRangeProfile(
-                        target.get_global_target_profile().get_profile_metadata(),
+                        target.get_global_target_profile().metadata,
                         elements=congestion_point_target.elements,
                     )
 
@@ -166,9 +166,7 @@ class PlanningServiceImpl(PlanningService):
             if isinstance(device_state, S2FrbcDeviceState):
                 logger.debug("S2 FRBC planner created!")
                 cpc.add_device_controller(
-                    S2FrbcDevicePlanner(
-                        device_state, target.get_profile_metadata(), plan_due_by_date
-                    )
+                    S2FrbcDevicePlanner(device_state, target.metadata, plan_due_by_date)
                 )
             # Add other device types here as needed
             else:
@@ -215,7 +213,7 @@ class PlanningServiceImpl(PlanningService):
                 target.set_congestion_point_target(
                     congestion_point_id=cp,
                     congestion_point_target=JouleRangeProfile(
-                        profile_start=target.get_global_target_profile().get_profile_metadata(),
+                        profile_start=target.get_global_target_profile().metadata,
                     ),
                 )
 
@@ -237,7 +235,7 @@ class PlanningServiceImpl(PlanningService):
                     device_plans.append(device.get_device_plan())
 
             # Create and return the cluster plan
-            plan_data = ClusterPlanData(device_plans, target.get_profile_metadata())
+            plan_data = ClusterPlanData(device_plans, target.metadata)
             plan = ClusterPlan(state, target, plan_data, reason, plan_due_by_date, None)
 
             end_time = datetime.now()

@@ -160,7 +160,8 @@ class ClusterPlanData:
     def get_device_plans(self) -> List[DevicePlan]:
         return self._device_plans
 
-    def get_profile_metadata(self) -> Any:
+    @property
+    def metadata(self):
         return self._profile_metadata
 
     def get_id(self) -> str:
@@ -205,7 +206,7 @@ class ClusterPlanData:
         if self._profile_metadata is None:
             return False
 
-        return self._profile_metadata.is_compatible(other.get_profile_metadata())
+        return self._profile_metadata.is_compatible(other.metadata)
 
     def subprofile(self, new_start_date: datetime) -> "ClusterPlanData":
         """Create a subprofile starting at the specified date.
@@ -320,7 +321,7 @@ class ClusterPlanData:
 
             if cp_id not in congestion_points:
                 congestion_points[cp_id] = ClusterPlanData.CpData.empty(
-                    cp_id, cluster_plan.get_plan_data().get_profile_metadata()
+                    cp_id, cluster_plan.get_plan_data().metadata
                 )
 
             congestion_points[cp_id] = congestion_points[cp_id].add_der_plan(
@@ -337,12 +338,8 @@ class ClusterPlanData:
             ]
         else:
             # Use the active plan, adjusting it to the profile metadata
-            profile_start = (
-                cluster_plan.get_plan_data().get_profile_metadata().profile_start
-            )
-            nr_of_timesteps = (
-                cluster_plan.get_plan_data().get_profile_metadata().nr_of_timesteps
-            )
+            profile_start = cluster_plan.get_plan_data().metadata.profile_start
+            nr_of_timesteps = cluster_plan.get_plan_data().metadata.nr_of_timesteps
 
             subprofile = active_plan.subprofile(profile_start)
             adjusted_profile = subprofile.adjust_nr_of_elements(nr_of_timesteps)
@@ -352,7 +349,7 @@ class ClusterPlanData:
             ]
 
         # Get the profile metadata
-        profile_metadata = cluster_plan.get_plan_data().get_profile_metadata()
+        profile_metadata = cluster_plan.get_plan_data().metadata
 
         # Set up the active target
         actual_active_target = (
@@ -403,7 +400,7 @@ def to_float_array(profile: JouleProfile) -> List[float]:
     Returns:
         A list of floats
     """
-    result = [0.0] * profile.get_profile_metadata().nr_of_timesteps
+    result = [0.0] * profile.metadata.nr_of_timesteps
     for i, element in enumerate(profile.get_elements()):
         result[i] = 0.0 if element is None else float(element)
     return result
@@ -502,7 +499,7 @@ class ClusterPlan:
 
             target = joule_target_segment.elements
             plan_segment = self.get_joule_profile().subprofile(
-                joule_target_segment.get_profile_metadata().profile_start
+                joule_target_segment.metadata.profile_start
             )
             plan = plan_segment.elements
 
@@ -637,13 +634,14 @@ class ClusterPlan:
             activated_at=None,
         )
 
-    def get_profile_metadata(self) -> Any:
+    @property
+    def metadata(self) -> Any:
         """Get the profile metadata for this plan.
 
         Returns:
             The profile metadata
         """
-        return self._target.get_profile_metadata()
+        return self._target.metadata
 
     def get_profile_per_congestion_point(self) -> Dict[str, JouleProfile]:
         """Get the profile for each congestion point.
@@ -673,9 +671,9 @@ class ClusterPlan:
 
         # Add all device plans to the profile
         sum_profile = JouleProfile(
-            profile_start=self.get_profile_metadata().profile_start,
-            timestep_duration=self.get_profile_metadata().timestep_duration,
-            profile_length=self.get_profile_metadata().nr_of_timesteps,
+            profile_start=self.metadata.profile_start,
+            timestep_duration=self.metadata.timestep_duration,
+            profile_length=self.metadata.nr_of_timesteps,
             value=0.0,
         )
         for device_plan in self._plan_data.get_device_plans():

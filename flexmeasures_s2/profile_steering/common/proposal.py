@@ -50,7 +50,7 @@ class Proposal:
     # @staticmethod
     # def get_cost(plan: JouleProfile, target_profile: TargetProfile) -> float:
     #     cost = 0.0
-    #     for i in range(target_profile.get_profile_metadata().get_nr_of_timesteps()):
+    #     for i in range(target_profile.metadata.get_nr_of_timesteps()):
     #         joule_usage = plan.get_elements()[i]
     #         target_element = target_profile.get_elements()[i]
     #         if isinstance(target_element, TargetProfile.TariffElement):
@@ -60,8 +60,8 @@ class Proposal:
     def get_congestion_improvement_value(self) -> float:
         if self.congestion_improvement_value is None:
             zero_profile = JouleProfile(
-                self.old_plan.get_profile_metadata().profile_start,
-                self.old_plan.get_profile_metadata().timestep_duration,
+                self.old_plan.metadata.profile_start,
+                self.old_plan.metadata.timestep_duration,
                 [0] * len(self.old_plan.elements),
             )
             exceed_max_target_old = self.diff_to_congestion_max.minimum(

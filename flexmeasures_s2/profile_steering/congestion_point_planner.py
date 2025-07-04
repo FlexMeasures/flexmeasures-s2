@@ -22,7 +22,7 @@ class CongestionPointPlanner:
         self.MAX_ITERATIONS = 1000
         self.congestion_point_id = congestion_point_id
         self.congestion_target = congestion_target
-        self.profile_metadata = congestion_target.get_profile_metadata()
+        self.profile_metadata = congestion_target.metadata
 
         # Create an empty profile (using all zeros)
         self.empty_profile = JouleProfile(

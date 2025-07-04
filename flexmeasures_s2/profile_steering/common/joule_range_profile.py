@@ -235,7 +235,7 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
             True if compatible, False otherwise
 
         """
-        return self.metadata == other.get_profile_metadata()
+        return self.metadata == other.metadata
 
     def __str__(self) -> str:
         """Return a string representation of this profile."""

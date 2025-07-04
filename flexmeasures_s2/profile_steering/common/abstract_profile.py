@@ -85,9 +85,6 @@ class AbstractProfile(ABC, Generic[E, PT]):
                 "The startTimeDuration should be aligned with the timeStepDuration"
             )
 
-    def get_profile_metadata(self) -> ProfileMetadata:
-        return self.metadata
-
     def get_elements(self) -> List[E]:
         return self.elements
 

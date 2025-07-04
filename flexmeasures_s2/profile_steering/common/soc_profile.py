@@ -24,8 +24,7 @@ class SoCProfile(AbstractProfile[float, "SoCProfile"]):
 
     def is_compatible(self, other: AbstractProfile) -> bool:
         return (
-            self.metadata.timestep_duration
-            == other.get_profile_metadata().timestep_duration
+            self.metadata.timestep_duration == other.metadata.timestep_duration
             and len(self.elements) == len(other.elements)
         )
 
