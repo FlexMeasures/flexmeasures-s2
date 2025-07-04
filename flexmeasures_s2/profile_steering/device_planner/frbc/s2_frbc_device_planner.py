@@ -82,7 +82,7 @@ class S2FrbcDevicePlanner(DevicePlanner):
                 for sd in storage_state.get_system_descriptions()
             )
         return (
-            storage_state._is_online()
+            storage_state.is_online
             and active_and_upcoming_system_descriptions_has_active_storage
         )
 

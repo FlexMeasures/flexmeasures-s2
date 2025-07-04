@@ -41,8 +41,9 @@ class S2FrbcDeviceStateWrapper:
         self.operation_mode_uses_factor_map: Dict[str, bool] = {}
         self.operation_modes: Dict[str, FrbcOperationModeWrapper] = {}
 
+    @property
     def is_online(self) -> bool:
-        return self.device_state._is_online()
+        return self.device_state.is_online
 
     def get_power_forecast(self) -> Any:
         return self.device_state.get_power_forecast()

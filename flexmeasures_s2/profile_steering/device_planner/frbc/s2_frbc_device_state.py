@@ -66,9 +66,6 @@ class S2FrbcDeviceState:
     def get_device_name(self) -> str:
         return self.device_name
 
-    def _is_online(self) -> bool:
-        return self.is_online
-
     def get_computational_parameters(self) -> ComputationalParameters:
         return self.computational_parameters
 
