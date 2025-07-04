@@ -125,7 +125,7 @@ class FrbcState:
             if isinstance(target, TargetProfile.JouleElement):
                 self.sum_squared_distance = (
                     previous_state.sum_squared_distance
-                    + (target.get_joules() - self.timestep_energy) ** 2
+                    + (target.joules - self.timestep_energy) ** 2
                 )
                 self.sum_energy_cost = previous_state.sum_energy_cost
             else:
@@ -295,7 +295,7 @@ class FrbcState:
         if isinstance(target, TargetProfile.JouleElement):
             self.sum_squared_distance = (
                 previous_state.sum_squared_distance
-                + (target.get_joules() - self.timestep_energy) ** 2
+                + (target.joules - self.timestep_energy) ** 2
             )
             self.sum_energy_cost = previous_state.sum_energy_cost
 

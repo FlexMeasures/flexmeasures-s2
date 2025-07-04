@@ -15,9 +15,6 @@ class TargetProfile(
         def __init__(self, joules: int):
             self.joules = joules
 
-        def get_joules(self) -> int:
-            return self.joules
-
     class NullElement(Element):
         pass
 
@@ -79,16 +76,12 @@ class TargetProfile(
 
     def get_total_energy(self) -> int:
         return sum(
-            e.get_joules()
-            for e in self.elements
-            if isinstance(e, TargetProfile.JouleElement)
+            e.joules for e in self.elements if isinstance(e, TargetProfile.JouleElement)
         )
 
     def target_elements_to_joule_profile(self) -> JouleProfile:
         joules = [
-            e.get_joules()
-            for e in self.elements
-            if isinstance(e, TargetProfile.JouleElement)
+            e.joules for e in self.elements if isinstance(e, TargetProfile.JouleElement)
         ]
         return JouleProfile(
             self.metadata.profile_start,
@@ -110,7 +103,7 @@ class TargetProfile(
                 other_energy = other.get_energy_for_timestep(i)
                 if other_energy is not None:
                     diff_elements.append(
-                        TargetProfile.JouleElement(element.get_joules() - other_energy)
+                        TargetProfile.JouleElement(element.joules - other_energy)
                     )
                 else:
                     diff_elements.append(self.NULL_ELEMENT)
@@ -131,7 +124,7 @@ class TargetProfile(
                 other_energy = other.get_energy_for_timestep(i)
                 if other_energy is not None:
                     sum_elements.append(
-                        TargetProfile.JouleElement(element.get_joules() + other_energy)
+                        TargetProfile.JouleElement(element.joules + other_energy)
                     )
                 else:
                     sum_elements.append(self.NULL_ELEMENT)
@@ -145,7 +138,7 @@ class TargetProfile(
 
     def sum_quadratic_distance(self) -> float:
         return sum(
-            e.get_joules() ** 2
+            e.joules**2
             for e in self.elements
             if isinstance(e, TargetProfile.JouleElement)
         )
