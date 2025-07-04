@@ -367,8 +367,10 @@ class S2FrbcDeviceStateWrapper:
     def get_energy_in_current_timestep(self) -> CommodityQuantity:
         return self.device_state.get_energy_in_current_timestep()
 
-    def get_actuator_statuses(self) -> List[FRBCActuatorStatus]:
-        return self.device_state.get_actuator_statuses()
+    @property
+    def actuator_statuses(self) -> List[FRBCActuatorStatus]:
+        return self.device_state.actuator_statuses
 
-    def get_storage_status(self) -> List[FRBCStorageStatus]:
-        return self.device_state.get_storage_status()
+    @property
+    def storage_status(self) -> List[FRBCStorageStatus]:
+        return self.device_state.storage_status

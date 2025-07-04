@@ -183,7 +183,7 @@ class FrbcState:
                     self.system_description
                 )
             )
-            for a in self.device_state.get_actuator_statuses():
+            for a in self.device_state.actuator_statuses:
                 actuator_status = a
                 actuators = self.system_description.actuators
                 for actuator in actuators:
