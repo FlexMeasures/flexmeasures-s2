@@ -9,20 +9,23 @@ from flexmeasures_s2.profile_steering.common.device_planner.device_plan import (
 
 
 class DevicePlanner(ABC):
+    @property
     @abstractmethod
-    def get_device_id(self) -> str:
-        """Get the device ID."""
-        pass
+    def device_id(self) -> str:
+        """The device ID."""
+        raise NotImplementedError
 
+    @property
     @abstractmethod
-    def get_device_name(self) -> str:
-        """Get the device name."""
-        pass
+    def device_name(self) -> str:
+        """The device name."""
+        raise NotImplementedError
 
+    @property
     @abstractmethod
-    def get_connection_id(self) -> str:
-        """Get the connection ID."""
-        pass
+    def connection_id(self) -> str:
+        """The connection ID."""
+        raise NotImplementedError
 
     @abstractmethod
     def create_improved_planning(

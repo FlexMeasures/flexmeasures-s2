@@ -308,7 +308,7 @@ class ClusterPlanData:
         # Process each device plan
         for device_plan in cluster_plan_data.get_device_plans():
             cp_id = cluster_plan.get_state().get_congestion_point(
-                device_plan.get_connection_id()
+                device_plan.connection_id
             )
             if cp_id is None:
                 # The interface needs all devices to function properly. So for devices without congestion point, set a
@@ -648,7 +648,7 @@ class ClusterPlan:
         result = {}
 
         for device_plan in self._plan_data.get_device_plans():
-            cp_id = self._state.get_congestion_point(device_plan.get_connection_id())
+            cp_id = self._state.get_congestion_point(device_plan.connection_id)
             profile = device_plan.get_profile()
 
             if cp_id in result:

@@ -143,7 +143,7 @@ class PlanningServiceImpl(PlanningService):
 
         for device_id, device_state in cluster_state.get_device_states().items():
             congestion_point = self.get_congestion_point(
-                cluster_state, device_state.get_connection_id()
+                cluster_state, device_state.connection_id
             )
             cpc = root_planner.get_congestion_point_controller(congestion_point)
 
