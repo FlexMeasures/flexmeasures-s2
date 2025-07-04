@@ -86,12 +86,15 @@ class S2FrbcDevicePlanner(DevicePlanner):
             and active_and_upcoming_system_descriptions_has_active_storage
         )
 
+    @property
     def device_id(self) -> str:
         return self.s2_frbc_state.device_id
 
+    @property
     def connection_id(self) -> str:
         return self.s2_frbc_state.connection_id
 
+    @property
     def device_name(self) -> str:
         return self.s2_frbc_state.device_name
 
