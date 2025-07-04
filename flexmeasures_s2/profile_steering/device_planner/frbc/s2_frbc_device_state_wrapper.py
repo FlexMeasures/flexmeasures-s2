@@ -53,8 +53,9 @@ class S2FrbcDeviceStateWrapper:
     def get_leakage_behaviours(self) -> Any:
         return self.device_state.get_leakage_behaviours()
 
-    def get_usage_forecasts(self) -> Any:
-        return self.device_state.get_usage_forecasts()
+    @property
+    def usage_forecasts(self) -> Any:
+        return self.device_state.usage_forecasts
 
     @property
     def fill_level_target_profiles(self) -> Any:

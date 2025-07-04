@@ -173,7 +173,7 @@ class OperationModeProfileTree:
             )
             current_usage_forecast = self.get_latest_before(
                 time_step_start_dt,
-                self.device_state.get_usage_forecasts(),
+                self.device_state.usage_forecasts,
                 lambda uf: uf.start_time,
             )
             current_usage_forecast_profile = None
