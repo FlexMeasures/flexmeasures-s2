@@ -63,9 +63,6 @@ class S2FrbcDeviceState:
     def get_leakage_behaviours(self) -> List[FRBCLeakageBehaviour]:
         return self.leakage_behaviours
 
-    def get_device_id(self) -> str:
-        return self.device_id
-
     def get_device_name(self) -> str:
         return self.device_name
 

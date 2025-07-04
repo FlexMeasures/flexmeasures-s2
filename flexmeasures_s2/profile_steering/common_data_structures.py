@@ -42,7 +42,8 @@ class DevicePlan:
         self._device_id = device_id
         self._profile = profile
 
-    def get_device_id(self) -> str:
+    @property
+    def device_id(self) -> str:
         return self._device_id
 
     @property

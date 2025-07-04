@@ -168,15 +168,15 @@ class S2FrbcDevicePlanner(DevicePlanner):
             raise ValueError("No latest plan found")
         if accepted_proposal.origin != self:
             raise ValueError(
-                f"Storage controller '{self.get_device_id()}' received a proposal that he did not send."
+                f"Storage controller '{self.device_id}' received a proposal that he did not send."
             )
         if not accepted_proposal.proposed_plan == self.latest_plan.energy:
             raise ValueError(
-                f"Storage controller '{self.get_device_id()}' received a proposal that he did not send."
+                f"Storage controller '{self.device_id}' received a proposal that he did not send."
             )
         if accepted_proposal.get_congestion_improvement_value() < 0:
             raise ValueError(
-                f"Storage controller '{self.get_device_id()}' received a proposal with negative improvement"
+                f"Storage controller '{self.device_id}' received a proposal with negative improvement"
             )
         self.accepted_plan = self.latest_plan
 

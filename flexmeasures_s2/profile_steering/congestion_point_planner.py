@@ -64,7 +64,7 @@ class CongestionPointPlanner:
             current_planning = current_planning.add(
                 device.create_initial_planning(plan_due_by_date)
             )
-            # print(f"Initial planning after adding device {device.get_device_id()}: {current_planning}")
+            # print(f"Initial planning after adding device {device.device_id}: {current_planning}")
 
         # Check if the current planning is within the congestion target range
         if self.congestion_target.is_within_range(current_planning):
