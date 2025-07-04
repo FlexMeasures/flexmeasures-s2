@@ -1,3 +1,6 @@
+from pydantic import BaseModel
+from pydantic.config import ConfigDict
+
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.common.soc_profile import SoCProfile
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_instruction_profile import (
@@ -5,26 +8,12 @@ from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_instruction_pr
 )
 
 
-class DevicePlan:
-    def __init__(
-        self,
-        device_id: str,
-        device_name: str,
-        connection_id: str,
-        energy_profile: JouleProfile,
-        fill_level_profile: SoCProfile,
-        instruction_profile: S2FrbcInstructionProfile,
-    ):
-        self.device_id = device_id
-        self.device_name = device_name
-        self.connection_id = connection_id
-        self.energy_profile = energy_profile
-        self.fill_level_profile = fill_level_profile
-        self.instruction_profile = instruction_profile
+class DevicePlan(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    def __str__(self) -> str:
-        return (
-            f"DevicePlan(device_id={self.device_id}, device_name={self.device_name}, "
-            f"connection_id={self.connection_id}, energy_profile={self.energy_profile}, "
-            f"fill_level_profile={self.fill_level_profile}, instruction_profile={self.instruction_profile})"
-        )
+    device_id: str
+    device_name: str
+    connection_id: str
+    energy_profile: JouleProfile
+    fill_level_profile: SoCProfile
+    instruction_profile: S2FrbcInstructionProfile
