@@ -123,10 +123,10 @@ class RootPlanner:
                 )
 
                 # Let the origin device/controller accept the proposal.
-                best_proposal.get_origin().accept_proposal(best_proposal)
+                best_proposal.origin.accept_proposal(best_proposal)
                 i += 1
                 print(
-                    f"Root controller: selected best controller '{best_proposal.get_origin().device_name}' with global energy impr {best_proposal.get_global_improvement_value()}, congestion impr {best_proposal.get_congestion_improvement_value()}, iteration {i}."
+                    f"Root controller: selected best controller '{best_proposal.origin.device_name}' with global energy impr {best_proposal.get_global_improvement_value()}, congestion impr {best_proposal.get_congestion_improvement_value()}, iteration {i}."
                 )
 
                 # Check stopping criteria: if improvement values are below thresholds or max iterations reached.

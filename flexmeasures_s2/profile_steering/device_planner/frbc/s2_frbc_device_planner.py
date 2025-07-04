@@ -166,7 +166,7 @@ class S2FrbcDevicePlanner(DevicePlanner):
     def accept_proposal(self, accepted_proposal: Proposal) -> None:
         if self.latest_plan is None:
             raise ValueError("No latest plan found")
-        if accepted_proposal.get_origin() != self:
+        if accepted_proposal.origin != self:
             raise ValueError(
                 f"Storage controller '{self.get_device_id()}' received a proposal that he did not send."
             )

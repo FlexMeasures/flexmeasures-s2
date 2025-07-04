@@ -132,11 +132,11 @@ class CongestionPointPlanner:
                 current_planning = current_planning.subtract(
                     best_proposal.old_plan
                 ).add(best_proposal.proposed_plan)
-                best_proposal.get_origin().accept_proposal(best_proposal)
+                best_proposal.origin.accept_proposal(best_proposal)
                 i += 1
 
                 print(
-                    f"Initial planning '{self.congestion_point_id}': best controller '{best_proposal.get_origin().device_id}' with congestion improvement of {best_proposal.get_congestion_improvement_value()}. Iteration {i}."
+                    f"Initial planning '{self.congestion_point_id}': best controller '{best_proposal.origin.device_id}' with congestion improvement of {best_proposal.get_congestion_improvement_value()}. Iteration {i}."
                 )
 
                 if i >= self.MAX_ITERATIONS:
@@ -212,7 +212,7 @@ class CongestionPointPlanner:
                 )
 
             print(
-                f"CP '{self.congestion_point_id}': Selected best controller '{best_proposal.get_origin().device_name}' with improvement of {best_proposal.get_global_improvement_value()}."
+                f"CP '{self.congestion_point_id}': Selected best controller '{best_proposal.origin.device_name}' with improvement of {best_proposal.get_global_improvement_value()}."
             )
 
         return best_proposal

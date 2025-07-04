@@ -117,6 +117,3 @@ class Proposal:
             ):
                 return True
         return False
-
-    def get_origin(self) -> DevicePlanner:
-        return self.origin
