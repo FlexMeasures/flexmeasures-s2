@@ -299,7 +299,7 @@ class OperationModeProfileTree:
         timestep_start_times = [ts.start_date for ts in self.timesteps]
 
         # Now use this list in the plot function
-        # plot_planning_results(timestep_start_times, plan.get_energy().elements, plan.get_fill_level().elements, plan.get_operation_mode_id(), ids)
+        # plot_planning_results(timestep_start_times, plan.get_energy().elements, plan.fill_level.elements, plan.get_operation_mode_id(), ids)
 
         return plan
 

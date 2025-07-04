@@ -23,8 +23,5 @@ class S2FrbcPlan:
     def get_energy(self):
         return self.energy
 
-    def get_fill_level(self):
-        return self.fill_level
-
     def get_operation_mode_id(self) -> List[Dict[str, S2ActuatorConfiguration]]:
         return self.operation_mode_id

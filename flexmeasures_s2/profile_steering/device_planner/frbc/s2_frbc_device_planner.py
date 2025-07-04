@@ -194,7 +194,7 @@ class S2FrbcDevicePlanner(DevicePlanner):
             device_name=self.device_name,
             connection_id=self.connection_id,
             energy_profile=self.accepted_plan.energy,
-            fill_level_profile=self.accepted_plan.get_fill_level(),
+            fill_level_profile=self.accepted_plan.fill_level,
             instruction_profile=self.convert_plan_to_instructions(
                 self.profile_metadata, self.accepted_plan
             ),
