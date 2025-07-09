@@ -62,6 +62,7 @@ class RootPlanner:
     ):
         # Compute an initial plan by summing each congestion point's initial planning.
         self.root_ctrl_planning = self.empty_profile
+        
         for cpc in self.cp_controllers:
             initial_plan = cpc.create_initial_planning(plan_due_by_date)
             self.root_ctrl_planning = self.root_ctrl_planning.add(initial_plan)

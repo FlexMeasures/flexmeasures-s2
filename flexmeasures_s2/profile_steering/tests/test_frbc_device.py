@@ -43,10 +43,11 @@ ids = []
 
 
 D = 10  # number of devices
-B = 20  # number of buckets
-S = 10  # number of stratification layers
-T = 160  # number of time steps (5 minutes * 160 = 800 minutes = 13.33 hours)
+B = 100  # number of buckets
+S = 20  # number of stratification layers
+T = 288  # number of time steps (288 * 5 minutes = 24 hours)
 TIMESTEP_DURATION = 300  # duration of a time step in seconds (5 minutes)
+
 
 
 # D = 10  # number of devices

@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List, Dict, Any, Optional
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 
 # Core profile steering imports
 from flexmeasures_s2.profile_steering.root_planner import RootPlanner
@@ -178,6 +179,9 @@ class PlanningServiceImpl(PlanningService):
 
         return root_planner
 
+    def get_device_plan_from_controller(self, device):
+        return device.get_device_plan()
+
     def plan(
         self,
         state: ClusterState,
@@ -231,11 +235,15 @@ class PlanningServiceImpl(PlanningService):
                 self.config.multithreaded(),
             )
 
-            # Collect device plans
-            device_plans = []
-            for cpc in root_controller.cp_controllers:
-                for device in cpc.get_device_controllers():
-                    device_plans.append(device.get_device_plan())
+            # Collect device plans in parallel using processes
+            device_controllers = [
+                device
+                for cpc in root_controller.cp_controllers
+                for device in cpc.get_device_controllers()
+            ]
+
+            with ProcessPoolExecutor() as executor:
+                device_plans = list(executor.map(self.get_device_plan_from_controller, device_controllers))
 
             # Create and return the cluster plan
             plan_data = ClusterPlanData(device_plans, target.get_profile_metadata())
