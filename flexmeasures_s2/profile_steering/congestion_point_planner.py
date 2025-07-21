@@ -32,7 +32,7 @@ class CongestionPointPlanner:
         )
 
         # List of device controllers that can be used for planning
-        self.devices = []
+        self.devices: List[DevicePlanner] = []
 
         # Keep track of accepted and latest plans
         self.accepted_plan = self.empty_profile

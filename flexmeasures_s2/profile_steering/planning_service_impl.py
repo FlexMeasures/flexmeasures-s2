@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List, Dict, Any, Optional
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 
 # Core profile steering imports
 from flexmeasures_s2.profile_steering.root_planner import RootPlanner
@@ -176,6 +177,9 @@ class PlanningServiceImpl(PlanningService):
 
         return root_planner
 
+    def get_device_plan_from_controller(self, device):
+        return device.get_device_plan()
+
     def plan(
         self,
         state: ClusterState,
@@ -221,6 +225,7 @@ class PlanningServiceImpl(PlanningService):
         root_controller = self.create_controller_tree(state, target, plan_due_by_date)
 
         try:
+            print(self.config.multithreaded())
             root_controller.plan(
                 plan_due_by_date,
                 optimize_for_target,

@@ -72,8 +72,8 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
         super().validate(profile_metadata, elements)
         # Add any JouleProfile-specific validation here if needed
 
-    def default_value(self) -> None:
-        return None
+    def default_value(self) -> int:
+        return 0
 
     def subprofile(self, new_start_date: datetime) -> "JouleProfile":
         index = self.index_at(new_start_date)
@@ -148,16 +148,12 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
     def is_below_or_equal(self, other: "JouleProfile") -> bool:
         if not self.is_compatible(other):
             raise ValueError("Profiles are not compatible")
-        return all(
-            a <= b for a, b in zip(self.elements, other.elements) if b is not None
-        )
+        return all(a <= b for a, b in zip(self.elements, other.elements) if b is not None)
 
     def is_above_or_equal(self, other: "JouleProfile") -> bool:
         if not self.is_compatible(other):
             raise ValueError("Profiles are not compatible")
-        return all(
-            a >= b for a, b in zip(self.elements, other.elements) if b is not None
-        )
+        return all(a >= b for a, b in zip(self.elements, other.elements) if b is not None)
 
     def minimum(self, other: "JouleProfile") -> "JouleProfile":
         if not self.is_compatible(other):

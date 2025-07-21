@@ -1,9 +1,11 @@
-from typing import List, Any
+from typing import List, Any, Optional
 from datetime import datetime
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from .congestion_point_planner import CongestionPointPlanner
 from flexmeasures_s2.profile_steering.common.proposal import Proposal
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
+import multiprocessing
+from functools import partial
 
 
 class RootPlanner:
@@ -56,10 +58,11 @@ class RootPlanner:
         plan_due_by_date: datetime,
         optimize_for_target: bool,
         max_priority_class_external: int,
-        multithreaded: bool = False,
+        multithreaded: bool = True,
     ):
         # Compute an initial plan by summing each congestion point's initial planning.
         self.root_ctrl_planning = self.empty_profile
+        
         for cpc in self.cp_controllers:
             initial_plan = cpc.create_initial_planning(plan_due_by_date)
             self.root_ctrl_planning = self.root_ctrl_planning.add(initial_plan)
@@ -71,17 +74,11 @@ class RootPlanner:
             return
 
         # Determine maximum and minimum priority classes across congestion points.
-        max_priority_class = max(
-            cpc.max_priority_class() for cpc in self.cp_controllers
-        )
-        min_priority_class = min(
-            cpc.min_priority_class() for cpc in self.cp_controllers
-        )
+        max_priority_class = max(cpc.max_priority_class() for cpc in self.cp_controllers)
+        min_priority_class = min(cpc.min_priority_class() for cpc in self.cp_controllers)
 
         # Iterate over the priority classes.
-        for priority_class in range(
-            min_priority_class, min(max_priority_class, max_priority_class_external) + 1
-        ):
+        for priority_class in range(min_priority_class, min(max_priority_class, max_priority_class_external) + 1):
             i = 0
             best_proposal = None
 
@@ -131,15 +128,33 @@ class RootPlanner:
 
                 # Check stopping criteria: if improvement values are below thresholds or max iterations reached.
                 if (
-                    best_proposal.get_global_improvement_value()
-                    <= self.energy_iteration_criterion
+                    best_proposal.get_global_improvement_value() <= self.energy_iteration_criterion
                 ) or i >= self.MAX_ITERATIONS:
                     break
 
-            print(
-                f"Optimizing priority class {priority_class} was done after {i} iterations."
-            )
+            print(f"Optimizing priority class {priority_class} was done after {i} iterations.")
             if i >= self.MAX_ITERATIONS:
                 print(
                     f"Warning: Optimization stopped due to iteration limit. Priority class: {priority_class}, Iterations: {i}"
                 )
+
+    def _get_proposal_from_controller(
+        self,
+        cpc: CongestionPointPlanner,
+        difference_profile: TargetProfile,
+        target_metadata: Any,
+        priority_class: int,
+        plan_due_by_date: datetime,
+    ) -> Optional[Proposal]:
+        """Helper method to get a proposal from a controller in a multiprocessing context."""
+        try:
+            print("Improving------------------------->")
+            return cpc.create_improved_planning(
+                difference_profile,
+                target_metadata,
+                priority_class,
+                plan_due_by_date,
+            )
+        except Exception as e:
+            print(f"Error getting proposal from controller: {e}")
+            return None

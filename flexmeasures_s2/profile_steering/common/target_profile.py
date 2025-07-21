@@ -5,9 +5,7 @@ from flexmeasures_s2.profile_steering.common.abstract_profile import AbstractPro
 from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
 
 
-class TargetProfile(
-    AbstractProfile[Union["TargetProfile.Element", None], "TargetProfile"]
-):
+class TargetProfile(AbstractProfile[Union["TargetProfile.Element", None], "TargetProfile"]):
     class Element:
         pass
 
@@ -58,9 +56,7 @@ class TargetProfile(
         if nr_of_elements < len(self.elements):
             new_elements = self.elements[:nr_of_elements]
         else:
-            new_elements = self.elements + [self.NULL_ELEMENT] * (
-                nr_of_elements - len(self.elements)
-            )
+            new_elements = self.elements + [self.default_value()] * (nr_of_elements - len(self.elements))
         return TargetProfile(
             self.metadata.profile_start,
             self.metadata.timestep_duration,
@@ -89,9 +85,7 @@ class TargetProfile(
         )
 
     def nr_of_joule_target_elements(self) -> int:
-        return len(
-            [e for e in self.elements if isinstance(e, TargetProfile.JouleElement)]
-        )
+        return len([e for e in self.elements if isinstance(e, TargetProfile.JouleElement)])
 
     def subtract(self, other: JouleProfile) -> "TargetProfile":
         if not self.is_compatible(other):
