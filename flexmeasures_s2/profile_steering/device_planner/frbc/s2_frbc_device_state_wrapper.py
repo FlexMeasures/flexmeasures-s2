@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Tuple
 from functools import lru_cache
 import numpy as np
 
@@ -34,9 +34,7 @@ class S2FrbcDeviceStateWrapper:
         self.device_state: S2FrbcDeviceState = device_state
         computational_params = self.device_state.get_computational_parameters()
         self.nr_of_buckets: int = computational_params.get_nr_of_buckets()
-        self.nr_of_stratification_layers: int = (
-            computational_params.get_stratification_layers()
-        )
+        self.nr_of_stratification_layers: int = computational_params.get_stratification_layers()
         self.actuator_operation_mode_map_per_timestep: Dict[datetime, Dict[str, List[str]]] = {}
         self.all_actions: Dict[datetime, List[Dict[str, S2ActuatorConfiguration]]] = {}
         self.operation_mode_uses_factor_map: Dict[str, bool] = {}
@@ -89,7 +87,7 @@ class S2FrbcDeviceStateWrapper:
         om_key = f"{actuator_id}-{operation_mode_id}"
         if om_key in self.operation_modes:
             return self.operation_modes[om_key]
-        
+
         actuator_description = self.get_actuator_description(target_timestep, actuator_id)
         if actuator_description:
             for operation_mode in actuator_description.operation_modes:
@@ -125,8 +123,9 @@ class S2FrbcDeviceStateWrapper:
 
         keys = list(possible_actuator_configs.keys())
         import itertools
+
         combinations = itertools.product(*(possible_actuator_configs[key] for key in keys))
-        
+
         return [dict(zip(keys, combo)) for combo in combinations]
 
     @staticmethod
@@ -149,7 +148,7 @@ class S2FrbcDeviceStateWrapper:
     def get_operation_mode_power(self, om_wrapper: FrbcOperationModeWrapper, fill_level: float, factor: float) -> float:
         element = self.find_operation_mode_element(om_wrapper, fill_level)
         power_watt = 0
-        for power_range in element.get_power_ranges():
+        for power_range in element.power_ranges:
             if power_range.commodity_quantity in [
                 CommodityQuantity.ELECTRIC_POWER_L1,
                 CommodityQuantity.ELECTRIC_POWER_L2,
@@ -163,19 +162,25 @@ class S2FrbcDeviceStateWrapper:
 
     @staticmethod
     def find_operation_mode_element(om_wrapper: FrbcOperationModeWrapper, fill_level: float):
-        
         starts = om_wrapper.fill_level_starts
         ends = om_wrapper.fill_level_ends
-        
-        mask = (starts <= fill_level) & (fill_level <= ends)
-        if np.any(mask):
-            return om_wrapper.elements[np.where(mask)[0][0]]
-        
+
+        # Assumes that starts is sorted, which is a reasonable assumption for S2 data.
+        # Find the index of the interval start that is just less than or equal to fill_level.
+        idx = np.searchsorted(starts, fill_level, side="right") - 1
+
+        # Check if fill_level is within the found range.
+        if idx >= 0 and fill_level <= ends[idx]:
+            return om_wrapper.elements[idx]
+
+        # Handle edge cases and gaps, consistent with the original logic.
         return om_wrapper.elements[0] if fill_level < starts[0] else om_wrapper.elements[-1]
 
-    def get_operation_mode_fill_rate(self, om_wrapper: FrbcOperationModeWrapper, fill_level: float, factor: float) -> float:
+    def get_operation_mode_fill_rate(
+        self, om_wrapper: FrbcOperationModeWrapper, fill_level: float, factor: float
+    ) -> float:
         element = self.find_operation_mode_element(om_wrapper, fill_level)
-        fill_rate = element.get_fill_rate()
+        fill_rate = element.fill_rate
         start = fill_rate.end_of_range
         end = fill_rate.start_of_range
         return (start - end) * factor + end
@@ -184,46 +189,57 @@ class S2FrbcDeviceStateWrapper:
     def get_leakage_rate(target_timestep: FrbcTimestep, fill_level: float) -> float:
         if target_timestep.leakage_behaviour is None:
             return 0.0
-        
-        element = S2FrbcDeviceStateWrapper.find_leakage_element(
-            target_timestep.leakage_behaviour, fill_level
-        )
+
+        element = S2FrbcDeviceStateWrapper.find_leakage_element(target_timestep.leakage_behaviour, fill_level)
         return element.leakage_rate if element else 0.0
 
     @staticmethod
-    def find_leakage_element(leakage_behaviour: FRBCLeakageBehaviour, fill_level: float) -> Optional[FRBCLeakageBehaviourElement]:
+    def find_leakage_element(
+        leakage_behaviour: FRBCLeakageBehaviour, fill_level: float
+    ) -> Optional[FRBCLeakageBehaviourElement]:
         if not leakage_behaviour.elements:
             return None
 
-        starts = np.array([e.fill_level_range.start_of_range for e in leakage_behaviour.elements])
-        ends = np.array([e.fill_level_range.end_of_range for e in leakage_behaviour.elements])
-        
-        mask = (starts <= fill_level) & (fill_level <= ends)
-        if np.any(mask):
-            return leakage_behaviour.elements[np.where(mask)[0][0]]
-            
+        # Monkey-patch caching for starts and ends arrays to avoid recalculation
+        if not hasattr(leakage_behaviour, "_cached_starts"):
+            leakage_behaviour._cached_starts = np.array(  # type: ignore[attr-defined]
+                [e.fill_level_range.start_of_range for e in leakage_behaviour.elements]
+            )
+            leakage_behaviour._cached_ends = np.array(  # type: ignore[attr-defined]
+                [e.fill_level_range.end_of_range for e in leakage_behaviour.elements]
+            )
+
+        starts = leakage_behaviour._cached_starts  # type: ignore[attr-defined]
+        ends = leakage_behaviour._cached_ends  # type: ignore[attr-defined]
+
+        # Use binary search for efficient lookup
+        idx = np.searchsorted(starts, fill_level, side="right") - 1
+
+        if idx >= 0 and fill_level <= ends[idx]:
+            return leakage_behaviour.elements[idx]
+
         return leakage_behaviour.elements[0] if fill_level < starts[0] else leakage_behaviour.elements[-1]
 
     @staticmethod
     def calculate_bucket(target_timestep: FrbcTimestep, fill_level: float) -> int:
-        fill_level_range = target_timestep.system_description.storage.fill_level_range
-        fill_level_lower_limit = fill_level_range.start_of_range
-        fill_level_upper_limit = fill_level_range.end_of_range
-        
+        fill_level_lower_limit, fill_level_upper_limit, nr_of_buckets = target_timestep.get_bucket_calculation_params()
+
         if fill_level_upper_limit == fill_level_lower_limit:
             return 0
-            
+
         bucket = int(
-            (fill_level - fill_level_lower_limit)
-            / (fill_level_upper_limit - fill_level_lower_limit)
-            * target_timestep.get_nr_of_buckets()
+            (fill_level - fill_level_lower_limit) / (fill_level_upper_limit - fill_level_lower_limit) * nr_of_buckets
         )
-        return min(max(bucket, 0), target_timestep.get_nr_of_buckets() - 1)
+        return min(max(bucket, 0), nr_of_buckets - 1)
 
     @staticmethod
     @lru_cache(maxsize=None)
     def get_timer_duration(target_timestep: FrbcTimestep, actuator_id: str, timer_id: str) -> timedelta:
-        return timedelta(milliseconds=S2FrbcDeviceStateWrapper.get_timer_duration_milliseconds(target_timestep, actuator_id, timer_id))
+        return timedelta(
+            milliseconds=S2FrbcDeviceStateWrapper.get_timer_duration_milliseconds(
+                target_timestep, actuator_id, timer_id
+            )
+        )
 
     @staticmethod
     @lru_cache(maxsize=None)
@@ -231,7 +247,7 @@ class S2FrbcDeviceStateWrapper:
         actuator_description = S2FrbcDeviceStateWrapper.get_actuator_description(target_timestep, actuator_id)
         if actuator_description is None:
             raise ValueError(f"Actuator description not found for actuator {actuator_id}")
-        
+
         timer = next((t for t in actuator_description.timers if str(t.id) == timer_id), None)
         return timer.duration.root if timer else 0
 

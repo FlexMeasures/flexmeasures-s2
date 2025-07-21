@@ -1,5 +1,6 @@
 import numpy as np
-from typing import List
+from typing import List, Optional
+
 from flexmeasures_s2.profile_steering.common.power_range_wrapper import PowerRangeWrapper
 from flexmeasures_s2.profile_steering.s2_utils.number_range_wrapper import (
     NumberRangeWrapper,
@@ -14,41 +15,17 @@ class FrbcOperationModeElementWrapper:
             element.fill_level_range.end_of_range,
         )
         self.fill_rate = NumberRangeWrapper(element.fill_rate.start_of_range, element.fill_rate.end_of_range)
-
-        self.power_ranges = [PowerRangeWrapper(pr) for pr in element.power_ranges]
+        self.power_ranges: List[PowerRangeWrapper] = [PowerRangeWrapper(pr) for pr in element.power_ranges]
 
         if element.running_costs is None:
-            self.running_costs = None
+            self.running_costs: Optional[NumberRangeWrapper] = None
         else:
             self.running_costs = NumberRangeWrapper(
                 element.running_costs.start_of_range,
                 element.running_costs.end_of_range,
             )
 
-    def get_fill_level_range(self) -> NumberRangeWrapper:
-        return self.fill_level_range
-
-    def get_fill_rate(self) -> NumberRangeWrapper:
-        return self.fill_rate
-
-    def get_power_ranges(self) -> List[PowerRangeWrapper]:
-        return self.power_ranges
-
-    def get_running_costs(self) -> NumberRangeWrapper | None:
-        return self.running_costs
-
-    def __str__(self) -> str:
-        return (
-            f"OperationModeElementWrapper("
-            f"fillLevelRange={self.fill_level_range}, "
-            f"fillRate={self.fill_rate}, "
-            f"powerRanges={self.power_ranges}, "
-            f"runningCosts={self.running_costs})"
-        )
-
     def __eq__(self, o: object) -> bool:
-        if self is o:
-            return True
         if not isinstance(o, FrbcOperationModeElementWrapper):
             return False
         return (
@@ -92,11 +69,11 @@ class FrbcOperationModeWrapper:
 
         for element in self.elements:
             if (
-                abs(element.get_fill_rate().start_of_range - element.get_fill_rate().end_of_range)
+                abs(element.fill_rate.start_of_range - element.fill_rate.end_of_range)
                 > S2FrbcDeviceStateWrapper.epsilon
             ):
                 return True
-            for power_range in element.get_power_ranges():
+            for power_range in element.power_ranges:
                 if abs(power_range.start_of_range - power_range.end_of_range) > S2FrbcDeviceStateWrapper.epsilon:
                     return True
         return False

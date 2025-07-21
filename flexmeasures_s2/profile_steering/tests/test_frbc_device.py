@@ -46,7 +46,7 @@ ids = []
 D = 10  # number of devices  -> todo: multiprocessing on create_improved_planning
 B = 100  # number of buckets  -> todo: vectorize computation of next state from current state
 S = 20  # number of stratification layers
-PLANNING_WINDOW = pd.Timedelta("PT12H30M")
+PLANNING_WINDOW = pd.Timedelta("PT24H")
 PLANNING_RESOLUTION = pd.Timedelta("PT5M")
 
 T = PLANNING_WINDOW // PLANNING_RESOLUTION  # number of time steps
