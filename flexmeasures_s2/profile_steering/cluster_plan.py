@@ -63,7 +63,9 @@ class ClusterPlanData:
         def get_cp_production_max(self) -> float:
             return self._cp_production_max
 
-        def add_der_plan(self, der_name: str, value: JouleProfile) -> "ClusterPlanData.CpData":
+        def add_der_plan(
+            self, der_name: str, value: JouleProfile
+        ) -> "ClusterPlanData.CpData":
             """Add a device energy resource plan to this congestion point.
 
             Args:
@@ -106,7 +108,7 @@ class ClusterPlanData:
             )
 
         @classmethod
-        def empty(cls, cp_id: str, profile_metadata: ProfileMetadata) -> "ClusterPlanData.CpData":
+        def empty(cls, cp_id: str, profile_metadata: Any) -> "ClusterPlanData.CpData":
             """Create an empty CpData instance.
 
             Args:
@@ -130,7 +132,7 @@ class ClusterPlanData:
     def __init__(
         self,
         device_plans: List[DevicePlan] = None,
-        profile_metadata: ProfileMetadata = None,
+        profile_metadata: Any = None,
         _id: str = None,
         reason: str = None,
         target: Any = None,
@@ -258,7 +260,9 @@ class ClusterPlanData:
             new_device_plans.append(DevicePlan(device_plan.device_id, new_profile))
 
         # Create new profile metadata with adjusted number of elements
-        new_profile_metadata = self._profile_metadata.adjust_nr_of_elements(nr_of_elements)
+        new_profile_metadata = self._profile_metadata.adjust_nr_of_elements(
+            nr_of_elements
+        )
 
         return ClusterPlanData(
             device_plans=new_device_plans,
@@ -267,7 +271,9 @@ class ClusterPlanData:
             reason=self._reason,
             target=self._target,
             active_target=self._active_target,
-            current_plan=(self._current_plan[:nr_of_elements] if self._current_plan else None),
+            current_plan=(
+                self._current_plan[:nr_of_elements] if self._current_plan else None
+            ),
             start=self._start,
             step=self._step,
             global_deviation_score=self._global_deviation_score,
@@ -279,8 +285,8 @@ class ClusterPlanData:
     def from_cluster_plan(
         cls,
         cluster_plan: "ClusterPlan",
-        active_target: ClusterTarget,
-        active_plan: JouleProfile,
+        active_target: ClusterTarget = None,
+        active_plan: JouleProfile = None,
     ) -> "ClusterPlanData":
         """Create a ClusterPlanData instance from a ClusterPlan.
 
@@ -295,7 +301,7 @@ class ClusterPlanData:
         congestion_points = {}
 
         # Get the device plans from the cluster plan
-        cluster_plan_data = cluster_plan._plan_data
+        cluster_plan_data = cluster_plan.get_plan_data()
         if cluster_plan_data is None:
             return None  # type: ignore
 
@@ -342,7 +348,9 @@ class ClusterPlanData:
         profile_metadata = cluster_plan.get_plan_data().metadata
 
         # Set up the active target
-        actual_active_target = active_target if active_target is not None else cluster_plan._target
+        actual_active_target = (
+            active_target if active_target is not None else cluster_plan.get_target()
+        )
 
         # Calculate timestamps
         start_time = (
@@ -354,17 +362,21 @@ class ClusterPlanData:
 
         # Get scores, defaulting to 1.0 if they're NaN
         global_deviation_score = cluster_plan.get_global_deviation_score()
-        global_deviation_score = 1.0 if global_deviation_score is None else global_deviation_score
+        global_deviation_score = (
+            1.0 if global_deviation_score is None else global_deviation_score
+        )
 
         constraint_violation_score = cluster_plan.get_constraint_violation_score()
-        constraint_violation_score = 1.0 if constraint_violation_score is None else constraint_violation_score
+        constraint_violation_score = (
+            1.0 if constraint_violation_score is None else constraint_violation_score
+        )
 
         return cls(
-            device_plans=cluster_plan_data._device_plans,
+            device_plans=cluster_plan_data.get_device_plans(),
             profile_metadata=profile_metadata,
-            _id=str(cluster_plan._id),
-            reason=cluster_plan._reason,
-            target=cluster_plan._target,
+            _id=str(cluster_plan.get_id()),
+            reason=cluster_plan.get_reason(),
+            target=cluster_plan.get_target(),
             active_target=actual_active_target,
             current_plan=current_plan,
             start=int(start_time),
@@ -450,7 +462,7 @@ class ClusterPlan:
         Returns:
             The target energy
         """
-        return self._target._global_target_profile.get_total_energy()
+        return self._target.get_target_energy()
 
     def get_planned_energy(self) -> float:
         """Get the planned energy for this plan.
@@ -458,21 +470,20 @@ class ClusterPlan:
         Returns:
             The planned energy
         """
-        if self._planned_energy is not None:
-            return self._planned_energy
+        if self._planned_energy is None:
+            # Calculate the planned energy as the sum of all device plans
+            sum_energy = 0.0
+            for device_plan in self._plan_data.get_device_plans():
+                sum_energy += device_plan.get_profile().get_total_energy()
+            self._planned_energy = sum_energy
 
-        sum_energy = 0.0
-        for device_plan in self._plan_data._device_plans:
-            sum_energy += device_plan._profile.get_total_energy()
-
-        self._planned_energy = sum_energy
-        return sum_energy
+        return self._planned_energy
 
     def get_global_deviation_score(self) -> Optional[float]:
-        """Get the global deviation score for this plan.
+        """Calculate the score for the deviation between target and plan. Lower is better.
 
         Returns:
-            The global deviation score
+            The global deviation score, or None if not set
         """
         if self._global_deviation_score is None:
             joule_target_segment = (
@@ -488,25 +499,28 @@ class ClusterPlan:
             )
             plan = plan_segment.elements
 
-        plan_segment = self.get_joule_profile().subprofile(self._target._global_target_profile.metadata.profile_start)
+            sum_squared_distance = 0.0
+            for i in range(len(target)):
+                if target[i] is not None:
+                    sum_squared_distance += abs(target[i] - plan[i])
 
-        if plan_segment.get_total_energy() == 0.0:
-            return 0.0
+            if plan_segment.get_total_energy() == 0.0:
+                self._global_deviation_score = 0.0
+            else:
+                self._global_deviation_score = (
+                    sum_squared_distance / plan_segment.get_total_energy()
+                )
 
-        sum_squared_distance = 0.0
-        for i in range(len(plan_segment.elements)):
-            sum_squared_distance += (plan_segment.elements[i] - self._target._global_target_profile.elements[i]) ** 2
-
-        return sum_squared_distance / plan_segment.get_total_energy()
+        return self._global_deviation_score
 
     def get_constraint_violation_score(self) -> Optional[float]:
-        """Get the constraint violation score for this plan.
+        """Calculate the score for violation of constraint targets. Lower is better.
 
         Returns:
-            The constraint violation score
+            The constraint violation score, or None if not set
         """
-        if self._constraint_violation_score is not None:
-            return self._constraint_violation_score
+        if self._constraint_violation_score is None:
+            violation_sum = 0.0
 
             for cp_id, cp_profile in self.get_profile_per_congestion_point().items():
                 plan = cp_profile.elements
@@ -518,23 +532,24 @@ class ClusterPlan:
                     # If there is no target, we don't need to calculate it for the violation sum
                     target_elements = congestion_point_target.elements
 
-        sum_squared_distance = 0.0
-        for cp_id, cp_profile in self.get_profile_per_congestion_point().items():
-            congestion_point_target = self._target.get_congestion_point_target(cp_id)
-            if congestion_point_target is None:
-                continue
+                    for i in range(len(target_elements)):
+                        element = target_elements[i]
+                        max_joule = element.max_joule
+                        min_joule = element.min_joule
 
-            for i in range(len(cp_profile.elements)):
-                if cp_profile.elements[i] > congestion_point_target.elements[i].max_joule:
-                    sum_squared_distance += (
-                        cp_profile.elements[i] - congestion_point_target.elements[i].max_joule
-                    ) ** 2
-                elif cp_profile.elements[i] < congestion_point_target.elements[i].min_joule:
-                    sum_squared_distance += (
-                        cp_profile.elements[i] - congestion_point_target.elements[i].min_joule
-                    ) ** 2
+                        if max_joule is not None and plan[i] > max_joule:
+                            violation_sum += abs(plan[i] - max_joule)
 
-        return sum_squared_distance / planned_energy
+                        if min_joule is not None and plan[i] < min_joule:
+                            violation_sum += abs(min_joule - plan[i])
+
+            planned_energy = self.get_planned_energy()
+            if planned_energy == 0.0:
+                self._constraint_violation_score = 0.0
+            else:
+                self._constraint_violation_score = violation_sum / planned_energy
+
+        return self._constraint_violation_score
 
     def has_constraint_violation(self) -> bool:
         """Check if this plan has any constraint violations.

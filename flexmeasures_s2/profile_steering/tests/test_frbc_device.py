@@ -54,13 +54,6 @@ TIMESTEP_DURATION = PLANNING_RESOLUTION / pd.Timedelta(
     "PT1S"
 )  # duration of a time step in seconds
 
-
-
-# D = 10  # number of devices
-# B = 100  # number of buckets
-# S = 20  # number of stratification layers
-# T = 288  # number of time steps (5 minutes * 288 = 1440 minutes = 24 hours)
-# TIMESTEP_DURATION = 300  # duration of a time step in seconds (5 minutes)
 """
 # Ideas for speeding up
 
@@ -660,7 +653,7 @@ def test_planning_service_impl_with_ev_device():
         energy_improvement_criterion=10.0,
         cost_improvement_criterion=1.0,
         congestion_retry_iterations=10,
-        multithreaded=True,
+        multithreaded=False,
     )
     print("Generating plan!")
 

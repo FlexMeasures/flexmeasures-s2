@@ -113,7 +113,9 @@ class ClusterTarget:
         """
         return self._congestion_point_targets
 
-    def get_congestion_point_target(self, congestion_point_id: str) -> Optional[JouleRangeProfile]:
+    def get_congestion_point_target(
+        self, congestion_point_id: str
+    ) -> Optional[JouleRangeProfile]:
         """
         Get the target for a specific congestion point.
 

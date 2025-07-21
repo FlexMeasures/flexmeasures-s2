@@ -57,7 +57,9 @@ class FrbcTimestep:
     def get_nr_of_buckets(self) -> int:
         return self.nr_of_buckets
 
-    def set_targets(self, target: float, min_constraint: float, max_constraint: float) -> None:
+    def set_targets(
+        self, target: float, min_constraint: float, max_constraint: float
+    ) -> None:
         self.target = target
         self.min_constraint = min_constraint
         self.max_constraint = max_constraint
@@ -76,7 +78,8 @@ class FrbcTimestep:
         else:
             if (
                 self.emergency_state is None
-                or state.get_fill_level_distance() < self.emergency_state.get_fill_level_distance()
+                or state.get_fill_level_distance()
+                < self.emergency_state.get_fill_level_distance()
             ):
                 self.emergency_state = state
                 state.set_selection_reason(SelectionReason.EMERGENCY_STATE)
@@ -103,10 +106,14 @@ class FrbcTimestep:
         final_states = self.get_final_states()
         if self.fill_level_target is None:
             return final_states
-        final_states = [s for s in final_states if self.state_is_within_fill_level_target_range(s)]
+        final_states = [
+            s for s in final_states if self.state_is_within_fill_level_target_range(s)
+        ]
         if final_states:
             return final_states
-        best_state = min(self.get_final_states(), key=self.get_fill_level_target_distance)
+        best_state = min(
+            self.get_final_states(), key=self.get_fill_level_target_distance
+        )
         return [best_state]
 
     def state_is_within_fill_level_target_range(self, state: FrbcState) -> bool:
@@ -114,26 +121,23 @@ class FrbcTimestep:
             return True
         return (
             self.fill_level_target.start_of_range is None
-            or state.get_fill_level() >= self.fill_level_target.start_of_range
+            or state.fill_level >= self.fill_level_target.start_of_range
         ) and (
-            self.fill_level_target.end_of_range is None or state.get_fill_level() <= self.fill_level_target.end_of_range
+            self.fill_level_target.end_of_range is None
+            or state.fill_level <= self.fill_level_target.end_of_range
         )
 
     def get_fill_level_target_distance(self, state: FrbcState) -> float:
-        if self.fill_level_target.start_of_range is None:
+        if self.fill_level_target is None:
             return 0
         if (
             self.fill_level_target.end_of_range is None
-            or state.get_fill_level() < self.fill_level_target.start_of_range
+            or state.fill_level < self.fill_level_target.start_of_range
         ):
-            return self.fill_level_target.start_of_range - state.get_fill_level()
+            return self.fill_level_target.start_of_range - state.fill_level
         else:
-            return state.get_fill_level() - self.fill_level_target.end_of_range
-
-    def get_forecasted_usage(self) -> float:
-        return self.forecasted_fill_level_usage
+            return state.fill_level - self.fill_level_target.end_of_range
 
     def clear(self) -> None:
         self.state_list = [None] * len(self.state_list)
         self.emergency_state = None
-

@@ -5,7 +5,9 @@ from datetime import datetime
 
 
 class SoCProfile(AbstractProfile[float, "SoCProfile"]):
-    def __init__(self, profile_metadata: ProfileMetadata, elements: Optional[List[float]] = None):
+    def __init__(
+        self, profile_metadata: ProfileMetadata, elements: Optional[List[float]] = None
+    ):
         self.profile_metadata = profile_metadata
         self.timestep_duration = self.profile_metadata.timestep_duration
         self.profile_start = self.profile_metadata.profile_start
