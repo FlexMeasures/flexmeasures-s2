@@ -99,9 +99,7 @@ class PlanningServiceImpl(PlanningService):
         self.context = context
         logger.info("Planning service initialized")
 
-    def get_congestion_point(
-        self, cluster_state: ClusterState, connection_id: str
-    ) -> str:
+    def get_congestion_point(self, cluster_state: ClusterState, connection_id: str) -> str:
         """Get the congestion point for a connection ID.
 
         Args:
@@ -142,16 +140,12 @@ class PlanningServiceImpl(PlanningService):
         )
 
         for device_id, device_state in cluster_state.get_device_states().items():
-            congestion_point = self.get_congestion_point(
-                cluster_state, device_state.connection_id
-            )
+            congestion_point = self.get_congestion_point(cluster_state, device_state.connection_id)
             cpc = root_planner.get_congestion_point_controller(congestion_point)
 
             if cpc is None:
                 # Create a new congestion point controller if one doesn't exist yet
-                congestion_point_target = target.get_congestion_point_target(
-                    congestion_point
-                )
+                congestion_point_target = target.get_congestion_point_target(congestion_point)
                 if congestion_point == self.DEFAULT_CONGESTION_POINT:
                     # This is a dummy congestion point. We will give it an empty profile.
                     congestion_point_target = JouleRangeProfile(
@@ -166,13 +160,16 @@ class PlanningServiceImpl(PlanningService):
             if isinstance(device_state, S2FrbcDeviceState):
                 logger.debug("S2 FRBC planner created!")
                 cpc.add_device_controller(
-                    S2FrbcDevicePlanner(device_state, target.metadata, plan_due_by_date)
+                    S2FrbcDevicePlanner(
+                        device_state,
+                        target.metadata,
+                        plan_due_by_date,
+                        congestion_point,
+                    )
                 )
             # Add other device types here as needed
             else:
-                logger.warning(
-                    f"Unknown device! No device planner added for {device_state}"
-                )
+                logger.warning(f"Unknown device! No device planner added for {device_state}")
 
         return root_planner
 
@@ -207,9 +204,7 @@ class PlanningServiceImpl(PlanningService):
             congestion_point_target = target.get_congestion_point_target(cp)
             if congestion_point_target is None and cp is not None:
                 # We don't have a target for the congestion point
-                logger.warning(
-                    f"CongestionPoint without target! CongestionPoint: {cp}. Generating empty target."
-                )
+                logger.warning(f"CongestionPoint without target! CongestionPoint: {cp}. Generating empty target.")
                 target.set_congestion_point_target(
                     congestion_point_id=cp,
                     congestion_point_target=JouleRangeProfile(
@@ -239,9 +234,7 @@ class PlanningServiceImpl(PlanningService):
             plan = ClusterPlan(state, target, plan_data, reason, plan_due_by_date, None)
 
             end_time = datetime.now()
-            execution_time = (
-                end_time - start_time
-            ).total_seconds() * 1000  # Convert to milliseconds
+            execution_time = (end_time - start_time).total_seconds() * 1000  # Convert to milliseconds
             logger.info(f"Generated new plan in {execution_time} ms")
 
             return plan

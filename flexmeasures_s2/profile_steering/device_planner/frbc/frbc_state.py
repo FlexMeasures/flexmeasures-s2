@@ -18,12 +18,13 @@ from flexmeasures_s2.profile_steering.device_planner.frbc.selection_reason_resul
     SelectionReason,
 )
 
-from typing import Dict, Optional, Any
+from typing import Dict, Optional, Any, Tuple
 
 
 class FrbcState:
     constraint_epsilon = 1e-4
     tariff_epsilon = 0.5
+    transition_cache: Dict[Any, Any] = {}
 
     def __init__(
         self,
@@ -46,29 +47,16 @@ class FrbcState:
             self.timestep_energy = 0.0
             self.fill_level = previous_state.fill_level
             seconds = self.timestep.get_duration_seconds()
-            for actuator_id, actuator_configuration in actuator_configurations.items():
-                om = self.device_state.get_operation_mode(
-                    self.timestep,
+            for actuator_id, actuator_configuration in (actuator_configurations or {}).items():
+                power, fill_rate = self._calculate_and_cache_op_mode_values(
+                    previous_state,
                     actuator_id,
-                    actuator_configuration.operation_mode_id,
-                )
-                self.timestep_energy += (
-                    self.device_state.get_operation_mode_power(
-                        om,
-                        previous_state.fill_level,
-                        actuator_configuration.factor,
-                    )
-                    * seconds
+                    actuator_configuration,
                 )
 
-                self.fill_level += (
-                    self.device_state.get_operation_mode_fill_rate(
-                        om,
-                        previous_state.fill_level,
-                        actuator_configuration.factor,
-                    )
-                    * seconds
-                )
+                self.timestep_energy += power * seconds
+                self.fill_level += fill_rate * seconds
+
             self.fill_level -= (
                 s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_leakage_rate(self.timestep, self.fill_level)
                 * seconds
@@ -82,7 +70,7 @@ class FrbcState:
                 for (
                     actuator_id,
                     actuator_configuration,
-                ) in actuator_configurations.items():
+                ) in (actuator_configurations or {}).items():
                     previous_operation_mode_id = previous_state.actuator_configurations[actuator_id].operation_mode_id
                     new_operation_mode_id = actuator_configuration.operation_mode_id
                     if previous_operation_mode_id != new_operation_mode_id:
@@ -138,6 +126,7 @@ class FrbcState:
             self.timestep.add_state(self)
 
         else:
+            FrbcState.transition_cache.clear()
             self.device_state = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper(device_state)
             self.timestep = timestep
             self.previous_state = None
@@ -274,6 +263,41 @@ class FrbcState:
         # todo: try vectorizing this
         for action in all_actions:
             self.try_create_next_state(self, target_timestep, action)
+
+    def _calculate_and_cache_op_mode_values(
+        self,
+        previous_state: "FrbcState",
+        actuator_id: str,
+        actuator_configuration: S2ActuatorConfiguration,
+    ) -> Tuple[float, float]:
+        discretized_fill_level = round(previous_state.fill_level, 4)
+        cache_key = (
+            actuator_id,
+            actuator_configuration.operation_mode_id,
+            actuator_configuration.factor,
+            discretized_fill_level,
+        )
+        if cache_key in FrbcState.transition_cache:
+            return FrbcState.transition_cache[cache_key]
+
+        om = self.device_state.get_operation_mode(
+            self.timestep,
+            actuator_id,
+            actuator_configuration.operation_mode_id,
+        )
+        power = self.device_state.get_operation_mode_power(
+            om,
+            previous_state.fill_level,
+            actuator_configuration.factor,
+        )
+        fill_rate = self.device_state.get_operation_mode_fill_rate(
+            om,
+            previous_state.fill_level,
+            actuator_configuration.factor,
+        )
+
+        FrbcState.transition_cache[cache_key] = (power, fill_rate)
+        return power, fill_rate
 
     @staticmethod
     def try_create_next_state(

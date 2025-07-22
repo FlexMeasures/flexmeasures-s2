@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Any
 from abc import ABC, abstractmethod
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
@@ -27,6 +27,12 @@ class DevicePlanner(ABC):
         """The connection ID."""
         raise NotImplementedError
 
+    @property
+    @abstractmethod
+    def congestion_point_id(self) -> str:
+        """The congestion point ID this device belongs to."""
+        raise NotImplementedError
+
     @abstractmethod
     def create_improved_planning(
         self,
@@ -49,14 +55,14 @@ class DevicePlanner(ABC):
         pass
 
     @abstractmethod
-    def create_initial_planning(self, plan_due_by_date: datetime) -> JouleProfile:
+    def create_initial_planning(self, plan_due_by_date: datetime) -> "Any":
         """Create an initial planning profile.
 
         Args:
             plan_due_by_date: The date by which the plan must be ready
 
         Returns:
-            A JouleProfile representing the initial plan
+            A plan object for the device.
         """
         pass
 
@@ -77,4 +83,14 @@ class DevicePlanner(ABC):
     @abstractmethod
     def get_device_plan(self) -> Optional[DevicePlan]:
         """Get the device plan."""
+        pass
+
+    @abstractmethod
+    def get_latest_plan(self) -> Any:
+        """Get the latest calculated plan, which may not have been accepted yet."""
+        pass
+
+    @abstractmethod
+    def set_accepted_plan(self, plan: Any):
+        """Forcefully set the accepted plan for the device."""
         pass

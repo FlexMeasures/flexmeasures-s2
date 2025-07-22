@@ -1,4 +1,4 @@
-from typing import List, Any
+from typing import List, Any, Optional
 from datetime import datetime
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from .congestion_point_planner import CongestionPointPlanner
@@ -71,17 +71,11 @@ class RootPlanner:
             return
 
         # Determine maximum and minimum priority classes across congestion points.
-        max_priority_class = max(
-            cpc.max_priority_class() for cpc in self.cp_controllers
-        )
-        min_priority_class = min(
-            cpc.min_priority_class() for cpc in self.cp_controllers
-        )
+        max_priority_class = max(cpc.max_priority_class() for cpc in self.cp_controllers)
+        min_priority_class = min(cpc.min_priority_class() for cpc in self.cp_controllers)
 
         # Iterate over the priority classes.
-        for priority_class in range(
-            min_priority_class, min(max_priority_class, max_priority_class_external) + 1
-        ):
+        for priority_class in range(min_priority_class, min(max_priority_class, max_priority_class_external) + 1):
             i = 0
             best_proposal = None
 
@@ -102,9 +96,7 @@ class RootPlanner:
                             plan_due_by_date,
                         )
                         if proposal is not None:
-                            if best_proposal is None or proposal.is_preferred_to(
-                                best_proposal
-                            ):
+                            if best_proposal is None or proposal.is_preferred_to(best_proposal):
                                 best_proposal = proposal
                     except Exception as e:
                         print(f"Error getting proposal from controller: {e}")
@@ -115,15 +107,29 @@ class RootPlanner:
                     break
 
                 # Update the root controller's planning based on the best proposal.
-                self.root_ctrl_planning = self.root_ctrl_planning.subtract(
-                    best_proposal.old_plan
-                )
-                self.root_ctrl_planning = self.root_ctrl_planning.add(
-                    best_proposal.proposed_plan
-                )
+                self.root_ctrl_planning = self.root_ctrl_planning.subtract(best_proposal.old_plan)
+                self.root_ctrl_planning = self.root_ctrl_planning.add(best_proposal.proposed_plan)
 
-                # Let the origin device/controller accept the proposal.
-                best_proposal.origin.accept_proposal(best_proposal)
+                # Find the real device object and explicitly update its state.
+                # This is crucial for parallel execution as best_proposal.origin is a copy.
+                cp_id_of_origin = best_proposal.origin.congestion_point_id
+                congestion_point_controller = self.get_congestion_point_controller(cp_id_of_origin)
+                if congestion_point_controller is None:
+                    raise Exception(f"Could not find CongestionPointController with id {cp_id_of_origin}")
+
+                real_device = None
+                for dev in congestion_point_controller.devices:
+                    if dev.device_id == best_proposal.origin.device_id:
+                        real_device = dev
+                        break
+
+                if real_device is None:
+                    raise Exception(
+                        f"Could not find device with id {best_proposal.origin.device_id} in CP {cp_id_of_origin}"
+                    )
+                plan_to_accept = best_proposal.origin.get_latest_plan()
+                real_device.set_accepted_plan(plan_to_accept)
+
                 i += 1
                 print(
                     f"Root controller: selected best controller '{best_proposal.origin.device_name}' with global energy impr {best_proposal.get_global_improvement_value()}, congestion impr {best_proposal.get_congestion_improvement_value()}, iteration {i}."
@@ -131,14 +137,11 @@ class RootPlanner:
 
                 # Check stopping criteria: if improvement values are below thresholds or max iterations reached.
                 if (
-                    best_proposal.get_global_improvement_value()
-                    <= self.energy_iteration_criterion
+                    best_proposal.get_global_improvement_value() <= self.energy_iteration_criterion
                 ) or i >= self.MAX_ITERATIONS:
                     break
 
-            print(
-                f"Optimizing priority class {priority_class} was done after {i} iterations."
-            )
+            print(f"Optimizing priority class {priority_class} was done after {i} iterations.")
             if i >= self.MAX_ITERATIONS:
                 print(
                     f"Warning: Optimization stopped due to iteration limit. Priority class: {priority_class}, Iterations: {i}"
