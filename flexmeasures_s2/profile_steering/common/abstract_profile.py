@@ -63,7 +63,7 @@ class AbstractProfile(ABC, Generic[E, PT]):
             return
 
         # Case 4: Empty initialization (for serialization)
-        self.metadata = None
+        self.metadata = ProfileMetadata(datetime.now(), timedelta(hours=1), 0)
         self.elements = []
 
     @abstractmethod

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import List, Optional, TypeVar, Union, Tuple
+from typing import List, Optional, Union
 
 from flexmeasures_s2.profile_steering.common.abstract_profile import AbstractProfile
 from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata

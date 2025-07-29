@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional, Dict
+from typing import List, Optional
 from s2python.common import CommodityQuantity, PowerForecast
 from s2python.frbc import (
     FRBCSystemDescription,

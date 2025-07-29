@@ -1,17 +1,20 @@
 from datetime import datetime, timedelta
-from typing import List, Optional, Dict, Tuple
+from typing import List, Optional, Dict, Tuple, TYPE_CHECKING
 
-from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 from flexmeasures_s2.profile_steering.s2_utils.number_range_wrapper import (
     NumberRangeWrapper,
 )
 from s2python.frbc import FRBCSystemDescription, FRBCLeakageBehaviour
-from flexmeasures_s2.profile_steering.device_planner.frbc.frbc_state import FrbcState
+
+if TYPE_CHECKING:
+    from flexmeasures_s2.profile_steering.device_planner.frbc.frbc_state import (
+        FrbcState,
+    )
+
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import (
     S2FrbcDeviceState,
 )
 from enum import Enum
-import numpy as np
 
 
 class SelectionReason(Enum):
@@ -44,7 +47,9 @@ class FrbcTimestep:
         self.leakage_behaviour = leakage_behaviour
         self.forecasted_fill_level_usage = forecasted_fill_level_usage
         self.fill_level_target = fill_level_target
-        self.previous_actuator_statuses: Dict[str, str] = kwargs.get("previous_actuator_statuses", {})
+        self.previous_actuator_statuses: Dict[str, str] = kwargs.get(
+            "previous_actuator_statuses", {}
+        )
         self.timers: Dict[str, timedelta] = kwargs.get("timers", {})
         self._states_by_bucket: Dict[int, FrbcState] = {}
         self.start_date = start_date
@@ -73,12 +78,14 @@ class FrbcTimestep:
             raise ValueError("Computational parameters are not set")
         return self.computational_parameters.get_nr_of_buckets()
 
-    def set_targets(self, target: float, min_constraint: float, max_constraint: float) -> None:
+    def set_targets(
+        self, target: float, min_constraint: float, max_constraint: float
+    ) -> None:
         self.target = target
         self.min_constraint = min_constraint
         self.max_constraint = max_constraint
 
-    def add_state(self, state: Optional[FrbcState]) -> None:
+    def add_state(self, state: Optional["FrbcState"]) -> None:
         if state is None:
             return
 
@@ -92,16 +99,19 @@ class FrbcTimestep:
                 selection_result = state.is_preferable_than(stored_state)
                 if selection_result.result:
                     self._states_by_bucket[bucket] = state
-                self._states_by_bucket[bucket].set_selection_reason(selection_result.reason)
+                self._states_by_bucket[bucket].set_selection_reason(
+                    selection_result.reason
+                )
         else:
             if (
                 self.emergency_state is None
-                or state.get_fill_level_distance() < self.emergency_state.get_fill_level_distance()
+                or state.get_fill_level_distance()
+                < self.emergency_state.get_fill_level_distance()
             ):
                 self.emergency_state = state
                 state.set_selection_reason(SelectionReason.EMERGENCY_STATE)
 
-    def add_all_states(self, states: List[Optional[FrbcState]]) -> None:
+    def add_all_states(self, states: List[Optional["FrbcState"]]) -> None:
         for state in states:
             self.add_state(state)
 
@@ -115,34 +125,45 @@ class FrbcTimestep:
     def get_target(self) -> float:
         return self.target
 
-    def get_final_states(self) -> List[FrbcState]:
+    def get_final_states(self) -> List["FrbcState"]:
         final_states = list(self._states_by_bucket.values())
 
         if not final_states and self.emergency_state is not None:
             return [self.emergency_state]
         return final_states
 
-    def get_final_states_within_fill_level_target(self) -> List[FrbcState]:
+    def get_final_states_within_fill_level_target(self) -> List["FrbcState"]:
         final_states = self.get_final_states()
         if self.fill_level_target is None:
             return final_states
-        final_states = [s for s in final_states if self.state_is_within_fill_level_target_range(s)]
+        final_states = [
+            s for s in final_states if self.state_is_within_fill_level_target_range(s)
+        ]
         if final_states:
             return final_states
-        best_state = min(self.get_final_states(), key=self.get_fill_level_target_distance)
+        best_state = min(
+            self.get_final_states(), key=self.get_fill_level_target_distance
+        )
         return [best_state]
 
-    def state_is_within_fill_level_target_range(self, state: FrbcState) -> bool:
+    def state_is_within_fill_level_target_range(self, state: "FrbcState") -> bool:
         if self.fill_level_target is None:
             return True
         return (
-            self.fill_level_target.start_of_range is None or state.fill_level >= self.fill_level_target.start_of_range
-        ) and (self.fill_level_target.end_of_range is None or state.fill_level <= self.fill_level_target.end_of_range)
+            self.fill_level_target.start_of_range is None
+            or state.fill_level >= self.fill_level_target.start_of_range
+        ) and (
+            self.fill_level_target.end_of_range is None
+            or state.fill_level <= self.fill_level_target.end_of_range
+        )
 
-    def get_fill_level_target_distance(self, state: FrbcState) -> float:
+    def get_fill_level_target_distance(self, state: "FrbcState") -> float:
         if self.fill_level_target is None:
             return 0
-        if self.fill_level_target.end_of_range is None or state.fill_level < self.fill_level_target.start_of_range:
+        if (
+            self.fill_level_target.end_of_range is None
+            or state.fill_level < self.fill_level_target.start_of_range
+        ):
             return self.fill_level_target.start_of_range - state.fill_level
         else:
             return state.fill_level - self.fill_level_target.end_of_range

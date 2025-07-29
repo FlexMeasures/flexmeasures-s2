@@ -1,7 +1,9 @@
 import numpy as np
 from typing import List, Optional
 
-from flexmeasures_s2.profile_steering.common.power_range_wrapper import PowerRangeWrapper
+from flexmeasures_s2.profile_steering.common.power_range_wrapper import (
+    PowerRangeWrapper,
+)
 from flexmeasures_s2.profile_steering.s2_utils.number_range_wrapper import (
     NumberRangeWrapper,
 )
@@ -14,8 +16,12 @@ class FrbcOperationModeElementWrapper:
             element.fill_level_range.start_of_range,
             element.fill_level_range.end_of_range,
         )
-        self.fill_rate = NumberRangeWrapper(element.fill_rate.start_of_range, element.fill_rate.end_of_range)
-        self.power_ranges: List[PowerRangeWrapper] = [PowerRangeWrapper(pr) for pr in element.power_ranges]
+        self.fill_rate = NumberRangeWrapper(
+            element.fill_rate.start_of_range, element.fill_rate.end_of_range
+        )
+        self.power_ranges: List[PowerRangeWrapper] = [
+            PowerRangeWrapper(pr) for pr in element.power_ranges
+        ]
 
         if element.running_costs is None:
             self.running_costs: Optional[NumberRangeWrapper] = None
@@ -51,13 +57,20 @@ class FrbcOperationModeWrapper:
         self.id = frbc_operation_mode.id
         self.diagnostic_label = frbc_operation_mode.diagnostic_label
         self.abnormal_condition_only = frbc_operation_mode.abnormal_condition_only
-        self.elements = [FrbcOperationModeElementWrapper(element) for element in frbc_operation_mode.elements]
+        self.elements = [
+            FrbcOperationModeElementWrapper(element)
+            for element in frbc_operation_mode.elements
+        ]
         self.uses_factor = self.calculate_uses_factor()
 
         # Pre-process elements into NumPy arrays for vectorization
         if self.elements:
-            self.fill_level_starts = np.array([e.fill_level_range.start_of_range for e in self.elements])
-            self.fill_level_ends = np.array([e.fill_level_range.end_of_range for e in self.elements])
+            self.fill_level_starts = np.array(
+                [e.fill_level_range.start_of_range for e in self.elements]
+            )
+            self.fill_level_ends = np.array(
+                [e.fill_level_range.end_of_range for e in self.elements]
+            )
         else:
             self.fill_level_starts = np.array([])
             self.fill_level_ends = np.array([])
@@ -74,7 +87,10 @@ class FrbcOperationModeWrapper:
             ):
                 return True
             for power_range in element.power_ranges:
-                if abs(power_range.start_of_range - power_range.end_of_range) > S2FrbcDeviceStateWrapper.epsilon:
+                if (
+                    abs(power_range.start_of_range - power_range.end_of_range)
+                    > S2FrbcDeviceStateWrapper.epsilon
+                ):
                     return True
         return False
 

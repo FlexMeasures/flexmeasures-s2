@@ -1,16 +1,10 @@
-from flexmeasures.data.schemas import AwareDateTimeField, DurationField
-
-from marshmallow import Schema, fields
-
-
-class S2FlexModelSchema(Schema): ...
+from __future__ import annotations
+from pydantic import BaseModel
 
 
-class TNOTargetProfile(Schema):
-    start = AwareDateTimeField()
-    duration = DurationField()
-    values = fields.List(fields.Float)
+class PowerValue(BaseModel):
+    value: float
 
 
-class TNOFlexContextSchema(Schema):
-    target_profile = fields.Nested(TNOTargetProfile())
+class Schedule(BaseModel):
+    values: list[PowerValue]

@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from typing import List, Optional, Any, Tuple
-from zoneinfo import ZoneInfo
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 from flexmeasures_s2.profile_steering.device_planner.frbc.frbc_timestep import (
     FrbcTimestep,
@@ -32,9 +33,6 @@ SI = UnitRegistry()
 
 
 # TODO: Add S2FrbcInsightsProfile?->Update 08-02-2025: Not needed for now
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-import matplotlib.patches as mpatches
 
 
 def plot_planning_results(
@@ -296,7 +294,7 @@ class OperationModeProfileTree:
         )
         plan = self.convert_to_plan(first_timestep_index, end_state)
         # Extract only the time component from each datetime object
-        timestep_start_times = [ts.start_date for ts in self.timesteps]
+        # timestep_start_times = [ts.start_date for ts in self.timesteps]
 
         # Now use this list in the plot function
         # plot_planning_results(timestep_start_times, plan.get_energy().elements, plan.fill_level.elements, plan.get_operation_mode_id(), ids)

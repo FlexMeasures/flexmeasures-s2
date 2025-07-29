@@ -4,9 +4,6 @@ import uuid
 
 # Common data types
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
-from flexmeasures_s2.profile_steering.common.joule_range_profile import (
-    JouleRangeProfile,
-)
 
 # Import from common data structures to avoid circular imports
 from flexmeasures_s2.profile_steering.common_data_structures import (

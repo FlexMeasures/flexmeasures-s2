@@ -1,14 +1,20 @@
-from datetime import datetime
-from typing import Optional, Any
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
+from datetime import datetime
+from typing import Any, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from flexmeasures_s2.profile_steering.common.proposal import Proposal
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
-from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 from flexmeasures_s2.profile_steering.common.device_planner.device_plan import (
     DevicePlan,
 )
 
 
 class DevicePlanner(ABC):
+    """Abstract base class for all device planners."""
+
     @property
     @abstractmethod
     def device_id(self) -> str:
@@ -36,21 +42,21 @@ class DevicePlanner(ABC):
     @abstractmethod
     def create_improved_planning(
         self,
-        cluster_diff_profile: TargetProfile,
-        diff_to_max_profile: JouleProfile,
-        diff_to_min_profile: JouleProfile,
+        difference_profile: JouleProfile,
+        diff_to_max_value: JouleProfile,
+        diff_to_min_value: JouleProfile,
         plan_due_by_date: datetime,
-    ) -> "Proposal":
-        """Create an improved planning proposal.
+    ) -> Optional["Proposal"]:
+        """Create an improved planning profile based on the difference profile.
 
         Args:
-            cluster_diff_profile: The difference profile for the cluster
-            diff_to_max_profile: The difference to the maximum profile
-            diff_to_min_profile: The difference to the minimum profile
+            difference_profile: The difference profile for the cluster
+            diff_to_max_value: The difference to the maximum profile
+            diff_to_min_value: The difference to the minimum profile
             plan_due_by_date: The date by which the plan must be ready
 
         Returns:
-            A Proposal object representing the improved plan
+            A Proposal object if an improvement was found, None otherwise
         """
         pass
 
@@ -67,11 +73,11 @@ class DevicePlanner(ABC):
         pass
 
     @abstractmethod
-    def accept_proposal(self, accepted_proposal: "Proposal"):
-        """Accept a proposal and update the device's planning.
+    def accept_proposal(self, proposal: "Proposal") -> None:
+        """This method is called when a proposal from this device is accepted by a higher-level controller.
 
         Args:
-            accepted_proposal: The proposal to accept
+            proposal: The proposal that was accepted
         """
         pass
 

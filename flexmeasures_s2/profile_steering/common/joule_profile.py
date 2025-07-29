@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import List, Optional, Union
+from typing import List, Optional
 from flexmeasures_s2.profile_steering.common.abstract_profile import AbstractProfile
 from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
 
@@ -31,7 +31,7 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
         if other_profile is not None:
             super().__init__(
                 profile_metadata=other_profile.metadata,
-                elements=other_profile.get_elements().copy(),
+                elements=other_profile.elements,
             )
             return
 

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional, Any
+from typing import Any, Optional
 import concurrent.futures
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.common.joule_range_profile import (
@@ -31,13 +31,17 @@ def _get_device_proposal(
         return None
 
 
-def _get_initial_device_plan(device: DevicePlanner, plan_due_by_date: datetime) -> tuple[str, Any]:
+def _get_initial_device_plan(
+    device: DevicePlanner, plan_due_by_date: datetime
+) -> tuple[str, Any]:
     """Helper function to be called by the process pool executor for initial planning."""
     try:
         plan = device.create_initial_planning(plan_due_by_date)
         return (device.device_id, plan)
     except Exception as e:
-        print(f"Error getting initial plan from device {device.device_id} in worker: {e}")
+        print(
+            f"Error getting initial plan from device {device.device_id} in worker: {e}"
+        )
         return (device.device_id, None)
 
 
@@ -79,7 +83,9 @@ class CongestionPointPlanner:
         # For now, always assume storage is available
         return True
 
-    def create_initial_planning(self, plan_due_by_date: datetime) -> JouleProfile:
+    def create_initial_planning(  # noqa: C901
+        self, plan_due_by_date: datetime
+    ) -> JouleProfile:
         """Create an initial plan for this congestion point.
 
         Args:
@@ -91,9 +97,12 @@ class CongestionPointPlanner:
         current_planning = self.empty_profile
 
         # Aggregate initial plans from all devices in parallel
-        device_plans = {}
+        device_plans: dict[str, Any] = {}
         with concurrent.futures.ProcessPoolExecutor() as executor:
-            futures = {executor.submit(_get_initial_device_plan, device, plan_due_by_date) for device in self.devices}
+            futures = {
+                executor.submit(_get_initial_device_plan, device, plan_due_by_date)
+                for device in self.devices
+            }
             for future in concurrent.futures.as_completed(futures):
                 device_id, plan = future.result()
                 if plan is not None:
@@ -108,13 +117,19 @@ class CongestionPointPlanner:
 
         # Check if the current planning is within the congestion target range
         if self.congestion_target.is_within_range(current_planning):
-            print(f"Current planning is within the congestion target range. Returning it.")
+            print(
+                "Current planning is within the congestion target range. Returning it."
+            )
             return current_planning
 
         # If the current planning is not within the congestion target range, optimize it
-        print(f"Current planning is not within the congestion target range. Optimizing it.")
+        print(
+            "Current planning is not within the congestion target range. Optimizing it."
+        )
 
         # print(f"Congestion target: {self.congestion_target}")
+        # This is an old implementation that does not use the root planner
+        # It is kept here for reference
         i = 0
         best_proposal = None
 
@@ -126,8 +141,12 @@ class CongestionPointPlanner:
             print(f"Optimizing priority class: {priority_class}")
             while True:
                 best_proposal = None
-                diff_to_max = self.congestion_target.difference_with_max_value(current_planning)
-                diff_to_min = self.congestion_target.difference_with_min_value(current_planning)
+                diff_to_max = self.congestion_target.difference_with_max_value(
+                    current_planning
+                )
+                diff_to_min = self.congestion_target.difference_with_min_value(
+                    current_planning
+                )
 
                 # Try to get improved plans from each device controller
                 for device in self.devices:
@@ -149,14 +168,21 @@ class CongestionPointPlanner:
                             ):
                                 best_proposal = proposal
                         except Exception as e:
-                            print(f"Error getting proposal from device {device.device_id}: {e}")
+                            print(
+                                f"Error getting proposal from device {device.device_id}: {e}"
+                            )
                             continue
 
-                if best_proposal is None or best_proposal.get_congestion_improvement_value() <= 0:
+                if (
+                    best_proposal is None
+                    or best_proposal.get_congestion_improvement_value() <= 0
+                ):
                     break
 
                 # Update the current planning based on the best proposal
-                current_planning = current_planning.subtract(best_proposal.old_plan).add(best_proposal.proposed_plan)
+                current_planning = current_planning.subtract(
+                    best_proposal.old_plan
+                ).add(best_proposal.proposed_plan)
                 best_proposal.origin.accept_proposal(best_proposal)
                 i += 1
 
@@ -191,12 +217,18 @@ class CongestionPointPlanner:
 
         current_planning = self.get_current_planning()
 
-        diff_to_max_value = self.congestion_target.difference_with_max_value(current_planning)
-        diff_to_min_value = self.congestion_target.difference_with_min_value(current_planning)
+        diff_to_max_value = self.congestion_target.difference_with_max_value(
+            current_planning
+        )
+        diff_to_min_value = self.congestion_target.difference_with_min_value(
+            current_planning
+        )
         # print(f"diff_to_max_value: {diff_to_max_value}")
         # print(f"diff_to_min_value: {diff_to_min_value}")
         # Try to get improved plans from each device controller
-        devices_to_plan = [d for d in self.devices if d.priority_class <= priority_class]
+        devices_to_plan = [
+            d for d in self.devices if d.priority_class <= priority_class
+        ]
 
         proposals = []
         if devices_to_plan:
@@ -232,7 +264,9 @@ class CongestionPointPlanner:
             )
         else:
             if best_proposal.get_congestion_improvement_value() == float("-inf"):
-                raise ValueError("Invalid proposal with negative infinity improvement value")
+                raise ValueError(
+                    "Invalid proposal with negative infinity improvement value"
+                )
 
             print(
                 f"CP '{self.congestion_point_id}': Selected best controller '{best_proposal.origin.device_name}' with improvement of {best_proposal.get_global_improvement_value()}."

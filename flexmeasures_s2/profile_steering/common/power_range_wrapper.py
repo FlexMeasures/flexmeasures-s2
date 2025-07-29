@@ -18,7 +18,9 @@ class PowerRangeWrapper:
         return self.commodity_quantity
 
     def get_power(self, factor: float) -> float:
-        return ((self.end_of_range - self.start_of_range) * factor) + self.start_of_range
+        return (
+            (self.end_of_range - self.start_of_range) * factor
+        ) + self.start_of_range
 
     def __eq__(self, o: object) -> bool:
         if self is o:
