@@ -40,22 +40,22 @@ class Proposal:
             )
         return self.global_improvement_value
 
-    # def get_cost_improvement_value(self) -> float:
-    #     if self.cost_improvement_value is None:
-    #         self.cost_improvement_value = self.get_cost(
-    #             self.old_plan, self.global_diff_target
-    #         ) - self.get_cost(self.proposed_plan, self.global_diff_target)
-    #     return self.cost_improvement_value
+    def get_cost_improvement_value(self) -> float:
+        if self.cost_improvement_value is None:
+            self.cost_improvement_value = self.get_cost(
+                self.old_plan, self.global_diff_target
+            ) - self.get_cost(self.proposed_plan, self.global_diff_target)
+        return self.cost_improvement_value
 
-    # @staticmethod
-    # def get_cost(plan: JouleProfile, target_profile: TargetProfile) -> float:
-    #     cost = 0.0
-    #     for i in range(target_profile.metadata.get_nr_of_timesteps()):
-    #         joule_usage = plan.get_elements()[i]
-    #         target_element = target_profile.get_elements()[i]
-    #         if isinstance(target_element, TargetProfile.TariffElement):
-    #             cost += (joule_usage / 3_600_000) * target_element.get_tariff()
-    #     return cost
+    @staticmethod
+    def get_cost(plan: JouleProfile, target_profile: TargetProfile) -> float:
+        cost = 0.0
+        for i in range(target_profile.metadata.nr_of_timesteps):
+            joule_usage = plan.elements[i]
+            target_element = target_profile.elements[i]
+            if isinstance(target_element, TargetProfile.TariffElement):  # type: ignore[reportIncompatibleVariableOverride]
+                cost += (joule_usage / 3_600_000) * target_element.get_tariff()
+        return cost
 
     def get_congestion_improvement_value(self) -> float:
         if self.congestion_improvement_value is None:

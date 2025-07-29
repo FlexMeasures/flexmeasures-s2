@@ -156,6 +156,8 @@ class RootPlanner:
                 if (
                     best_proposal.get_global_improvement_value()
                     <= self.energy_iteration_criterion
+                    # or best_proposal.get_cost_improvement_value()
+                    # <= self.cost_iteration_criterion
                 ) or i >= self.MAX_ITERATIONS:
                     break
 
