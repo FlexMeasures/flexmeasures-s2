@@ -300,6 +300,7 @@ def create_recharge_system_description(
         actuator_id=charge_actuator_id,
         active_operation_mode_id=id_on_operation_mode,
         operation_mode_factor=0,
+        transition_duration=None,
     )
 
     charge_actuator_description = FRBCActuatorDescription(
@@ -583,6 +584,21 @@ def create_device_state(
 
 def get_target_profile_elements(number_of_elements: int):
     """Create target profile elements with the same pattern as the Java code."""
+    target_elements = []
+    # First 38 elements of 0
+    target_elements.extend([0] * 38)
+    # Next 62 elements of 8400000
+    target_elements.extend([8400000] * 62)
+    # Next 55 elements of 0
+    target_elements.extend([0] * 45)
+    # Next 18 elements of 8400000
+    target_elements.extend([8400000] * 28)
+    # Last 115 elements of 176000000
+    target_elements.extend([176000000] * 115)
+    return target_elements[:number_of_elements]
+
+def get_cost_target_profile_elements(number_of_elements: int):
+    """Create cost target profile elements with the same pattern as the Java code."""
     target_elements = []
     # First 38 elements of 0
     target_elements.extend([0] * 38)
