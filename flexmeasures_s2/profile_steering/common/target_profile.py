@@ -1,4 +1,4 @@
-from typing import List, Union, cast
+from typing import List, Union, cast, Optional
 from datetime import datetime, timedelta
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.common.abstract_profile import AbstractProfile
@@ -33,6 +33,9 @@ class TargetProfile(AbstractProfile[Union["TargetProfile.Element", None], "Targe
         if isinstance(elements, list) and all(isinstance(e, int) for e in elements):
             new_elements = [TargetProfile.JouleElement(e) for e in cast(List[int], elements)]
             super().__init__(metadata, cast(List[Union["TargetProfile.Element", None]], new_elements))
+        elif isinstance(elements, list) and all(isinstance(e, float) for e in elements):
+            new_cost_elements = [TargetProfile.TariffElement(e) for e in cast(List[float], elements)]
+            super().__init__(metadata, cast(List[Union["TargetProfile.Element", None]], new_cost_elements))
         else:
             super().__init__(metadata, cast(List[Union["TargetProfile.Element", None]], elements))
 

@@ -300,7 +300,6 @@ def create_recharge_system_description(
         actuator_id=charge_actuator_id,
         active_operation_mode_id=id_on_operation_mode,
         operation_mode_factor=0,
-        transition_duration=None,
     )
 
     charge_actuator_description = FRBCActuatorDescription(
@@ -597,20 +596,43 @@ def get_target_profile_elements(number_of_elements: int):
     target_elements.extend([176000000] * 115)
     return target_elements[:number_of_elements]
 
-def get_cost_target_profile_elements(number_of_elements: int):
-    """Create cost target profile elements with the same pattern as the Java code."""
-    target_elements = []
-    # First 38 elements of 0
-    target_elements.extend([0] * 38)
-    # Next 62 elements of 8400000
-    target_elements.extend([8400000] * 62)
-    # Next 55 elements of 0
-    target_elements.extend([0] * 45)
-    # Next 18 elements of 8400000
-    target_elements.extend([8400000] * 28)
-    # Last 115 elements of 176000000
-    target_elements.extend([176000000] * 115)
-    return target_elements[:number_of_elements]
+
+def get_netherlands_day_ahead_prices(number_of_elements: int):
+    """Create Netherlands day ahead price profile elements for 30/07/2025."""
+    # Base hourly prices for 24 hours
+    hourly_prices = [
+        92.16,  # 00:00 - 01:00
+        87.99,  # 01:00 - 02:00
+        86.00,  # 02:00 - 03:00
+        77.18,  # 03:00 - 04:00
+        78.25,  # 04:00 - 05:00
+        87.65,  # 05:00 - 06:00
+        96.46,  # 06:00 - 07:00
+        95.05,  # 07:00 - 08:00
+        98.31,  # 08:00 - 09:00
+        82.55,  # 09:00 - 10:00
+        63.29,  # 10:00 - 11:00
+        40.37,  # 11:00 - 12:00
+        24.79,  # 12:00 - 13:00
+        17.69,  # 13:00 - 14:00
+        10.70,  # 14:00 - 15:00
+        27.40,  # 15:00 - 16:00
+        41.31,  # 16:00 - 17:00
+        69.19,  # 17:00 - 18:00
+        87.18,  # 18:00 - 19:00
+        105.00,  # 19:00 - 20:00
+        115.55,  # 20:00 - 21:00
+        111.06,  # 21:00 - 22:00
+        104.15,  # 22:00 - 23:00
+        93.03,  # 23:00 - 00:00
+    ]
+
+    price_elements = []
+    # Repeat each hourly price 12 times for 5-minute intervals (288 total elements)
+    for price in hourly_prices:
+        price_elements.extend([price] * 12)
+
+    return price_elements[:number_of_elements]
 
 
 def test_planning_service_impl_with_ev_device():
@@ -627,7 +649,8 @@ def test_planning_service_impl_with_ev_device():
     )
     plan_due_by_date = target_metadata.profile_start + timedelta(seconds=10)
     target_profile_elements = get_target_profile_elements(T)
-
+    cost_target_profile_elements = get_netherlands_day_ahead_prices(T)
+    
     device_states = [
         create_device_state(
             f"battery{i+1}", datetime.fromtimestamp(3600), timezone(timedelta(hours=1))
