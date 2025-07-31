@@ -9,7 +9,7 @@ from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_instruction_pr
     S2FrbcInstructionProfile,
 )
 from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
-from flexmeasures_s2.profile_steering.common.device_planner.device_plan import (
+from flexmeasures_s2.profile_steering.common.device_plan import (
     DevicePlan,
 )
 from flexmeasures_s2.profile_steering.device_planner.frbc.operation_mode_profile_tree import (

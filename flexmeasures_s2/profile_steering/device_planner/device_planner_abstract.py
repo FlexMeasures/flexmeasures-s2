@@ -7,7 +7,7 @@ from typing import Any, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from flexmeasures_s2.profile_steering.common.proposal import Proposal
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
-from flexmeasures_s2.profile_steering.common.device_planner.device_plan import (
+from flexmeasures_s2.profile_steering.common.device_plan import (
     DevicePlan,
 )
 
