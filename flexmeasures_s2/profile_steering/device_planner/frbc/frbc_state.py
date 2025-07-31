@@ -161,11 +161,14 @@ class FrbcState:
 
         else:
             FrbcState.transition_cache.clear()
-            self.device_state = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper(
-                device_state
-            )
+            if device_state is not None:
+                self.device_state = (
+                    s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper(device_state)
+                )
+            else:
+                self.device_state = None  # type: ignore[assignment]
             self.timestep = timestep
-            self.previous_state = None
+            self.previous_state = None  # type: ignore[assignment]
             self.system_description = timestep.system_description
             self.fill_level = present_fill_level
             self.bucket = 0
@@ -174,7 +177,7 @@ class FrbcState:
             self.sum_squared_constraint_violation = 0.0
             self.sum_energy_cost = 0.0
             self.sum_squared_energy = 0.0
-            self.selection_reason: Optional[SelectionReason] = None
+            self.selection_reason: Optional[SelectionReason] = None  # type: ignore[no-redef]
             self.actuator_configurations = {}
             self.timer_elapse_map = (
                 self.get_initial_timer_elapse_map_for_system_description(

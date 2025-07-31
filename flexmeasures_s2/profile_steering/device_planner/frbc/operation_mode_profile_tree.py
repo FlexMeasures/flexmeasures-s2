@@ -258,7 +258,7 @@ class OperationModeProfileTree:
         diff_to_min_profile: Any,
         diff_to_max_profile: Any,
         ids: Optional[dict] = None,
-    ) -> Tuple[S2FrbcPlan, List[datetime]]:
+    ) -> S2FrbcPlan:
         for i, ts in enumerate(self.timesteps):
             ts.clear()
             ts.set_targets(
@@ -273,7 +273,7 @@ class OperationModeProfileTree:
         first_timestep = self.timesteps[first_timestep_index]
         last_timestep = self.timesteps[-1]
         state_zero = FrbcState(
-            device_state=self.device_state,
+            device_state=self.device_state.device_state,
             timestep=first_timestep,
             present_fill_level=0,
         )
