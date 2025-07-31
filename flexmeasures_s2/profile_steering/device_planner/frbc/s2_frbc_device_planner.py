@@ -85,7 +85,7 @@ class S2FrbcDevicePlanner(DevicePlanner):
 
     @property
     def priority_class(self) -> int:
-        return self._priority_class
+        return self.s2_frbc_state.priority_class
 
     @property
     def device_id(self) -> str:

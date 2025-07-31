@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import List, Optional, Any, Tuple
+from typing import List, Optional, Any
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
@@ -336,9 +336,9 @@ class OperationModeProfileTree:
         return S2FrbcPlan(
             False,
             JouleProfile(
-                self.profile_metadata.profile_start,
-                self.profile_metadata.timestep_duration,
-                energy,
+                profile_start=self.profile_metadata.profile_start,
+                timestep_duration=self.profile_metadata.timestep_duration,
+                elements=energy,  # type: ignore[arg-type]
             ),
             SoCProfile(
                 self.profile_metadata,
