@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Optional
 from datetime import datetime, timedelta
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.common.abstract_profile import AbstractProfile
@@ -42,6 +42,13 @@ class TargetProfile(
     ):
         super().validate(profile_metadata, elements)
         # Add any TargetProfile-specific validation if needed
+
+    def get_energy_for_timestep(self, index: int) -> Optional[int]:
+        if 0 <= index < len(self.elements) and isinstance(
+            self.elements[index], TargetProfile.JouleElement
+        ):
+            return self.elements[index].joules  # type: ignore
+        return None
 
     def default_value(self) -> "TargetProfile.Element":
         return TargetProfile.NULL_ELEMENT

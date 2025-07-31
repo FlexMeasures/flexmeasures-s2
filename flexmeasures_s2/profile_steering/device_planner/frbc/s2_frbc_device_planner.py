@@ -78,10 +78,7 @@ class S2FrbcDevicePlanner(DevicePlanner):
                 >= latest_before_first_ptu.valid_from.replace(tzinfo=None)
                 for sd in storage_state.get_system_descriptions()
             )
-        return (
-            storage_state.is_online
-            and active_and_upcoming_system_descriptions_has_active_storage
-        )
+        return storage_state.is_online and active_and_upcoming_system_descriptions_has_active_storage
 
     @property
     def priority_class(self) -> int:
@@ -119,9 +116,7 @@ class S2FrbcDevicePlanner(DevicePlanner):
         min_profile = diff_to_min.add(self.accepted_plan.energy)
 
         if self.is_storage_available(self.s2_frbc_state):
-            self.latest_plan = self.state_tree.find_best_plan(
-                target, min_profile, max_profile
-            )
+            self.latest_plan = self.state_tree.find_best_plan(target, min_profile, max_profile)
         else:
             self.latest_plan = S2FrbcPlan(
                 idle=True,
@@ -141,9 +136,7 @@ class S2FrbcDevicePlanner(DevicePlanner):
         )
         return proposal
 
-    def create_initial_planning(
-        self, plan_due_by_date: datetime, ids: Optional[dict] = None
-    ) -> S2FrbcPlan:
+    def create_initial_planning(self, plan_due_by_date: datetime, ids: Optional[dict] = None) -> S2FrbcPlan:
         if self.is_storage_available(self.s2_frbc_state):
             if ids is None:
                 self.latest_plan = self.state_tree.find_best_plan(
@@ -172,17 +165,11 @@ class S2FrbcDevicePlanner(DevicePlanner):
         if self.latest_plan is None:
             raise ValueError("No latest plan found")
         if accepted_proposal.origin != self:
-            raise ValueError(
-                f"Storage controller '{self.device_id}' received a proposal that he did not send."
-            )
+            raise ValueError(f"Storage controller '{self.device_id}' received a proposal that he did not send.")
         if not accepted_proposal.proposed_plan == self.latest_plan.energy:
-            raise ValueError(
-                f"Storage controller '{self.device_id}' received a proposal that he did not send."
-            )
+            raise ValueError(f"Storage controller '{self.device_id}' received a proposal that he did not send.")
         if accepted_proposal.get_congestion_improvement_value() < 0:
-            raise ValueError(
-                f"Storage controller '{self.device_id}' received a proposal with negative improvement"
-            )
+            raise ValueError(f"Storage controller '{self.device_id}' received a proposal with negative improvement")
         self.accepted_plan = self.latest_plan
 
     def get_latest_plan(self) -> Optional[S2FrbcPlan]:
@@ -193,7 +180,6 @@ class S2FrbcDevicePlanner(DevicePlanner):
             raise TypeError(f"Expected S2FrbcPlan, but got {type(plan)}")
         self.accepted_plan = plan
 
-    @property
     def current_profile(self) -> JouleProfile:
         if self.accepted_plan is None:
             raise ValueError("No accepted plan found")
@@ -208,9 +194,7 @@ class S2FrbcDevicePlanner(DevicePlanner):
             connection_id=self.connection_id,
             energy_profile=self.accepted_plan.energy,
             fill_level_profile=self.accepted_plan.fill_level,
-            instruction_profile=self.convert_plan_to_instructions(
-                self.profile_metadata, self.accepted_plan
-            ),
+            instruction_profile=self.convert_plan_to_instructions(self.profile_metadata, self.accepted_plan),
         )
 
     @staticmethod
@@ -221,9 +205,7 @@ class S2FrbcDevicePlanner(DevicePlanner):
         actuator_configurations_per_timestep = device_plan.get_operation_mode_id()
         if actuator_configurations_per_timestep is not None:
             for actuator_configurations in actuator_configurations_per_timestep:
-                new_element = S2FrbcInstructionProfile.Element(
-                    not actuator_configurations, actuator_configurations
-                )
+                new_element = S2FrbcInstructionProfile.Element(not actuator_configurations, actuator_configurations)
                 elements.append(new_element)
         else:
             elements = [None] * profile_metadata.nr_of_timesteps
