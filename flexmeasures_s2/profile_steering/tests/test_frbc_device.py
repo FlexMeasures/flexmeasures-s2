@@ -195,14 +195,12 @@ def create_ev_device_state(
     return device_state
 
 
-@staticmethod
 def create_recharge_system_description(
     start_of_recharge,
     charge_power_soc_percentage_per_second,
     charging_power_kw,
     soc_percentage_before_charging,
 ) -> FRBCSystemDescription:
-    global charge_actuator_id, id_on_operation_mode, id_off_operation_mode, id_on_to_off_timer, id_off_to_on_timer
     # Create and return a mock system description for recharging
     on_operation_element = FRBCOperationModeElement(
         fill_level_range=NumberRange(start_of_range=0, end_of_range=100),
@@ -284,11 +282,11 @@ def create_recharge_system_description(
         (transition_id_from_off_to_on, "transition_from_charge_off_to_charge_on")
     )
     transition_from_off_to_on = Transition(
-        id=transition_id_from_off_to_on,
-        **{"from": id_off_operation_mode},
-        to=id_on_operation_mode,
-        start_timers=[id_on_to_off_timer],
-        blocking_timers=[id_off_to_on_timer],
+        id=transition_id_from_off_to_on,  # type: ignore[arg-type]
+        **{"from": id_off_operation_mode},  # type: ignore[arg-type]
+        to=id_on_operation_mode,  # type: ignore[arg-type]
+        start_timers=[id_on_to_off_timer],  # type: ignore[arg-type]
+        blocking_timers=[id_off_to_on_timer],  # type: ignore[arg-type]
         transition_duration=None,
         abnormal_condition_only=False,
     )
@@ -296,14 +294,14 @@ def create_recharge_system_description(
     logging.debug(f"charge_actuator_id: {charge_actuator_id}")
     ids.append((charge_actuator_id, "charge_actuator"))
     charge_actuator_status = FRBCActuatorStatus(
-        message_id=charge_actuator_id,
-        actuator_id=charge_actuator_id,
-        active_operation_mode_id=id_on_operation_mode,
+        message_id=charge_actuator_id,  # type: ignore[arg-type]
+        actuator_id=charge_actuator_id,  # type: ignore[arg-type]
+        active_operation_mode_id=id_on_operation_mode,  # type: ignore[arg-type]
         operation_mode_factor=0,
     )
 
     charge_actuator_description = FRBCActuatorDescription(
-        id=charge_actuator_id,
+        id=charge_actuator_id,  # type: ignore[arg-type]
         diagnostic_label="charge.actuator",
         operation_modes=[on_operation_mode, off_operation_mode],
         transitions=[transition_from_on_to_off, transition_from_off_to_on],
@@ -314,7 +312,8 @@ def create_recharge_system_description(
     logging.debug(f"storage_status_id: {storage_status_id}")
     ids.append((storage_status_id, "storage_status"))
     storage_status = FRBCStorageStatus(
-        message_id=storage_status_id, present_fill_level=soc_percentage_before_charging
+        message_id=storage_status_id,  # type: ignore[arg-type]
+        present_fill_level=soc_percentage_before_charging,
     )
 
     frbc_storage_description = FRBCStorageDescription(
@@ -325,9 +324,11 @@ def create_recharge_system_description(
         provides_usage_forecast=False,
         fill_level_range=NumberRange(start_of_range=0, end_of_range=100),
     )
-
+    system_description_id = str(uuid.uuid4())
+    logging.debug(f"system_description_id: {system_description_id}")
+    ids.append((system_description_id, "system_description"))
     frbc_system_description = FRBCSystemDescription(
-        message_id=str(uuid.uuid4()),
+        message_id=system_description_id,  # type: ignore[arg-type]
         valid_from=start_of_recharge,
         actuators=[charge_actuator_description],
         storage=frbc_storage_description,
@@ -336,7 +337,6 @@ def create_recharge_system_description(
     return frbc_system_description, charge_actuator_status, storage_status
 
 
-@staticmethod
 def create_recharge_leakage_behaviour(start_of_recharge):
     leakage_id = str(uuid.uuid4())
     logging.debug(f"leakage_id: {leakage_id}")
@@ -353,7 +353,6 @@ def create_recharge_leakage_behaviour(start_of_recharge):
     )
 
 
-@staticmethod
 def create_recharge_usage_forecast(start_of_recharge, recharge_duration):
     no_usage = FRBCUsageForecastElement(
         duration=int(recharge_duration.total_seconds()), usage_rate_expected=0
@@ -395,7 +394,6 @@ def create_recharge_fill_level_target_profile(
     )
 
 
-@staticmethod
 def create_driving_system_description(start_of_drive, soc_percentage_before_driving):
     global off_actuator_id, id_off_operation_mode
     off_operation_element = FRBCOperationModeElement(
@@ -458,7 +456,6 @@ def create_driving_system_description(start_of_drive, soc_percentage_before_driv
     )
 
 
-@staticmethod
 def create_driving_usage_forecast(
     start_of_driving, next_drive_duration, soc_usage_per_second
 ):

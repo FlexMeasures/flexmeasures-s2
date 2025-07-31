@@ -282,8 +282,8 @@ class ClusterPlanData:
     def from_cluster_plan(
         cls,
         cluster_plan: "ClusterPlan",
-        active_target: ClusterTarget = None,
-        active_plan: JouleProfile = None,
+        active_target: Optional[ClusterTarget] = None,
+        active_plan: Optional[JouleProfile] = None,
     ) -> "ClusterPlanData":
         """Create a ClusterPlanData instance from a ClusterPlan.
 
@@ -375,7 +375,7 @@ class ClusterPlanData:
             reason=cluster_plan.get_reason(),
             target=cluster_plan.get_target(),
             active_target=actual_active_target,
-            current_plan=current_plan,
+            current_plan=current_plan,  # type: ignore[arg-type]
             start=int(start_time),
             step=int(timestep_duration),
             global_deviation_score=global_deviation_score,
@@ -394,7 +394,7 @@ def to_float_array(profile: JouleProfile) -> List[float]:
         A list of floats
     """
     result = [0.0] * profile.metadata.nr_of_timesteps
-    for i, element in enumerate(profile.get_elements()):
+    for i, element in enumerate(profile.elements):
         result[i] = 0.0 if element is None else float(element)
     return result
 
@@ -471,7 +471,7 @@ class ClusterPlan:
             # Calculate the planned energy as the sum of all device plans
             sum_energy = 0.0
             for device_plan in self._plan_data.get_device_plans():
-                sum_energy += device_plan.get_profile().get_total_energy()
+                sum_energy += device_plan.get_profile().get_total_energy
             self._planned_energy = sum_energy
 
         return self._planned_energy
@@ -501,11 +501,11 @@ class ClusterPlan:
                 if target[i] is not None:
                     sum_squared_distance += abs(target[i] - plan[i])
 
-            if plan_segment.get_total_energy() == 0.0:
+            if plan_segment.get_total_energy == 0.0:
                 self._global_deviation_score = 0.0
             else:
                 self._global_deviation_score = (
-                    sum_squared_distance / plan_segment.get_total_energy()
+                    sum_squared_distance / plan_segment.get_total_energy
                 )
 
         return self._global_deviation_score
@@ -642,7 +642,7 @@ class ClusterPlan:
         Returns:
             A dictionary mapping congestion point IDs to profiles
         """
-        result = {}
+        result: Dict[str, JouleProfile] = {}
 
         for device_plan in self._plan_data.get_device_plans():
             cp_id = self._state.get_congestion_point(device_plan.connection_id)
@@ -650,8 +650,12 @@ class ClusterPlan:
 
             if cp_id in result:
                 result[cp_id] = result[cp_id].add(profile)
-            else:
+            elif cp_id is not None:
                 result[cp_id] = profile
+            else:
+                raise ValueError(
+                    f"No congestion point found for device plan {device_plan.device_id}"
+                )
 
         return result
 
@@ -667,7 +671,7 @@ class ClusterPlan:
             profile_start=self.metadata.profile_start,
             timestep_duration=self.metadata.timestep_duration,
             profile_length=self.metadata.nr_of_timesteps,
-            value=0.0,
+            value=0,
         )
         for device_plan in self._plan_data.get_device_plans():
             sum_profile = sum_profile.add(device_plan.energy_profile)

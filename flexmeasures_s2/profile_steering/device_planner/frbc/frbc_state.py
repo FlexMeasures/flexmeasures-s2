@@ -32,6 +32,12 @@ class FrbcState:
         previous_state: Optional["FrbcState"] = None,
         actuator_configurations: Optional[Dict[str, S2ActuatorConfiguration]] = None,
     ):
+        self.timer_elapse_map: Dict[tuple, datetime]
+        self.actuator_configurations: Dict[str, S2ActuatorConfiguration]
+        self.sum_squared_distance: float
+        self.sum_energy_cost: float
+        self.sum_squared_constraint_violation: float
+        self.sum_squared_energy: float
         if previous_state:
             if device_state:
                 self.device_state = (

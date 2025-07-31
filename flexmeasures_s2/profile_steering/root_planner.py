@@ -98,7 +98,6 @@ class RootPlanner:
                     try:
                         proposal = cpc.create_improved_planning(
                             difference_profile,
-                            self.target.metadata,
                             priority_class,
                             plan_due_by_date,
                         )

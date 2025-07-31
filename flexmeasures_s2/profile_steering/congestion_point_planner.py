@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any, Optional, List
 import concurrent.futures
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.common.joule_range_profile import (
@@ -67,7 +67,7 @@ class CongestionPointPlanner:
         )
 
         # List of device controllers that can be used for planning
-        self.devices = []
+        self.devices: List[DevicePlanner] = []
 
         # Keep track of accepted and latest plans
         self.accepted_plan = self.empty_profile
@@ -198,7 +198,6 @@ class CongestionPointPlanner:
     def create_improved_planning(
         self,
         difference_profile: JouleProfile,
-        target_metadata: any,
         priority_class: int,
         plan_due_by_date: datetime,
     ) -> Optional[Proposal]:
@@ -206,7 +205,6 @@ class CongestionPointPlanner:
 
         Args:
             difference_profile: The difference between target and current planning
-            target_metadata: Metadata about the target profile
             priority_class: Priority class for this planning iteration
             plan_due_by_date: The date by which the plan must be ready
 
