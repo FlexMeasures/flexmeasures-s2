@@ -158,6 +158,10 @@ class CongestionPointPlanner:
                                 diff_to_min,
                                 plan_due_by_date,
                             )
+                            if proposal is None:
+                                raise ValueError(
+                                    f"No proposal found for device {device.device_id}"
+                                )
                             print(
                                 f"congestion point improvement for '{device.device_id}': {proposal.get_congestion_improvement_value()}"
                             )

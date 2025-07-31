@@ -17,6 +17,12 @@ class DevicePlanner(ABC):
 
     @property
     @abstractmethod
+    def priority_class(self) -> int:
+        """The priority class of the device."""
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
     def device_id(self) -> str:
         """The device ID."""
         raise NotImplementedError

@@ -8,7 +8,6 @@ from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 # Import from common data structures to avoid circular imports
 from flexmeasures_s2.profile_steering.common_data_structures import (
     ClusterState,
-    
 )
 from flexmeasures_s2.profile_steering.common.device_plan import DevicePlan
 

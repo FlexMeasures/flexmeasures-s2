@@ -1,8 +1,6 @@
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 
-from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
-
 
 class ClusterState:
     """Class representing the state of a cluster of devices."""
