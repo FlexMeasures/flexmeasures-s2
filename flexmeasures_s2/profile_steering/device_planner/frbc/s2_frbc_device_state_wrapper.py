@@ -336,8 +336,9 @@ class S2FrbcDeviceStateWrapper:
 
     @property
     def actuator_statuses(self) -> List[FRBCActuatorStatus]:
-        return self.device_state.actuator_statuses
+        return self.device_state.actuator_statuses or []
 
     @property
     def storage_status(self) -> List[FRBCStorageStatus]:
-        return self.device_state.storage_status
+        # The return type is correct but mypy does not understand the structure of s2python correctly
+        return self.device_state.storage_status  # type: ignore[return-value]

@@ -98,16 +98,19 @@ class FrbcState:
                             new_operation_mode_id,
                         )
                         last_timer_id = None
-                        new_finished_at = None
-                        for timer_id in transition.start_timers:
-                            duration = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_timer_duration(
-                                self.timestep, actuator_id, str(timer_id)
-                            )
-                            new_finished_at = self.timestep.start_date + duration
-                            last_timer_id = timer_id
-                        if last_timer_id is not None:
-                            key = FrbcState.timer_key(actuator_id, str(last_timer_id))
-                            self.timer_elapse_map[key] = new_finished_at
+                        new_finished_at: datetime = datetime.min
+                        if transition is not None:
+                            for timer_id in transition.start_timers:
+                                duration = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_timer_duration(
+                                    self.timestep, actuator_id, str(timer_id)
+                                )
+                                new_finished_at = self.timestep.start_date + duration
+                                last_timer_id = timer_id
+                            if last_timer_id is not None:
+                                key = FrbcState.timer_key(
+                                    actuator_id, str(last_timer_id)
+                                )
+                                self.timer_elapse_map[key] = new_finished_at
             else:
                 self.timer_elapse_map = (
                     self.get_initial_timer_elapse_map_for_system_description(
