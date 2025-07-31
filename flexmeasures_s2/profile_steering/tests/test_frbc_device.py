@@ -44,7 +44,7 @@ import matplotlib.pyplot as plt
 ids = []
 
 # -> todo: plot of run time vs D, vs B, vs S and vs T
-D = 5  # number of devices  -> todo: multiprocessing on create_improved_planning
+D = 3  # number of devices  -> todo: multiprocessing on create_improved_planning
 B = 100  # number of buckets  -> todo: vectorize computation of next state from current state
 S = 20  # number of stratification layers
 PLANNING_WINDOW = pd.Timedelta("PT24H")
@@ -614,7 +614,9 @@ def test_planning_service_impl_with_ev_device():
 
     device_states = [
         create_device_state(
-            f"battery{i+1}", datetime.fromtimestamp(3600), timezone(timedelta(hours=1))
+            f"battery{i + 1}",
+            datetime.fromtimestamp(3600),
+            timezone(timedelta(hours=1)),
         )
         for i in range(numberOfDevices)
     ]
@@ -689,7 +691,7 @@ def test_planning_service_impl_with_ev_device():
     execution_time = end_time - start_time
 
     # Log information
-    print(f"Plan generated in {execution_time:.2f} seconds")
+    print(f"Plan generated in {execution_time: .2f} seconds")
 
     # Assert
     assert cluster_plan is not None

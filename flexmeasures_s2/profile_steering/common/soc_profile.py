@@ -16,7 +16,8 @@ class SoCProfile(AbstractProfile[float, "SoCProfile"]):
             self.profile_metadata, elements if elements is not None else []
         )
 
-    def default_value(self) -> Optional[float]:
+    # mypy complains that the return is None
+    def default_value(self) -> None:  # type: ignore
         return None
 
     def __str__(self) -> str:
@@ -36,7 +37,7 @@ class SoCProfile(AbstractProfile[float, "SoCProfile"]):
         if index < 0:
             raise ValueError("New start date is outside profile range")
         new_elements = self.elements[index:]
-        return SoCProfile(new_start_date, self.metadata.timestep_duration, new_elements)
+        return SoCProfile(self.metadata, new_elements)
 
     def adjust_nr_of_elements(self, nr_of_elements: int) -> "SoCProfile":
         if nr_of_elements < len(self.elements):
@@ -44,7 +45,6 @@ class SoCProfile(AbstractProfile[float, "SoCProfile"]):
         else:
             new_elements = self.elements + [0.0] * (nr_of_elements - len(self.elements))
         return SoCProfile(
-            self.metadata.profile_start,
-            self.metadata.timestep_duration,
+            self.metadata,
             new_elements,
         )
