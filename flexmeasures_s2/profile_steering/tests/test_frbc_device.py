@@ -672,7 +672,7 @@ def test_planning_service_impl_with_ev_device():
     global_target_profile = TargetProfile(
         profile_start=target_metadata.profile_start,
         timestep_duration=target_metadata.timestep_duration,
-        elements=target_profile_elements,
+        elements=cost_target_profile_elements,
     )
     # Create a cluster state using the list of device states
     cluster_state = ClusterState(
@@ -744,7 +744,7 @@ def test_planning_service_impl_with_ev_device():
         timestep_duration=timedelta(seconds=TIMESTEP_DURATION),
         nr_of_timesteps=T,
         predicted_energy_elements=energy_profile.elements,
-        target_energy_elements=target_profile_elements,
+        target_energy_elements=cost_target_profile_elements,
     )
 
     # Get only the non-None plans
