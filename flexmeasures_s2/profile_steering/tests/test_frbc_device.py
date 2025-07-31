@@ -365,7 +365,6 @@ def create_recharge_usage_forecast(start_of_recharge, recharge_duration):
     )
 
 
-@staticmethod
 def create_recharge_fill_level_target_profile(
     start_of_recharge,
     recharge_duration,

@@ -153,10 +153,10 @@ class PlanningServiceImpl(PlanningService):
                     # This is a dummy congestion point. We will give it an empty profile.
                     congestion_point_target = JouleRangeProfile(
                         target.get_global_target_profile().metadata,
-                        elements=congestion_point_target.elements,
+                        elements=congestion_point_target.elements,  # type: ignore[union-attr]
                     )
 
-                cpc = CongestionPointPlanner(congestion_point, congestion_point_target)
+                cpc = CongestionPointPlanner(congestion_point, congestion_point_target)  # type: ignore[arg-type]
                 root_planner.add_congestion_point_controller(cpc)
 
             # Add the appropriate device planner based on the device state type
@@ -237,7 +237,7 @@ class PlanningServiceImpl(PlanningService):
                     device_plans.append(device.get_device_plan())
 
             # Create and return the cluster plan
-            plan_data = ClusterPlanData(device_plans, target.metadata)
+            plan_data = ClusterPlanData(device_plans, target.metadata)  # type: ignore[arg-type]
             plan = ClusterPlan(state, target, plan_data, reason, plan_due_by_date, None)
 
             end_time = datetime.now()
