@@ -162,10 +162,10 @@ class ClusterPlanData:
         return self._profile_metadata
 
     def get_id(self) -> str:
-        return self._id
+        return self._id or ""
 
     def get_reason(self) -> str:
-        return self._reason
+        return self._reason or ""
 
     def get_target(self) -> Any:
         return self._target
@@ -174,13 +174,13 @@ class ClusterPlanData:
         return self._active_target
 
     def get_current_plan(self) -> List[float]:
-        return self._current_plan
+        return self._current_plan or []
 
     def get_start(self) -> int:
-        return self._start
+        return self._start or 0
 
     def get_step(self) -> int:
-        return self._step
+        return self._step or 0
 
     def get_global_deviation_score(self) -> float:
         return self._global_deviation_score
