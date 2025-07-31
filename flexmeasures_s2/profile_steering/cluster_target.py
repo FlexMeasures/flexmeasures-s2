@@ -224,4 +224,4 @@ class ClusterTarget:
         self._congestion_point_targets[congestion_point_id] = congestion_point_target
 
         if elements is not None:
-            self._congestion_point_targets[congestion_point_id].set_elements(elements)
+            self._congestion_point_targets[congestion_point_id].elements = elements

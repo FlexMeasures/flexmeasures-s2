@@ -73,9 +73,9 @@ class ClusterPlanData:
                 A new CpData instance with the added device energy resource plan
             """
             der_plan = to_float_array(value)
-            new_cp_plan = [0] * len(self._cp_plan)
-            cp_consumption = [0] * len(self._cp_plan)
-            cp_production = [0] * len(self._cp_plan)
+            new_cp_plan = [0.0] * len(self._cp_plan)
+            cp_consumption = [0.0] * len(self._cp_plan)
+            cp_production = [0.0] * len(self._cp_plan)
             consumption_max = self._cp_consumption_max
             production_max = self._cp_production_max
 
@@ -128,18 +128,18 @@ class ClusterPlanData:
 
     def __init__(
         self,
-        device_plans: List[DevicePlan] = None,
+        device_plans: Optional[List[DevicePlan]] = None,
         profile_metadata: Any = None,
-        _id: str = None,
-        reason: str = None,
+        _id: Optional[str] = None,
+        reason: Optional[str] = None,
         target: Any = None,
         active_target: Any = None,
-        current_plan: List[float] = None,
-        start: int = None,
-        step: int = None,
+        current_plan: Optional[List[float]] = None,
+        start: Optional[int] = None,
+        step: Optional[int] = None,
         global_deviation_score: float = 1.0,
         constraint_violation_score: float = 1.0,
-        cp_datas: Dict[str, CpData] = None,
+        cp_datas: Optional[Dict[str, CpData]] = None,
     ):
         self._device_plans = device_plans or []
         self._profile_metadata = profile_metadata

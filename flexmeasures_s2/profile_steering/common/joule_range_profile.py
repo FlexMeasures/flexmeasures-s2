@@ -226,7 +226,8 @@ class JouleRangeProfile(AbstractProfile[Element, "JouleRangeProfile"]):
         if nr_of_elements < len(self.elements):
             new_elements = self.elements[:nr_of_elements]
         else:
-            new_elements = self.elements + [Element.NULL] * (
+            # Ignore type error because Element.NULL is not None
+            new_elements = self.elements + [Element.NULL] * (  # type: ignore[list-item]
                 nr_of_elements - len(self.elements)
             )
 

@@ -30,7 +30,8 @@ class TargetProfile(
         super().__init__(metadata, elements)
         # if elements is a list of ints, convert it to a list of JouleElement
         if isinstance(elements, list) and all(isinstance(e, int) for e in elements):
-            self.elements = [TargetProfile.JouleElement(e) for e in elements]
+            # Ignore type error because e is int
+            self.elements = [TargetProfile.JouleElement(e) for e in elements]  # type: ignore[arg-type]
         else:
             self.elements = elements
 
@@ -82,10 +83,11 @@ class TargetProfile(
         joules = [
             e.joules for e in self.elements if isinstance(e, TargetProfile.JouleElement)
         ]
+        # Ignore type error because joules is a list of ints
         return JouleProfile(
             self.metadata.profile_start,
             self.metadata.timestep_duration,
-            joules,
+            joules,  # type: ignore[arg-type]
         )
 
     def nr_of_joule_target_elements(self) -> int:
@@ -144,9 +146,6 @@ class TargetProfile(
 
     def __str__(self) -> str:
         return f"TargetProfile(elements={self.elements}, profile_start={self.metadata.profile_start}, timestep_duration={self.metadata.timestep_duration})"
-
-    def get_elements(self) -> List["TargetProfile.Element | None"]:
-        return self.elements
 
     @staticmethod
     def null_profile(metadata: ProfileMetadata) -> "TargetProfile":
