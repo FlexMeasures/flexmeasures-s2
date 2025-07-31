@@ -84,7 +84,9 @@ class CongestionPointPlanner:
         # For now, always assume storage is available
         return True
 
-    def create_initial_planning(self, plan_due_by_date: datetime) -> JouleProfile:  # noqa: C901
+    def create_initial_planning(
+        self, plan_due_by_date: datetime
+    ) -> JouleProfile:  # noqa: C901
         """Create an initial plan for this congestion point.
 
         Args:
