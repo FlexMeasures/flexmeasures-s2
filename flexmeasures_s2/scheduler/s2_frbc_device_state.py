@@ -3,11 +3,9 @@ from s2python.frbc import (
 )
 
 from typing import List
-from pydantic import BaseModel
-from pydantic.config import ConfigDict
+from flexmeasures_s2.profile_steering.common.pydantic_base import ReflexBaseModel
 
 
-class S2FrbcDeviceState(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
+class S2FrbcDeviceState(ReflexBaseModel):
 
     system_descriptions: List[FRBCSystemDescription]
