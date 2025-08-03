@@ -395,9 +395,7 @@ class FrbcState:
                         actuator_id
                     ].operation_mode_id
                 except KeyError:
-                    raise KeyError(
-                        f"UUID {actuator_id} not found in actuator configurations"
-                    )
+                    raise KeyError(f"UUID {actuator_id} not in actuator configurations")
 
                 new_operation_mode_id = actuator_configuration.operation_mode_id
                 if previous_operation_mode_id != new_operation_mode_id:
