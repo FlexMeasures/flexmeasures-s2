@@ -1,7 +1,12 @@
 import pandas as pd
 
 from flexmeasures_s2.scheduler.schedulers import S2Scheduler
-from flexmeasures_s2.scheduler.tests.joule_profile import get_JouleProfileTarget
+
+
+def get_JouleProfileTarget():
+    """Simple test helper function to create a target profile for testing."""
+    # TODO: Implement proper target profile creation
+    return {"test": "target"}
 
 
 def test_s2_frbc_scheduler(setup_frbc_asset):

@@ -30,7 +30,7 @@ from s2python.common import Timer
 from s2python.common import PowerValue
 from s2python.common import Commodity
 
-from flexmeasures_s2.profile_steering.planning_service_impl import (
+from flexmeasures_s2.scheduler.schedulers import (
     PlanningServiceImpl,
     PlanningServiceConfig,
     ClusterState,
@@ -608,6 +608,13 @@ def test_planning_service_impl_with_ev_device():
     plan_due_by_date = target_metadata.profile_start + timedelta(seconds=10)
     target_profile_elements = get_target_profile_elements(T)
 
+    # Create a target profile
+    global_target_profile = TargetProfile(
+        profile_start=target_metadata.profile_start,
+        timestep_duration=target_metadata.timestep_duration,
+        elements=target_profile_elements,
+    )
+
     device_states = [
         create_device_state(
             f"battery{i + 1}",
@@ -626,21 +633,12 @@ def test_planning_service_impl_with_ev_device():
     congestion_points_by_connection_id = {
         device_id: "" for device_id in device_states_dict.keys()
     }
-
-    # Create a target profile
-    global_target_profile = TargetProfile(
-        profile_start=target_metadata.profile_start,
-        timestep_duration=target_metadata.timestep_duration,
-        elements=target_profile_elements,
-    )
     # Create a cluster state using the list of device states
     cluster_state = ClusterState(
         datetime.now(), device_states_dict, congestion_points_by_connection_id
     )
-
     #  Create an empty map for congestion point targets
     congestion_point_targets = {}
-
     # Create a cluster target
     cluster_target = ClusterTarget(
         datetime.now(),
@@ -656,20 +654,12 @@ def test_planning_service_impl_with_ev_device():
         congestion_retry_iterations=10,
         multithreaded=False,
     )
+
     print("Generating plan!")
 
     # Create planning service implementation
     service = PlanningServiceImpl(config)
 
-    # Create cluster target
-
-    cluster_target = ClusterTarget(
-        datetime.now(),
-        None,
-        None,
-        global_target_profile=global_target_profile,
-        congestion_point_targets=congestion_point_targets,
-    )
     # Set due by date for planning
     plan_due_by_date = target_metadata.profile_start + timedelta(seconds=10)
     # Act - Generate a plan
