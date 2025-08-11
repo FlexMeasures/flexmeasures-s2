@@ -246,17 +246,13 @@ class S2FrbcDeviceStateWrapper:
         if not leakage_behaviour.elements:
             return None
 
-        # Monkey-patch caching for starts and ends arrays to avoid recalculation
-        if not hasattr(leakage_behaviour, "_cached_starts"):
-            leakage_behaviour._cached_starts = np.array(  # type: ignore[attr-defined]
-                [e.fill_level_range.start_of_range for e in leakage_behaviour.elements]
-            )
-            leakage_behaviour._cached_ends = np.array(  # type: ignore[attr-defined]
-                [e.fill_level_range.end_of_range for e in leakage_behaviour.elements]
-            )
-
-        starts = leakage_behaviour._cached_starts  # type: ignore[attr-defined]
-        ends = leakage_behaviour._cached_ends  # type: ignore[attr-defined]
+        # Calculate starts and ends arrays directly to avoid monkey-patching issues
+        starts = np.array(
+            [e.fill_level_range.start_of_range for e in leakage_behaviour.elements]
+        )
+        ends = np.array(
+            [e.fill_level_range.end_of_range for e in leakage_behaviour.elements]
+        )
 
         # Use binary search for efficient lookup
         idx = np.searchsorted(starts, fill_level, side="right") - 1
@@ -315,7 +311,7 @@ class S2FrbcDeviceStateWrapper:
         timer = next(
             (t for t in actuator_description.timers if str(t.id) == timer_id), None
         )
-        return timer.duration.root if timer else 0
+        return timer.duration.__root__ if timer else 0
 
     @staticmethod
     @lru_cache(maxsize=None)

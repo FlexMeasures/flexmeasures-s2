@@ -1,4 +1,4 @@
-from flexmeasures_s2.profile_steering.common.pydantic_base import ReflexBaseModel
+from flexmeasures_s2.profile_steering.common.pydantic_base import FlexMeasuresBaseModel
 
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.common.soc_profile import SoCProfile
@@ -7,7 +7,7 @@ from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_instruction_pr
 )
 
 
-class DevicePlan(ReflexBaseModel):
+class DevicePlan(FlexMeasuresBaseModel):
 
     device_id: str
     device_name: str

@@ -38,13 +38,14 @@ from flexmeasures_s2.scheduler.schedulers import (
 )
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+import json
 
 # Global variables to store IDs for debugging
 # make a list of tuples with the ids and the names
 ids = []
 
 # -> todo: plot of run time vs D, vs B, vs S and vs T
-D = 3  # number of devices  -> todo: multiprocessing on create_improved_planning
+D = 10  # number of devices  -> todo: multiprocessing on create_improved_planning
 B = 100  # number of buckets  -> todo: vectorize computation of next state from current state
 S = 20  # number of stratification layers
 PLANNING_WINDOW = pd.Timedelta("PT24H")
@@ -252,7 +253,7 @@ def create_recharge_system_description(
     on_to_off_timer = Timer(
         id=id_on_to_off_timer,
         diagnostic_label="charge_on.to.off.timer",
-        duration=Duration(30),
+        duration=Duration(__root__=30),
     )
     id_off_to_on_timer = str(uuid.uuid4())
     logging.debug(f"id_off_to_on_timer: {id_off_to_on_timer}")
@@ -260,7 +261,7 @@ def create_recharge_system_description(
     off_to_on_timer = Timer(
         id=id_off_to_on_timer,
         diagnostic_label="charge_off.to.on.timer",
-        duration=Duration(30),
+        duration=Duration(__root__=30),
     )
     transition_id_from_on_to_off = str(uuid.uuid4())
     logging.debug(f"transition_id_from_on_to_off: {transition_id_from_on_to_off}")
@@ -689,6 +690,11 @@ def test_planning_service_impl_with_ev_device():
     device_plans = cluster_plan.get_plan_data().get_device_plans()
     energy_profile = cluster_plan.get_joule_profile()
 
+    # Save the energy profile to a file,
+    with open(f"energy_profile-D={D}_B={B}_S={S}_T={T}.json", "w") as f:
+        json.dump(energy_profile.elements, f)
+
+    # Plot the planning results
     plot_planning_results(
         timestep_duration=timedelta(seconds=TIMESTEP_DURATION),
         nr_of_timesteps=T,

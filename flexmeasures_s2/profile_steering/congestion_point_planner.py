@@ -47,18 +47,25 @@ def _get_initial_device_plan(
 
 
 class CongestionPointPlanner:
-    def __init__(self, congestion_point_id: str, congestion_target: JouleRangeProfile):
+    def __init__(
+        self,
+        congestion_point_id: str,
+        congestion_target: JouleRangeProfile,
+        multithreaded: bool = False,
+    ):
         """Initialize a congestion point planner.
 
         Args:
 
             congestion_point_id: Unique identifier for this congestion point
             congestion_target: Target profile with range constraints for this congestion point
+            multithreaded: Whether to use multiprocessing for device planning
         """
         self.MAX_ITERATIONS = 1000
         self.congestion_point_id = congestion_point_id
         self.congestion_target = congestion_target
         self.profile_metadata = congestion_target.metadata
+        self.multithreaded = multithreaded
 
         # Create an empty profile (using all zeros)
         self.empty_profile = JouleProfile(
@@ -97,15 +104,23 @@ class CongestionPointPlanner:
         """
         current_planning = self.empty_profile
 
-        # Aggregate initial plans from all devices in parallel
+        # Aggregate initial plans from all devices (parallel or sequential based on multithreaded setting)
         device_plans: dict[str, Any] = {}
-        with concurrent.futures.ProcessPoolExecutor() as executor:
-            futures = {
-                executor.submit(_get_initial_device_plan, device, plan_due_by_date)
-                for device in self.devices
-            }
-            for future in concurrent.futures.as_completed(futures):
-                device_id, plan = future.result()
+        if self.multithreaded:
+            # Use multiprocessing for parallel execution
+            with concurrent.futures.ProcessPoolExecutor() as executor:
+                futures = {
+                    executor.submit(_get_initial_device_plan, device, plan_due_by_date)
+                    for device in self.devices
+                }
+                for future in concurrent.futures.as_completed(futures):
+                    device_id, plan = future.result()
+                    if plan is not None:
+                        device_plans[device_id] = plan
+        else:
+            # Use sequential execution to avoid pickling issues
+            for device in self.devices:
+                device_id, plan = _get_initial_device_plan(device, plan_due_by_date)
                 if plan is not None:
                     device_plans[device_id] = plan
 
@@ -235,20 +250,34 @@ class CongestionPointPlanner:
 
         proposals = []
         if devices_to_plan:
-            with concurrent.futures.ProcessPoolExecutor() as executor:
-                futures = {
-                    executor.submit(
-                        _get_device_proposal,
+            if self.multithreaded:
+                # Use multiprocessing for parallel execution
+                with concurrent.futures.ProcessPoolExecutor() as executor:
+                    futures = {
+                        executor.submit(
+                            _get_device_proposal,
+                            device,
+                            difference_profile,
+                            diff_to_max_value,
+                            diff_to_min_value,
+                            plan_due_by_date,
+                        )
+                        for device in devices_to_plan
+                    }
+                    for future in concurrent.futures.as_completed(futures):
+                        proposal = future.result()
+                        if proposal:
+                            proposals.append(proposal)
+            else:
+                # Use sequential execution to avoid pickling issues
+                for device in devices_to_plan:
+                    proposal = _get_device_proposal(
                         device,
                         difference_profile,
                         diff_to_max_value,
                         diff_to_min_value,
                         plan_due_by_date,
                     )
-                    for device in devices_to_plan
-                }
-                for future in concurrent.futures.as_completed(futures):
-                    proposal = future.result()
                     if proposal:
                         proposals.append(proposal)
 

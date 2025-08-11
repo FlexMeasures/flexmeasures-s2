@@ -48,7 +48,7 @@ class UsageForecastUtil:
         start = usage_forecast.start_time
         start = start.astimezone(timezone.utc)
         for element in usage_forecast.elements:
-            end = start + timedelta(seconds=element.duration.root)
+            end = start + timedelta(seconds=element.duration.__root__)
             elements.append(
                 UsageForecastElement(start, end, element.usage_rate_expected)
             )
