@@ -9,7 +9,7 @@ from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_instruction_pr
     S2FrbcInstructionProfile,
 )
 from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
-from flexmeasures_s2.profile_steering.common.device_planner.device_plan import (
+from flexmeasures_s2.profile_steering.common.device_plan import (
     DevicePlan,
 )
 from flexmeasures_s2.profile_steering.device_planner.frbc.operation_mode_profile_tree import (
@@ -51,7 +51,7 @@ class S2FrbcDevicePlanner(DevicePlanner):
                 profile_metadata,
                 plan_due_by_date,
             )
-        self.priority_class = 1
+        self._priority_class = 1
         self.latest_plan: Optional[S2FrbcPlan] = None
         self.accepted_plan: Optional[S2FrbcPlan] = None
 
@@ -82,6 +82,10 @@ class S2FrbcDevicePlanner(DevicePlanner):
             storage_state.is_online
             and active_and_upcoming_system_descriptions_has_active_storage
         )
+
+    @property
+    def priority_class(self) -> int:
+        return self.s2_frbc_state.priority_class
 
     @property
     def device_id(self) -> str:
@@ -189,7 +193,6 @@ class S2FrbcDevicePlanner(DevicePlanner):
             raise TypeError(f"Expected S2FrbcPlan, but got {type(plan)}")
         self.accepted_plan = plan
 
-    @property
     def current_profile(self) -> JouleProfile:
         if self.accepted_plan is None:
             raise ValueError("No accepted plan found")

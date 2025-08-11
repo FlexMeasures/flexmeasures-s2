@@ -32,6 +32,12 @@ class FrbcState:
         previous_state: Optional["FrbcState"] = None,
         actuator_configurations: Optional[Dict[str, S2ActuatorConfiguration]] = None,
     ):
+        self.timer_elapse_map: Dict[tuple, datetime]
+        self.actuator_configurations: Dict[str, S2ActuatorConfiguration]
+        self.sum_squared_distance: float
+        self.sum_energy_cost: float
+        self.sum_squared_constraint_violation: float
+        self.sum_squared_energy: float
         if previous_state:
             if device_state:
                 self.device_state = (
@@ -92,16 +98,19 @@ class FrbcState:
                             new_operation_mode_id,
                         )
                         last_timer_id = None
-                        new_finished_at = None
-                        for timer_id in transition.start_timers:
-                            duration = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_timer_duration(
-                                self.timestep, actuator_id, str(timer_id)
-                            )
-                            new_finished_at = self.timestep.start_date + duration
-                            last_timer_id = timer_id
-                        if last_timer_id is not None:
-                            key = FrbcState.timer_key(actuator_id, str(last_timer_id))
-                            self.timer_elapse_map[key] = new_finished_at
+                        new_finished_at: datetime = datetime.min
+                        if transition is not None:
+                            for timer_id in transition.start_timers:
+                                duration = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_timer_duration(
+                                    self.timestep, actuator_id, str(timer_id)
+                                )
+                                new_finished_at = self.timestep.start_date + duration
+                                last_timer_id = timer_id
+                            if last_timer_id is not None:
+                                key = FrbcState.timer_key(
+                                    actuator_id, str(last_timer_id)
+                                )
+                                self.timer_elapse_map[key] = new_finished_at
             else:
                 self.timer_elapse_map = (
                     self.get_initial_timer_elapse_map_for_system_description(
@@ -152,11 +161,14 @@ class FrbcState:
 
         else:
             FrbcState.transition_cache.clear()
-            self.device_state = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper(
-                device_state
-            )
+            if device_state is not None:
+                self.device_state = (
+                    s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper(device_state)
+                )
+            else:
+                self.device_state = None  # type: ignore[assignment]
             self.timestep = timestep
-            self.previous_state = None
+            self.previous_state = None  # type: ignore[assignment]
             self.system_description = timestep.system_description
             self.fill_level = present_fill_level
             self.bucket = 0
@@ -165,7 +177,7 @@ class FrbcState:
             self.sum_squared_constraint_violation = 0.0
             self.sum_energy_cost = 0.0
             self.sum_squared_energy = 0.0
-            self.selection_reason: Optional[SelectionReason] = None
+            self.selection_reason: Optional[SelectionReason] = None  # type: ignore[no-redef]
             self.actuator_configurations = {}
             self.timer_elapse_map = (
                 self.get_initial_timer_elapse_map_for_system_description(
@@ -388,9 +400,7 @@ class FrbcState:
                         actuator_id
                     ].operation_mode_id
                 except KeyError:
-                    raise KeyError(
-                        f"UUID {actuator_id} not found in actuator configurations"
-                    )
+                    raise KeyError(f"UUID {actuator_id} not in actuator configurations")
 
                 new_operation_mode_id = actuator_configuration.operation_mode_id
                 if previous_operation_mode_id != new_operation_mode_id:

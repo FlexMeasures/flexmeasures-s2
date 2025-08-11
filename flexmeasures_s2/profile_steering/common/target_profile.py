@@ -1,11 +1,13 @@
-from typing import List, Union, cast, Optional
+from typing import List, Union, Optional, cast
 from datetime import datetime, timedelta
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.common.abstract_profile import AbstractProfile
 from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
 
 
-class TargetProfile(AbstractProfile[Union["TargetProfile.Element", None], "TargetProfile"]):
+class TargetProfile(
+    AbstractProfile[Union["TargetProfile.Element", None], "TargetProfile"]
+):
     class Element:
         pass
 
@@ -31,13 +33,24 @@ class TargetProfile(AbstractProfile[Union["TargetProfile.Element", None], "Targe
         metadata = ProfileMetadata(profile_start, timestep_duration, len(elements))
         # if elements is a list of ints, convert it to a list of JouleElement
         if isinstance(elements, list) and all(isinstance(e, int) for e in elements):
-            new_elements = [TargetProfile.JouleElement(e) for e in cast(List[int], elements)]
-            super().__init__(metadata, cast(List[Union["TargetProfile.Element", None]], new_elements))
+            new_elements = [
+                TargetProfile.JouleElement(e) for e in cast(List[int], elements)
+            ]
+            super().__init__(
+                metadata, cast(List[Union["TargetProfile.Element", None]], new_elements)
+            )
         elif isinstance(elements, list) and all(isinstance(e, float) for e in elements):
-            new_cost_elements = [TargetProfile.TariffElement(e) for e in cast(List[float], elements)]
-            super().__init__(metadata, cast(List[Union["TargetProfile.Element", None]], new_cost_elements))
+            new_cost_elements = [
+                TargetProfile.TariffElement(e) for e in cast(List[float], elements)
+            ]
+            super().__init__(
+                metadata,
+                cast(List[Union["TargetProfile.Element", None]], new_cost_elements),
+            )
         else:
-            super().__init__(metadata, cast(List[Union["TargetProfile.Element", None]], elements))
+            super().__init__(
+                metadata, cast(List[Union["TargetProfile.Element", None]], elements)
+            )
 
     def validate(
         self,
@@ -59,12 +72,23 @@ class TargetProfile(AbstractProfile[Union["TargetProfile.Element", None], "Targe
             if isinstance(current_element, TargetProfile.TariffElement) and isinstance(
                 next_element, TargetProfile.JouleElement
             ):
-                raise ValueError("A TariffElement can only be followed by another TariffElement or a NullElement")
+                raise ValueError(
+                    "A TariffElement can only be followed by another TariffElement or a NullElement"
+                )
 
-            if isinstance(current_element, TargetProfile.NullElement) and not isinstance(
-                next_element, TargetProfile.NullElement
-            ):
-                raise ValueError("A NullElement can only be followed by another NullElement")
+            if isinstance(
+                current_element, TargetProfile.NullElement
+            ) and not isinstance(next_element, TargetProfile.NullElement):
+                raise ValueError(
+                    "A NullElement can only be followed by another NullElement"
+                )
+
+    def get_energy_for_timestep(self, index: int) -> Optional[int]:
+        if 0 <= index < len(self.elements) and isinstance(
+            self.elements[index], TargetProfile.JouleElement
+        ):
+            return self.elements[index].joules  # type: ignore
+        return None
 
     def default_value(self) -> "TargetProfile.Element":
         return TargetProfile.NULL_ELEMENT
@@ -74,13 +98,17 @@ class TargetProfile(AbstractProfile[Union["TargetProfile.Element", None], "Targe
         if index < 0:
             raise ValueError("New start date is outside profile range")
         new_elements = self.elements[index:]
-        return TargetProfile(new_start_date, self.metadata.timestep_duration, new_elements)
+        return TargetProfile(
+            new_start_date, self.metadata.timestep_duration, new_elements
+        )
 
     def adjust_nr_of_elements(self, nr_of_elements: int) -> "TargetProfile":
         if nr_of_elements < len(self.elements):
             new_elements = self.elements[:nr_of_elements]
         else:
-            new_elements = self.elements + [self.NULL_ELEMENT] * (nr_of_elements - len(self.elements))
+            new_elements = self.elements + [self.NULL_ELEMENT] * (
+                nr_of_elements - len(self.elements)
+            )
         return TargetProfile(
             self.metadata.profile_start,
             self.metadata.timestep_duration,
@@ -88,31 +116,45 @@ class TargetProfile(AbstractProfile[Union["TargetProfile.Element", None], "Targe
         )
 
     def is_compatible(self, other: AbstractProfile) -> bool:
-        return self.metadata.timestep_duration == other.metadata.timestep_duration and len(self.elements) == len(
-            other.elements
+        return (
+            self.metadata.timestep_duration == other.metadata.timestep_duration
+            and len(self.elements) == len(other.elements)
         )
 
     def get_total_energy(self) -> int:
-        return sum(e.joules for e in self.elements if isinstance(e, TargetProfile.JouleElement))
+        return sum(
+            e.joules for e in self.elements if isinstance(e, TargetProfile.JouleElement)
+        )
 
     def target_elements_to_joule_profile(self) -> JouleProfile:
-        joules = [e.joules for e in self.elements if isinstance(e, TargetProfile.JouleElement)]
+        joules = [
+            e.joules for e in self.elements if isinstance(e, TargetProfile.JouleElement)
+        ]
         return JouleProfile(
             self.metadata.profile_start,
             self.metadata.timestep_duration,
-            joules,
+            joules,  # type: ignore[arg-type]
         )
 
     def nr_of_joule_target_elements(self) -> int:
-        return len([e for e in self.elements if isinstance(e, TargetProfile.JouleElement)])
+        return len(
+            [e for e in self.elements if isinstance(e, TargetProfile.JouleElement)]
+        )
 
     def subtract(self, other: JouleProfile) -> "TargetProfile":
         if not self.is_compatible(other):
             raise ValueError("Profiles are not compatible")
         diff_elements: List["TargetProfile.Element | None"] = []
         for i, element in enumerate(self.elements):
-            if isinstance(element, TargetProfile.JouleElement) and other.get_energy_for_timestep(i) is not None:
-                diff_elements.append(TargetProfile.JouleElement(element.joules - other.get_energy_for_timestep(i)))
+            if (
+                isinstance(element, TargetProfile.JouleElement)
+                and other.get_energy_for_timestep(i) is not None
+            ):
+                other_energy = other.get_energy_for_timestep(i)
+                assert other_energy is not None  # This is guaranteed by the check above
+                diff_elements.append(
+                    TargetProfile.JouleElement(element.joules - other_energy)
+                )
             elif isinstance(element, TargetProfile.TariffElement):
                 diff_elements.append(element)
             else:
@@ -131,7 +173,9 @@ class TargetProfile(AbstractProfile[Union["TargetProfile.Element", None], "Targe
             if isinstance(element, TargetProfile.JouleElement):
                 other_energy = other.get_energy_for_timestep(i)
                 if other_energy is not None:
-                    sum_elements.append(TargetProfile.JouleElement(element.joules + other_energy))
+                    sum_elements.append(
+                        TargetProfile.JouleElement(element.joules + other_energy)
+                    )
                 else:
                     sum_elements.append(self.NULL_ELEMENT)
             else:
@@ -143,7 +187,11 @@ class TargetProfile(AbstractProfile[Union["TargetProfile.Element", None], "Targe
         )
 
     def sum_quadratic_distance(self) -> float:
-        return sum(e.joules**2 for e in self.elements if isinstance(e, TargetProfile.JouleElement))
+        return sum(
+            e.joules**2
+            for e in self.elements
+            if isinstance(e, TargetProfile.JouleElement)
+        )
 
     def __str__(self) -> str:
         return f"TargetProfile(elements={self.elements}, profile_start={self.metadata.profile_start}, timestep_duration={self.metadata.timestep_duration})"

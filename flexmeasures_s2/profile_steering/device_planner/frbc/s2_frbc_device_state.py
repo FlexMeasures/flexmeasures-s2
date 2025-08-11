@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List, Optional
-from s2python.common import CommodityQuantity, PowerForecast
+from s2python.common import PowerForecast
 from s2python.frbc import (
     FRBCSystemDescription,
     FRBCLeakageBehaviour,
@@ -72,5 +72,5 @@ class S2FrbcDeviceState:
     def get_power_forecast(self) -> Optional[PowerForecast]:
         return self.power_forecast
 
-    def get_energy_in_current_timestep(self) -> CommodityQuantity:
+    def get_energy_in_current_timestep(self) -> PowerValue:
         return self.energy_in_current_timestep

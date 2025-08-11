@@ -7,13 +7,20 @@ from typing import Any, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from flexmeasures_s2.profile_steering.common.proposal import Proposal
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
-from flexmeasures_s2.profile_steering.common.device_planner.device_plan import (
+from flexmeasures_s2.profile_steering.common.device_plan import (
     DevicePlan,
 )
+from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 
 
 class DevicePlanner(ABC):
     """Abstract base class for all device planners."""
+
+    @property
+    @abstractmethod
+    def priority_class(self) -> int:
+        """The priority class of the device."""
+        raise NotImplementedError
 
     @property
     @abstractmethod
@@ -42,7 +49,7 @@ class DevicePlanner(ABC):
     @abstractmethod
     def create_improved_planning(
         self,
-        difference_profile: JouleProfile,
+        difference_profile: TargetProfile,
         diff_to_max_value: JouleProfile,
         diff_to_min_value: JouleProfile,
         plan_due_by_date: datetime,

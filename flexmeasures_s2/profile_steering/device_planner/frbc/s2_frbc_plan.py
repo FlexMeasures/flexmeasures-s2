@@ -2,13 +2,14 @@ from typing import List, Dict
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_actuator_configuration import (
     S2ActuatorConfiguration,
 )
+from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 
 
 class S2FrbcPlan:
     def __init__(
         self,
         idle: bool,
-        energy,
+        energy: JouleProfile,
         fill_level,
         operation_mode_id: List[Dict[str, S2ActuatorConfiguration]],
     ):

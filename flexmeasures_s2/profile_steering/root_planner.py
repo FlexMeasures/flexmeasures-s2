@@ -89,7 +89,9 @@ class RootPlanner:
             # Simulate a do-while loop: we run at least once.
             while True:
                 # Compute the difference profile
-                difference_profile = self.target.subtract(self.root_ctrl_planning)
+                difference_profile: TargetProfile = self.target.subtract(
+                    self.root_ctrl_planning
+                )
                 best_proposal = None
 
                 # Get proposals from each congestion point controller
@@ -98,7 +100,6 @@ class RootPlanner:
                     try:
                         proposal = cpc.create_improved_planning(
                             difference_profile,
-                            self.target.metadata,
                             priority_class,
                             plan_due_by_date,
                         )

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any, Optional, List
 import concurrent.futures
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.common.joule_range_profile import (
@@ -9,11 +9,12 @@ from flexmeasures_s2.profile_steering.common.proposal import Proposal
 from flexmeasures_s2.profile_steering.device_planner.device_planner_abstract import (
     DevicePlanner,
 )
+from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 
 
 def _get_device_proposal(
     device: DevicePlanner,
-    difference_profile: JouleProfile,
+    difference_profile: TargetProfile,
     diff_to_max_value: JouleProfile,
     diff_to_min_value: JouleProfile,
     plan_due_by_date: datetime,
@@ -46,28 +47,35 @@ def _get_initial_device_plan(
 
 
 class CongestionPointPlanner:
-    def __init__(self, congestion_point_id: str, congestion_target: JouleRangeProfile):
+    def __init__(
+        self,
+        congestion_point_id: str,
+        congestion_target: JouleRangeProfile,
+        multithreaded: bool = False,
+    ):
         """Initialize a congestion point planner.
 
         Args:
 
             congestion_point_id: Unique identifier for this congestion point
             congestion_target: Target profile with range constraints for this congestion point
+            multithreaded: Whether to use multiprocessing for device planning
         """
         self.MAX_ITERATIONS = 1000
         self.congestion_point_id = congestion_point_id
         self.congestion_target = congestion_target
         self.profile_metadata = congestion_target.metadata
+        self.multithreaded = multithreaded
 
         # Create an empty profile (using all zeros)
         self.empty_profile = JouleProfile(
-            self.profile_metadata.profile_start,
-            self.profile_metadata.timestep_duration,
-            elements=[0] * self.profile_metadata.nr_of_timesteps,
+            profile_start=self.profile_metadata.profile_start,
+            timestep_duration=self.profile_metadata.timestep_duration,
+            elements=[0] * self.profile_metadata.nr_of_timesteps,  # type: ignore[list-item]
         )
 
         # List of device controllers that can be used for planning
-        self.devices = []
+        self.devices: List[DevicePlanner] = []
 
         # Keep track of accepted and latest plans
         self.accepted_plan = self.empty_profile
@@ -83,9 +91,9 @@ class CongestionPointPlanner:
         # For now, always assume storage is available
         return True
 
-    def create_initial_planning(  # noqa: C901
+    def create_initial_planning(
         self, plan_due_by_date: datetime
-    ) -> JouleProfile:
+    ) -> JouleProfile:  # noqa: C901
         """Create an initial plan for this congestion point.
 
         Args:
@@ -96,15 +104,23 @@ class CongestionPointPlanner:
         """
         current_planning = self.empty_profile
 
-        # Aggregate initial plans from all devices in parallel
+        # Aggregate initial plans from all devices (parallel or sequential based on multithreaded setting)
         device_plans: dict[str, Any] = {}
-        with concurrent.futures.ProcessPoolExecutor() as executor:
-            futures = {
-                executor.submit(_get_initial_device_plan, device, plan_due_by_date)
-                for device in self.devices
-            }
-            for future in concurrent.futures.as_completed(futures):
-                device_id, plan = future.result()
+        if self.multithreaded:
+            # Use multiprocessing for parallel execution
+            with concurrent.futures.ProcessPoolExecutor() as executor:
+                futures = {
+                    executor.submit(_get_initial_device_plan, device, plan_due_by_date)
+                    for device in self.devices
+                }
+                for future in concurrent.futures.as_completed(futures):
+                    device_id, plan = future.result()
+                    if plan is not None:
+                        device_plans[device_id] = plan
+        else:
+            # Use sequential execution to avoid pickling issues
+            for device in self.devices:
+                device_id, plan = _get_initial_device_plan(device, plan_due_by_date)
                 if plan is not None:
                     device_plans[device_id] = plan
 
@@ -153,11 +169,15 @@ class CongestionPointPlanner:
                     if device.priority_class <= priority_class:
                         try:
                             proposal = device.create_improved_planning(
-                                self.empty_profile,  # Assuming empty global target
+                                self.empty_profile,  # type: ignore[arg-type]
                                 diff_to_max,
                                 diff_to_min,
                                 plan_due_by_date,
                             )
+                            if proposal is None:
+                                raise ValueError(
+                                    f"No proposal found for device {device.device_id}"
+                                )
                             print(
                                 f"congestion point improvement for '{device.device_id}': {proposal.get_congestion_improvement_value()}"
                             )
@@ -197,8 +217,7 @@ class CongestionPointPlanner:
 
     def create_improved_planning(
         self,
-        difference_profile: JouleProfile,
-        target_metadata: any,
+        difference_profile: TargetProfile,
         priority_class: int,
         plan_due_by_date: datetime,
     ) -> Optional[Proposal]:
@@ -206,7 +225,6 @@ class CongestionPointPlanner:
 
         Args:
             difference_profile: The difference between target and current planning
-            target_metadata: Metadata about the target profile
             priority_class: Priority class for this planning iteration
             plan_due_by_date: The date by which the plan must be ready
 
@@ -232,20 +250,34 @@ class CongestionPointPlanner:
 
         proposals = []
         if devices_to_plan:
-            with concurrent.futures.ProcessPoolExecutor() as executor:
-                futures = {
-                    executor.submit(
-                        _get_device_proposal,
+            if self.multithreaded:
+                # Use multiprocessing for parallel execution
+                with concurrent.futures.ProcessPoolExecutor() as executor:
+                    futures = {
+                        executor.submit(
+                            _get_device_proposal,
+                            device,
+                            difference_profile,
+                            diff_to_max_value,
+                            diff_to_min_value,
+                            plan_due_by_date,
+                        )
+                        for device in devices_to_plan
+                    }
+                    for future in concurrent.futures.as_completed(futures):
+                        proposal = future.result()
+                        if proposal:
+                            proposals.append(proposal)
+            else:
+                # Use sequential execution to avoid pickling issues
+                for device in devices_to_plan:
+                    proposal = _get_device_proposal(
                         device,
                         difference_profile,
                         diff_to_max_value,
                         diff_to_min_value,
                         plan_due_by_date,
                     )
-                    for device in devices_to_plan
-                }
-                for future in concurrent.futures.as_completed(futures):
-                    proposal = future.result()
                     if proposal:
                         proposals.append(proposal)
 
@@ -279,7 +311,8 @@ class CongestionPointPlanner:
         # Return the latest accepted plan as the current planning
         current_planning = self.empty_profile
         for device in self.devices:
-            current_planning = current_planning.add(device.current_profile)
+            # Ignore type error because current_profile is a JouleProfile but its considered a callable JouleProfile
+            current_planning = current_planning.add(device.current_profile())  # type: ignore[arg-type]
         return current_planning
 
     def add_device_controller(self, device):

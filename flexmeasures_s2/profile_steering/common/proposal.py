@@ -54,7 +54,7 @@ class Proposal:
             joule_usage = plan.elements[i]
             target_element = target_profile.elements[i]
             if isinstance(target_element, TargetProfile.TariffElement):  # type: ignore[reportIncompatibleVariableOverride]
-                cost += (joule_usage / 3_600_000) * target_element.get_tariff()
+                cost += (joule_usage / 3_600_000) * target_element.tariff
         return cost
 
     def get_congestion_improvement_value(self) -> float:

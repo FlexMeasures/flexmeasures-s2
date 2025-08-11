@@ -30,7 +30,7 @@ from s2python.common import Timer
 from s2python.common import PowerValue
 from s2python.common import Commodity
 
-from flexmeasures_s2.profile_steering.planning_service_impl import (
+from flexmeasures_s2.scheduler.schedulers import (
     PlanningServiceImpl,
     PlanningServiceConfig,
     ClusterState,
@@ -38,13 +38,14 @@ from flexmeasures_s2.profile_steering.planning_service_impl import (
 )
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+import json
 
 # Global variables to store IDs for debugging
 # make a list of tuples with the ids and the names
 ids = []
 
 # -> todo: plot of run time vs D, vs B, vs S and vs T
-D = 5  # number of devices  -> todo: multiprocessing on create_improved_planning
+D = 10  # number of devices  -> todo: multiprocessing on create_improved_planning
 B = 100  # number of buckets  -> todo: vectorize computation of next state from current state
 S = 20  # number of stratification layers
 PLANNING_WINDOW = pd.Timedelta("PT24H")
@@ -195,14 +196,12 @@ def create_ev_device_state(
     return device_state
 
 
-@staticmethod
 def create_recharge_system_description(
     start_of_recharge,
     charge_power_soc_percentage_per_second,
     charging_power_kw,
     soc_percentage_before_charging,
 ) -> FRBCSystemDescription:
-    global charge_actuator_id, id_on_operation_mode, id_off_operation_mode, id_on_to_off_timer, id_off_to_on_timer
     # Create and return a mock system description for recharging
     on_operation_element = FRBCOperationModeElement(
         fill_level_range=NumberRange(start_of_range=0, end_of_range=100),
@@ -254,7 +253,7 @@ def create_recharge_system_description(
     on_to_off_timer = Timer(
         id=id_on_to_off_timer,
         diagnostic_label="charge_on.to.off.timer",
-        duration=Duration(30),
+        duration=Duration(__root__=30),
     )
     id_off_to_on_timer = str(uuid.uuid4())
     logging.debug(f"id_off_to_on_timer: {id_off_to_on_timer}")
@@ -262,7 +261,7 @@ def create_recharge_system_description(
     off_to_on_timer = Timer(
         id=id_off_to_on_timer,
         diagnostic_label="charge_off.to.on.timer",
-        duration=Duration(30),
+        duration=Duration(__root__=30),
     )
     transition_id_from_on_to_off = str(uuid.uuid4())
     logging.debug(f"transition_id_from_on_to_off: {transition_id_from_on_to_off}")
@@ -284,11 +283,11 @@ def create_recharge_system_description(
         (transition_id_from_off_to_on, "transition_from_charge_off_to_charge_on")
     )
     transition_from_off_to_on = Transition(
-        id=transition_id_from_off_to_on,
-        **{"from": id_off_operation_mode},
-        to=id_on_operation_mode,
-        start_timers=[id_on_to_off_timer],
-        blocking_timers=[id_off_to_on_timer],
+        id=transition_id_from_off_to_on,  # type: ignore[arg-type]
+        **{"from": id_off_operation_mode},  # type: ignore[arg-type]
+        to=id_on_operation_mode,  # type: ignore[arg-type]
+        start_timers=[id_on_to_off_timer],  # type: ignore[arg-type]
+        blocking_timers=[id_off_to_on_timer],  # type: ignore[arg-type]
         transition_duration=None,
         abnormal_condition_only=False,
     )
@@ -296,14 +295,14 @@ def create_recharge_system_description(
     logging.debug(f"charge_actuator_id: {charge_actuator_id}")
     ids.append((charge_actuator_id, "charge_actuator"))
     charge_actuator_status = FRBCActuatorStatus(
-        message_id=charge_actuator_id,
-        actuator_id=charge_actuator_id,
-        active_operation_mode_id=id_on_operation_mode,
+        message_id=charge_actuator_id,  # type: ignore[arg-type]
+        actuator_id=charge_actuator_id,  # type: ignore[arg-type]
+        active_operation_mode_id=id_on_operation_mode,  # type: ignore[arg-type]
         operation_mode_factor=0,
     )
 
     charge_actuator_description = FRBCActuatorDescription(
-        id=charge_actuator_id,
+        id=charge_actuator_id,  # type: ignore[arg-type]
         diagnostic_label="charge.actuator",
         operation_modes=[on_operation_mode, off_operation_mode],
         transitions=[transition_from_on_to_off, transition_from_off_to_on],
@@ -314,7 +313,8 @@ def create_recharge_system_description(
     logging.debug(f"storage_status_id: {storage_status_id}")
     ids.append((storage_status_id, "storage_status"))
     storage_status = FRBCStorageStatus(
-        message_id=storage_status_id, present_fill_level=soc_percentage_before_charging
+        message_id=storage_status_id,  # type: ignore[arg-type]
+        present_fill_level=soc_percentage_before_charging,
     )
 
     frbc_storage_description = FRBCStorageDescription(
@@ -325,9 +325,11 @@ def create_recharge_system_description(
         provides_usage_forecast=False,
         fill_level_range=NumberRange(start_of_range=0, end_of_range=100),
     )
-
+    system_description_id = str(uuid.uuid4())
+    logging.debug(f"system_description_id: {system_description_id}")
+    ids.append((system_description_id, "system_description"))
     frbc_system_description = FRBCSystemDescription(
-        message_id=str(uuid.uuid4()),
+        message_id=system_description_id,  # type: ignore[arg-type]
         valid_from=start_of_recharge,
         actuators=[charge_actuator_description],
         storage=frbc_storage_description,
@@ -336,7 +338,6 @@ def create_recharge_system_description(
     return frbc_system_description, charge_actuator_status, storage_status
 
 
-@staticmethod
 def create_recharge_leakage_behaviour(start_of_recharge):
     leakage_id = str(uuid.uuid4())
     logging.debug(f"leakage_id: {leakage_id}")
@@ -353,7 +354,6 @@ def create_recharge_leakage_behaviour(start_of_recharge):
     )
 
 
-@staticmethod
 def create_recharge_usage_forecast(start_of_recharge, recharge_duration):
     no_usage = FRBCUsageForecastElement(
         duration=int(recharge_duration.total_seconds()), usage_rate_expected=0
@@ -366,7 +366,6 @@ def create_recharge_usage_forecast(start_of_recharge, recharge_duration):
     )
 
 
-@staticmethod
 def create_recharge_fill_level_target_profile(
     start_of_recharge,
     recharge_duration,
@@ -395,7 +394,6 @@ def create_recharge_fill_level_target_profile(
     )
 
 
-@staticmethod
 def create_driving_system_description(start_of_drive, soc_percentage_before_driving):
     global off_actuator_id, id_off_operation_mode
     off_operation_element = FRBCOperationModeElement(
@@ -458,7 +456,6 @@ def create_driving_system_description(start_of_drive, soc_percentage_before_driv
     )
 
 
-@staticmethod
 def create_driving_usage_forecast(
     start_of_driving, next_drive_duration, soc_usage_per_second
 ):
@@ -648,12 +645,14 @@ def test_planning_service_impl_with_ev_device():
         nr_of_timesteps=T,
     )
     plan_due_by_date = target_metadata.profile_start + timedelta(seconds=10)
-    target_profile_elements = get_target_profile_elements(T)
+    # target_profile_elements = get_target_profile_elements(T)
     cost_target_profile_elements = get_netherlands_day_ahead_prices(T)
-    
+
     device_states = [
         create_device_state(
-            f"battery{i+1}", datetime.fromtimestamp(3600), timezone(timedelta(hours=1))
+            f"battery{i + 1}",
+            datetime.fromtimestamp(3600),
+            timezone(timedelta(hours=1)),
         )
         for i in range(numberOfDevices)
     ]
@@ -678,10 +677,8 @@ def test_planning_service_impl_with_ev_device():
     cluster_state = ClusterState(
         datetime.now(), device_states_dict, congestion_points_by_connection_id
     )
-
     #  Create an empty map for congestion point targets
     congestion_point_targets = {}
-
     # Create a cluster target
     cluster_target = ClusterTarget(
         datetime.now(),
@@ -697,20 +694,12 @@ def test_planning_service_impl_with_ev_device():
         congestion_retry_iterations=10,
         multithreaded=False,
     )
+
     print("Generating plan!")
 
     # Create planning service implementation
     service = PlanningServiceImpl(config)
 
-    # Create cluster target
-
-    cluster_target = ClusterTarget(
-        datetime.now(),
-        None,
-        None,
-        global_target_profile=global_target_profile,
-        congestion_point_targets=congestion_point_targets,
-    )
     # Set due by date for planning
     plan_due_by_date = target_metadata.profile_start + timedelta(seconds=10)
     # Act - Generate a plan
@@ -728,7 +717,7 @@ def test_planning_service_impl_with_ev_device():
     execution_time = end_time - start_time
 
     # Log information
-    print(f"Plan generated in {execution_time:.2f} seconds")
+    print(f"Plan generated in {execution_time: .2f} seconds")
 
     # Assert
     assert cluster_plan is not None
@@ -740,6 +729,11 @@ def test_planning_service_impl_with_ev_device():
     device_plans = cluster_plan.get_plan_data().get_device_plans()
     energy_profile = cluster_plan.get_joule_profile()
 
+    # Save the energy profile to a file,
+    with open(f"energy_profile-D={D}_B={B}_S={S}_T={T}.json", "w") as f:
+        json.dump(energy_profile.elements, f)
+
+    # Plot the planning results
     plot_planning_results(
         timestep_duration=timedelta(seconds=TIMESTEP_DURATION),
         nr_of_timesteps=T,
