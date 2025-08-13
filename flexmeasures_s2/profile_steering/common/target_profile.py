@@ -29,17 +29,19 @@ class TargetProfile(
         profile_start: datetime,
         timestep_duration: timedelta,
         elements: Union[List[int], List[Union["TargetProfile.Element", None]]],
+        tarif_target: bool = False,
     ):
         metadata = ProfileMetadata(profile_start, timestep_duration, len(elements))
+        self.tarif_target = tarif_target
         # if elements is a list of ints, convert it to a list of JouleElement
-        if isinstance(elements, list) and all(isinstance(e, int) for e in elements):
+        if not self.tarif_target:
             new_elements = [
                 TargetProfile.JouleElement(e) for e in cast(List[int], elements)
             ]
             super().__init__(
                 metadata, cast(List[Union["TargetProfile.Element", None]], new_elements)
             )
-        elif isinstance(elements, list) and all(isinstance(e, float) for e in elements):
+        elif tarif_target:
             new_cost_elements = [
                 TargetProfile.TariffElement(e) for e in cast(List[float], elements)
             ]

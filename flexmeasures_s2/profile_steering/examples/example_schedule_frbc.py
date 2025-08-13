@@ -38,7 +38,8 @@ from flexmeasures_s2.scheduler.schedulers import (
 )
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
-import json
+
+# import json
 
 # Global variables to store IDs for debugging
 # make a list of tuples with the ids and the names
@@ -672,6 +673,7 @@ def test_planning_service_impl_with_ev_device():
         profile_start=target_metadata.profile_start,
         timestep_duration=target_metadata.timestep_duration,
         elements=cost_target_profile_elements,
+        tarif_target=True,
     )
     # Create a cluster state using the list of device states
     cluster_state = ClusterState(
@@ -730,8 +732,8 @@ def test_planning_service_impl_with_ev_device():
     energy_profile = cluster_plan.get_joule_profile()
 
     # Save the energy profile to a file,
-    with open(f"energy_profile-D={D}_B={B}_S={S}_T={T}.json", "w") as f:
-        json.dump(energy_profile.elements, f)
+    # with open(f"energy_profile-D={D}_B={B}_S={S}_T={T}.json", "w") as f:
+    #     json.dump(energy_profile.elements, f)
 
     # Plot the planning results
     plot_planning_results(

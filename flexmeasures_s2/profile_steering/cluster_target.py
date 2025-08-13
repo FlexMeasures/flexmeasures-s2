@@ -46,6 +46,7 @@ class ClusterTarget:
         self._generated_by = generated_by
         self._global_target_profile = global_target_profile
         self._congestion_point_targets = congestion_point_targets or {}
+        self._has_energy_target = not self._global_target_profile.tarif_target
 
         # Validate
         if global_target_profile is None:
