@@ -3,12 +3,6 @@ class NumberRangeWrapper:
         self.start_of_range = start_of_range
         self.end_of_range = end_of_range
 
-    def get_start_of_range(self):
-        return self.start_of_range
-
-    def get_end_of_range(self):
-        return self.end_of_range
-
     def __eq__(self, other):
         if not isinstance(other, NumberRangeWrapper):
             return False

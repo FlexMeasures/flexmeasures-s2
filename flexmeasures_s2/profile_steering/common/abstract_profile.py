@@ -15,11 +15,11 @@ class AbstractProfile(ABC, Generic[E, PT]):
         profile_start: Optional[datetime] = None,
         timestep_duration: Optional[timedelta] = None,
         value: Optional[E] = None,
-        nr_of_elements: Optional[int] = None
+        nr_of_elements: Optional[int] = None,
     ):
         """
         Initialize an AbstractProfile with various parameter combinations.
-        
+
         Args:
             profile_metadata: ProfileMetadata object containing start time and duration
             elements: List of profile elements
@@ -36,21 +36,34 @@ class AbstractProfile(ABC, Generic[E, PT]):
             return
 
         # Case 2: Initialize with start time, duration and elements
-        if profile_start is not None and timestep_duration is not None and elements is not None:
-            self.metadata = ProfileMetadata(profile_start, timestep_duration, len(elements))
+        if (
+            profile_start is not None
+            and timestep_duration is not None
+            and elements is not None
+        ):
+            self.metadata = ProfileMetadata(
+                profile_start, timestep_duration, len(elements)
+            )
             self.elements = elements
             self.validate(self.metadata, elements)
             return
 
         # Case 3: Initialize with start time, duration, single value and number of elements
-        if profile_start is not None and timestep_duration is not None and value is not None and nr_of_elements is not None:
+        if (
+            profile_start is not None
+            and timestep_duration is not None
+            and value is not None
+            and nr_of_elements is not None
+        ):
             self.elements = [value] * nr_of_elements
-            self.metadata = ProfileMetadata(profile_start, timestep_duration, nr_of_elements)
+            self.metadata = ProfileMetadata(
+                profile_start, timestep_duration, nr_of_elements
+            )
             self.validate(self.metadata, self.elements)
             return
 
         # Case 4: Empty initialization (for serialization)
-        self.metadata = None
+        self.metadata = ProfileMetadata(datetime.now(), timedelta(hours=1), 0)
         self.elements = []
 
     @abstractmethod
@@ -72,9 +85,7 @@ class AbstractProfile(ABC, Generic[E, PT]):
                 "The startTimeDuration should be aligned with the timeStepDuration"
             )
 
-    def get_profile_metadata(self) -> ProfileMetadata:
-        return self.metadata
-
+    @property
     def get_elements(self) -> List[E]:
         return self.elements
 

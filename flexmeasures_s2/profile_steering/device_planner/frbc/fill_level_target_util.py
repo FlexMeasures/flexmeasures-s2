@@ -30,7 +30,7 @@ class FillLevelTargetUtil:
         elements = []
         start = fill_level_target_profile.start_time.astimezone(timezone.utc)
         for element in fill_level_target_profile.elements:
-            end = start + timedelta(seconds=element.duration.root)
+            end = start + timedelta(seconds=element.duration.__root__)
             elements.append(
                 FillLevelTargetElement(
                     start,

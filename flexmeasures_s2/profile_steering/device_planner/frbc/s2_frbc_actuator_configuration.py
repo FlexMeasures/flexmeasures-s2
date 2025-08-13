@@ -8,12 +8,6 @@ class S2ActuatorConfiguration:
         self.operation_mode_id = operation_mode_id
         self.factor = factor
 
-    def get_operation_mode_id(self) -> str:
-        return self.operation_mode_id
-
-    def get_factor(self) -> float:
-        return self.factor
-
     def to_dict(self):
         return {"operationModeId": self.operation_mode_id, "factor": self.factor}
 

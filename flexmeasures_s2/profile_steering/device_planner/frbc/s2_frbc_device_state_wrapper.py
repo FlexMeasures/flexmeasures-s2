@@ -1,5 +1,8 @@
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, TYPE_CHECKING
+from functools import lru_cache
+import numpy as np
+
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_actuator_configuration import (
     S2ActuatorConfiguration,
 )
@@ -7,12 +10,15 @@ from s2python.common import CommodityQuantity
 from flexmeasures_s2.profile_steering.device_planner.frbc.frbc_operation_mode_wrapper import (
     FrbcOperationModeWrapper,
 )
-from flexmeasures_s2.profile_steering.device_planner.frbc.frbc_timestep import (
-    FrbcTimestep,
-)
+
+if TYPE_CHECKING:
+    from flexmeasures_s2.profile_steering.device_planner.frbc.frbc_timestep import (
+        FrbcTimestep,
+    )
 
 from s2python.common.transition import Transition
 from s2python.frbc import (
+    FRBCLeakageBehaviour,
     FRBCLeakageBehaviourElement,
     FRBCActuatorDescription,
     FRBCActuatorStatus,
@@ -26,13 +32,12 @@ from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state i
 class S2FrbcDeviceStateWrapper:
     epsilon = 1e-4
 
-    def __init__(self, device_state):
+    def __init__(self, device_state: S2FrbcDeviceState):
         self.device_state: S2FrbcDeviceState = device_state
-        self.nr_of_buckets: int = (
-            self.device_state.get_computational_parameters().get_nr_of_buckets()
-        )
+        computational_params = self.device_state.get_computational_parameters()
+        self.nr_of_buckets: int = computational_params.get_nr_of_buckets()
         self.nr_of_stratification_layers: int = (
-            self.device_state.get_computational_parameters().get_stratification_layers()
+            computational_params.get_stratification_layers()
         )
         self.actuator_operation_mode_map_per_timestep: Dict[
             datetime, Dict[str, List[str]]
@@ -41,8 +46,9 @@ class S2FrbcDeviceStateWrapper:
         self.operation_mode_uses_factor_map: Dict[str, bool] = {}
         self.operation_modes: Dict[str, FrbcOperationModeWrapper] = {}
 
+    @property
     def is_online(self) -> bool:
-        return self.device_state._is_online()
+        return self.device_state.is_online
 
     def get_power_forecast(self) -> Any:
         return self.device_state.get_power_forecast()
@@ -53,163 +59,114 @@ class S2FrbcDeviceStateWrapper:
     def get_leakage_behaviours(self) -> Any:
         return self.device_state.get_leakage_behaviours()
 
-    def get_usage_forecasts(self) -> Any:
-        return self.device_state.get_usage_forecasts()
+    @property
+    def usage_forecasts(self) -> Any:
+        return self.device_state.usage_forecasts
 
-    def get_fill_level_target_profiles(self) -> Any:
-        return self.device_state.get_fill_level_target_profiles()
+    @property
+    def fill_level_target_profiles(self) -> Any:
+        return self.device_state.fill_level_target_profiles
 
     def get_computational_parameters(self) -> Any:
         return self.device_state.get_computational_parameters()
 
-    def get_actuators(self, target_timestep: FrbcTimestep) -> List[str]:
-        actuator_operation_mode_map = self.actuator_operation_mode_map_per_timestep.get(
-            target_timestep.get_start_date()
-        )
-        if actuator_operation_mode_map is None:
-            actuator_operation_mode_map = self.create_actuator_operation_mode_map(
-                target_timestep
-            )
-        return list(actuator_operation_mode_map.keys())
+    @lru_cache(maxsize=None)
+    def get_actuators(self, target_timestep: "FrbcTimestep") -> List[str]:
+        return list(self.create_actuator_operation_mode_map(target_timestep).keys())
 
+    @lru_cache(maxsize=None)
     def get_normal_operation_modes_for_actuator(
-        self, target_timestep: FrbcTimestep, actuator_id: str
+        self, target_timestep: "FrbcTimestep", actuator_id: str
     ) -> List[str]:
-        actuator_operation_mode_map = self.actuator_operation_mode_map_per_timestep.get(
-            target_timestep.get_start_date()
+        actuator_operation_mode_map = self.create_actuator_operation_mode_map(
+            target_timestep
         )
-        if actuator_operation_mode_map is None:
-            actuator_operation_mode_map = self.create_actuator_operation_mode_map(
-                target_timestep
-            )
         return actuator_operation_mode_map.get(actuator_id, [])
 
+    @lru_cache(maxsize=None)
     def create_actuator_operation_mode_map(
-        self, target_timestep: FrbcTimestep
+        self, target_timestep: "FrbcTimestep"
     ) -> Dict[str, List[str]]:
         actuator_operation_mode_map = {}
-        for a in target_timestep.get_system_description().actuators:
+        for a in target_timestep.system_description.actuators:
             actuator_operation_mode_map[str(a.id)] = [
                 str(om.id) for om in a.operation_modes if not om.abnormal_condition_only
             ]
-        self.actuator_operation_mode_map_per_timestep[
-            target_timestep.get_start_date()
-        ] = actuator_operation_mode_map
         return actuator_operation_mode_map
 
+    @lru_cache(maxsize=None)
     def get_operation_mode(
         self, target_timestep, actuator_id: str, operation_mode_id: str
     ):
-        from flexmeasures_s2.profile_steering.device_planner.frbc.frbc_operation_mode_wrapper import (
-            FrbcOperationModeWrapper,
-        )
-
         om_key = f"{actuator_id}-{operation_mode_id}"
         if om_key in self.operation_modes:
             return self.operation_modes[om_key]
-        actuators = target_timestep.get_system_description().actuators
-        found_actuator_description = next(
-            (ad for ad in actuators if str(ad.id) == actuator_id), None
+
+        actuator_description = self.get_actuator_description(
+            target_timestep, actuator_id
         )
-        if found_actuator_description:
-            for operation_mode in found_actuator_description.operation_modes:
+        if actuator_description:
+            for operation_mode in actuator_description.operation_modes:
                 if str(operation_mode.id) == operation_mode_id:
                     found_operation_mode = FrbcOperationModeWrapper(operation_mode)
                     self.operation_modes[om_key] = found_operation_mode
                     return found_operation_mode
         return None
 
+    @lru_cache(maxsize=None)
     def operation_mode_uses_factor(
         self,
-        target_timestep: FrbcTimestep,
+        target_timestep: "FrbcTimestep",
         actuator_id: str,
         operation_mode_id: str,
     ) -> bool:
-        key = f"{actuator_id}-{operation_mode_id}"
-        if key not in self.operation_mode_uses_factor_map:
-            result = self.get_operation_mode(
-                target_timestep, actuator_id, operation_mode_id
-            ).is_uses_factor()
-            self.operation_mode_uses_factor_map[key] = result
-        return self.operation_mode_uses_factor_map[key]
+        return self.get_operation_mode(
+            target_timestep, actuator_id, operation_mode_id
+        ).is_uses_factor()
 
+    @lru_cache(maxsize=None)
     def get_all_possible_actuator_configurations(
-        self, target_timestep: FrbcTimestep
+        self, target_timestep: "FrbcTimestep"
     ) -> List[Dict[Any, S2ActuatorConfiguration]]:
-        timestep_date = target_timestep.get_start_date()
-        if timestep_date not in self.all_actions:
-            possible_actuator_configs = {}
-            for actuator_id in self.get_actuators(target_timestep):
-                actuator_list = []
-                for operation_mode_id in self.get_normal_operation_modes_for_actuator(
-                    target_timestep, actuator_id
+        possible_actuator_configs = {}
+        for actuator_id in self.get_actuators(target_timestep):
+            actuator_list = []
+            for op_mode_id in self.get_normal_operation_modes_for_actuator(
+                target_timestep, actuator_id
+            ):
+                if self.operation_mode_uses_factor(
+                    target_timestep, actuator_id, op_mode_id
                 ):
-                    if self.operation_mode_uses_factor(
-                        target_timestep, actuator_id, operation_mode_id
-                    ):
-                        for i in range(self.nr_of_stratification_layers + 1):
-                            factor_for_actuator = i * (
-                                1.0 / self.nr_of_stratification_layers
-                            )
-                            actuator_list.append(
-                                S2ActuatorConfiguration(
-                                    operation_mode_id, factor_for_actuator
-                                )
-                            )
-                    else:
-                        actuator_list.append(
-                            S2ActuatorConfiguration(operation_mode_id, 0.0)
-                        )
-                possible_actuator_configs[actuator_id] = actuator_list
-            keys = list(possible_actuator_configs.keys())
-            actions_for_timestep = []
-            combination = [0] * len(keys)
-            actions_for_timestep.append(
-                self.combination_to_map(combination, keys, possible_actuator_configs)
-            )
-            while self.increase(combination, keys, possible_actuator_configs):
-                actions_for_timestep.append(
-                    self.combination_to_map(
-                        combination, keys, possible_actuator_configs
+                    factors = np.linspace(
+                        0.0, 1.0, self.nr_of_stratification_layers + 1
                     )
-                )
-            self.all_actions[timestep_date] = actions_for_timestep
-        return self.all_actions[timestep_date]
+                    actuator_list.extend(
+                        [
+                            S2ActuatorConfiguration(op_mode_id, factor)
+                            for factor in factors
+                        ]
+                    )
+                else:
+                    actuator_list.append(S2ActuatorConfiguration(op_mode_id, 0.0))
+            possible_actuator_configs[actuator_id] = actuator_list
 
-    def combination_to_map(
-        self,
-        cur: List[int],
-        keys: List[str],
-        possible_actuator_configs: Dict[str, List[S2ActuatorConfiguration]],
-    ) -> Dict[str, S2ActuatorConfiguration]:
-        combination = {}
-        for i, key in enumerate(keys):
-            combination[key] = possible_actuator_configs[key][cur[i]]
-        return combination
+        keys = list(possible_actuator_configs.keys())
+        import itertools
 
-    def increase(
-        self,
-        cur: List[int],
-        keys: List[str],
-        possible_actuator_configs: Dict[str, List[S2ActuatorConfiguration]],
-    ) -> bool:
-        cur[0] += 1
-        for i, key in enumerate(keys):
-            if cur[i] >= len(possible_actuator_configs[key]):
-                if i + 1 >= len(keys):
-                    return False
-                cur[i] = 0
-                cur[i + 1] += 1
-        return True
+        combinations = itertools.product(
+            *(possible_actuator_configs[key] for key in keys)
+        )
+
+        return [dict(zip(keys, combo)) for combo in combinations]
 
     @staticmethod
+    @lru_cache(maxsize=None)
     def get_transition(
         target_timestep,
         actuator_id: str,
         from_operation_mode_id: str,
         to_operation_mode_id: str,
     ) -> Optional[Transition]:
-
         actuator_description = S2FrbcDeviceStateWrapper.get_actuator_description(
             target_timestep, actuator_id
         )
@@ -222,18 +179,14 @@ class S2FrbcDeviceStateWrapper:
                 and str(transition.to) == to_operation_mode_id
             ):
                 return transition
-            else:
-                # print(f"Transition {transition.from_} -> {transition.to} does not match {from_operation_mode_id} -> {to_operation_mode_id}")
-                pass
         return None
 
     def get_operation_mode_power(
-        self, om: FrbcOperationModeWrapper, fill_level: float, factor: float
+        self, om_wrapper: FrbcOperationModeWrapper, fill_level: float, factor: float
     ) -> float:
-
-        element = self.find_operation_mode_element(om, fill_level)
+        element = self.find_operation_mode_element(om_wrapper, fill_level)
         power_watt = 0
-        for power_range in element.get_power_ranges():
+        for power_range in element.power_ranges:
             if power_range.commodity_quantity in [
                 CommodityQuantity.ELECTRIC_POWER_L1,
                 CommodityQuantity.ELECTRIC_POWER_L2,
@@ -246,103 +199,95 @@ class S2FrbcDeviceStateWrapper:
         return power_watt
 
     @staticmethod
-    def find_operation_mode_element(om, fill_level):
-        element = next(
-            (
-                e
-                for e in om.get_elements()
-                if e.fill_level_range.start_of_range
-                <= fill_level
-                <= e.fill_level_range.end_of_range
-            ),
-            None,
+    def find_operation_mode_element(
+        om_wrapper: FrbcOperationModeWrapper, fill_level: float
+    ):
+        starts = om_wrapper.fill_level_starts
+        ends = om_wrapper.fill_level_ends
+
+        # Assumes that starts is sorted, which is a reasonable assumption for S2 data.
+        # Find the index of the interval start that is just less than or equal to fill_level.
+        idx = np.searchsorted(starts, fill_level, side="right") - 1
+
+        # Check if fill_level is within the found range.
+        if idx >= 0 and fill_level <= ends[idx]:
+            return om_wrapper.elements[idx]
+
+        # Handle edge cases and gaps, consistent with the original logic.
+        return (
+            om_wrapper.elements[0]
+            if fill_level < starts[0]
+            else om_wrapper.elements[-1]
         )
-        if element is None:
-            first = om.get_elements()[0]
-            last = om.get_elements()[-1]
-            element = (
-                first
-                if fill_level < first.fill_level_range.start_of_range
-                else last
-            )
-        return element
 
     def get_operation_mode_fill_rate(
-        self, om: FrbcOperationModeWrapper, fill_level: float, factor: float
+        self, om_wrapper: FrbcOperationModeWrapper, fill_level: float, factor: float
     ) -> float:
-        element = self.find_operation_mode_element(om, fill_level)
+        element = self.find_operation_mode_element(om_wrapper, fill_level)
         fill_rate = element.fill_rate
         start = fill_rate.end_of_range
         end = fill_rate.start_of_range
         return (start - end) * factor + end
 
     @staticmethod
-    def get_leakage_rate(target_timestep: FrbcTimestep, fill_level: float) -> float:
-        if target_timestep.get_leakage_behaviour() is None:
-            return 0
-        else:
-            return S2FrbcDeviceStateWrapper.find_leakage_element(
-                target_timestep, fill_level
-            ).leakage_rate
+    def get_leakage_rate(target_timestep: "FrbcTimestep", fill_level: float) -> float:
+        if target_timestep.leakage_behaviour is None:
+            return 0.0
+
+        element = S2FrbcDeviceStateWrapper.find_leakage_element(
+            target_timestep.leakage_behaviour, fill_level
+        )
+        return element.leakage_rate if element else 0.0
 
     @staticmethod
     def find_leakage_element(
-        target_timestep: FrbcTimestep, fill_level: float
-    ) -> FRBCLeakageBehaviourElement:
-        leakage = target_timestep.get_leakage_behaviour()
-        element = next(
-            (
-                e
-                for e in leakage.elements
-                if e.fill_level_range.start_of_range
-                <= fill_level
-                <= e.fill_level_range.end_of_range
-            ),
-            None,
+        leakage_behaviour: FRBCLeakageBehaviour, fill_level: float
+    ) -> Optional[FRBCLeakageBehaviourElement]:
+        if not leakage_behaviour.elements:
+            return None
+
+        # Calculate starts and ends arrays directly to avoid monkey-patching issues
+        starts = np.array(
+            [e.fill_level_range.start_of_range for e in leakage_behaviour.elements]
         )
-        if element is None:
-            first = leakage.elements[0]
-            last = leakage.elements[-1]
-            element = (
-                first if fill_level < first.fill_level_range.start_of_range else last
-            )
-        return element
+        ends = np.array(
+            [e.fill_level_range.end_of_range for e in leakage_behaviour.elements]
+        )
+
+        # Use binary search for efficient lookup
+        idx = np.searchsorted(starts, fill_level, side="right") - 1
+
+        if idx >= 0 and fill_level <= ends[idx]:
+            return leakage_behaviour.elements[idx]
+
+        return (
+            leakage_behaviour.elements[0]
+            if fill_level < starts[0]
+            else leakage_behaviour.elements[-1]
+        )
 
     @staticmethod
-    def calculate_bucket(target_timestep: FrbcTimestep, fill_level: float) -> int:
-        fill_level_lower_limit = (
-            target_timestep.get_system_description().storage.fill_level_range.start_of_range
-        )
-        fill_level_upper_limit = (
-            target_timestep.get_system_description().storage.fill_level_range.end_of_range
-        )
-        return int(
+    def calculate_bucket(target_timestep: "FrbcTimestep", fill_level: float) -> int:
+        (
+            fill_level_lower_limit,
+            fill_level_upper_limit,
+            nr_of_buckets,
+        ) = target_timestep.get_bucket_calculation_params()
+
+        if fill_level_upper_limit == fill_level_lower_limit:
+            return 0
+
+        bucket = int(
             (fill_level - fill_level_lower_limit)
             / (fill_level_upper_limit - fill_level_lower_limit)
-            * target_timestep.get_nr_of_buckets()
+            * nr_of_buckets
         )
+        return min(max(bucket, 0), nr_of_buckets - 1)
 
     @staticmethod
-    def get_timer_duration_milliseconds(
-        target_timestep: FrbcTimestep, actuator_id: str, timer_id: str
-    ) -> int:
-        actuator_description = S2FrbcDeviceStateWrapper.get_actuator_description(
-            target_timestep, actuator_id
-        )
-        if actuator_description is None:
-            raise ValueError(
-                f"Actuator description not found for actuator {actuator_id}"
-            )
-        timer = next(
-            (t for t in actuator_description.timers if str(t.id) == timer_id),
-            None,
-        )
-        # Return the duration in milliseconds directly
-        return timer.duration.root if timer else 0
-
-    @staticmethod
+    @lru_cache(maxsize=None)
     def get_timer_duration(
-        target_timestep: FrbcTimestep, actuator_id: str, timer_id: str
+        target_timestep: "FrbcTimestep", actuator_id: str, timer_id: str
     ) -> timedelta:
         return timedelta(
             milliseconds=S2FrbcDeviceStateWrapper.get_timer_duration_milliseconds(
@@ -351,13 +296,32 @@ class S2FrbcDeviceStateWrapper:
         )
 
     @staticmethod
+    @lru_cache(maxsize=None)
+    def get_timer_duration_milliseconds(
+        target_timestep: "FrbcTimestep", actuator_id: str, timer_id: str
+    ) -> int:
+        actuator_description = S2FrbcDeviceStateWrapper.get_actuator_description(
+            target_timestep, actuator_id
+        )
+        if actuator_description is None:
+            raise ValueError(
+                f"Actuator description not found for actuator {actuator_id}"
+            )
+
+        timer = next(
+            (t for t in actuator_description.timers if str(t.id) == timer_id), None
+        )
+        return timer.duration.__root__ if timer else 0
+
+    @staticmethod
+    @lru_cache(maxsize=None)
     def get_actuator_description(
-        target_timestep: FrbcTimestep, actuator_id: str
+        target_timestep: "FrbcTimestep", actuator_id: str
     ) -> Optional[FRBCActuatorDescription]:
         return next(
             (
                 ad
-                for ad in target_timestep.get_system_description().actuators
+                for ad in target_timestep.system_description.actuators
                 if str(ad.id) == actuator_id
             ),
             None,
@@ -366,8 +330,11 @@ class S2FrbcDeviceStateWrapper:
     def get_energy_in_current_timestep(self) -> CommodityQuantity:
         return self.device_state.get_energy_in_current_timestep()
 
-    def get_actuator_statuses(self) -> List[FRBCActuatorStatus]:
-        return self.device_state.get_actuator_statuses()
+    @property
+    def actuator_statuses(self) -> List[FRBCActuatorStatus]:
+        return self.device_state.actuator_statuses or []
 
-    def get_storage_status(self) -> List[FRBCStorageStatus]:
-        return self.device_state.get_storage_status()
+    @property
+    def storage_status(self) -> List[FRBCStorageStatus]:
+        # The return type is correct but mypy does not understand the structure of s2python correctly
+        return self.device_state.storage_status  # type: ignore[return-value]

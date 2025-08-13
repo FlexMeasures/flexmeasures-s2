@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Dict, Any, Optional
+from typing import Any
 
 # Core profile steering imports
 from flexmeasures_s2.profile_steering.root_planner import RootPlanner
@@ -11,13 +11,10 @@ from flexmeasures_s2.profile_steering.congestion_point_planner import (
 from flexmeasures_s2.profile_steering.common.joule_range_profile import (
     JouleRangeProfile,
 )
-from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
-from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 
 # Import from common data structures to avoid circular imports
 from flexmeasures_s2.profile_steering.common_data_structures import (
     ClusterState,
-    DevicePlan,
 )
 
 # Import cluster related classes
@@ -143,7 +140,7 @@ class PlanningServiceImpl(PlanningService):
 
         for device_id, device_state in cluster_state.get_device_states().items():
             congestion_point = self.get_congestion_point(
-                cluster_state, device_state.get_connection_id()
+                cluster_state, device_state.connection_id
             )
             cpc = root_planner.get_congestion_point_controller(congestion_point)
 
@@ -155,11 +152,11 @@ class PlanningServiceImpl(PlanningService):
                 if congestion_point == self.DEFAULT_CONGESTION_POINT:
                     # This is a dummy congestion point. We will give it an empty profile.
                     congestion_point_target = JouleRangeProfile(
-                        target.get_global_target_profile().get_profile_metadata(),
-                        elements=congestion_point_target.get_elements(),
+                        target.get_global_target_profile().metadata,
+                        elements=congestion_point_target.elements,  # type: ignore[union-attr]
                     )
 
-                cpc = CongestionPointPlanner(congestion_point, congestion_point_target)
+                cpc = CongestionPointPlanner(congestion_point, congestion_point_target, self.config.multithreaded())  # type: ignore[arg-type]
                 root_planner.add_congestion_point_controller(cpc)
 
             # Add the appropriate device planner based on the device state type
@@ -167,7 +164,10 @@ class PlanningServiceImpl(PlanningService):
                 logger.debug("S2 FRBC planner created!")
                 cpc.add_device_controller(
                     S2FrbcDevicePlanner(
-                        device_state, target.get_profile_metadata(), plan_due_by_date
+                        device_state,
+                        target.metadata,
+                        plan_due_by_date,
+                        congestion_point,
                     )
                 )
             # Add other device types here as needed
@@ -215,7 +215,7 @@ class PlanningServiceImpl(PlanningService):
                 target.set_congestion_point_target(
                     congestion_point_id=cp,
                     congestion_point_target=JouleRangeProfile(
-                        profile_start=target.get_global_target_profile().get_profile_metadata(),
+                        profile_start=target.get_global_target_profile().metadata,
                     ),
                 )
 
@@ -233,11 +233,11 @@ class PlanningServiceImpl(PlanningService):
             # Collect device plans
             device_plans = []
             for cpc in root_controller.cp_controllers:
-                for device in cpc.get_device_controllers():
+                for device in cpc.devices:
                     device_plans.append(device.get_device_plan())
 
             # Create and return the cluster plan
-            plan_data = ClusterPlanData(device_plans, target.get_profile_metadata())
+            plan_data = ClusterPlanData(device_plans, target.metadata)  # type: ignore[arg-type]
             plan = ClusterPlan(state, target, plan_data, reason, plan_due_by_date, None)
 
             end_time = datetime.now()

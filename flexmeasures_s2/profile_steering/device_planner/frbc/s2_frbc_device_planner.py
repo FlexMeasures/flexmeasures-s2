@@ -1,8 +1,6 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy.sql.base import elements
-
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.common.proposal import Proposal
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
@@ -11,10 +9,7 @@ from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_instruction_pr
     S2FrbcInstructionProfile,
 )
 from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
-from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state_wrapper import (
-    S2FrbcDeviceStateWrapper,
-)
-from flexmeasures_s2.profile_steering.common.device_planner.device_plan import (
+from flexmeasures_s2.profile_steering.common.device_plan import (
     DevicePlan,
 )
 from flexmeasures_s2.profile_steering.device_planner.frbc.operation_mode_profile_tree import (
@@ -35,18 +30,20 @@ class S2FrbcDevicePlanner(DevicePlanner):
         s2_frbc_state: S2FrbcDeviceState,
         profile_metadata: ProfileMetadata,
         plan_due_by_date: datetime,
+        congestion_point_id: str,
     ):
+        self._congestion_point_id = congestion_point_id
         self.s2_frbc_state = s2_frbc_state
         self.profile_metadata = profile_metadata
         self.zero_profile = JouleProfile(
-            profile_metadata.get_profile_start(),
-            profile_metadata.get_timestep_duration(),
-            [0] * profile_metadata.get_nr_of_timesteps(),
+            profile_metadata.profile_start,
+            profile_metadata.timestep_duration,
+            [0] * profile_metadata.nr_of_timesteps,
         )
         self.null_profile = JouleProfile(
-            profile_metadata.get_profile_start(),
-            profile_metadata.get_timestep_duration(),
-            elements=[None] * profile_metadata.get_nr_of_timesteps(),
+            profile_metadata.profile_start,
+            profile_metadata.timestep_duration,
+            elements=[None] * profile_metadata.nr_of_timesteps,
         )
         if self.is_storage_available(self.s2_frbc_state):
             self.state_tree = OperationModeProfileTree(
@@ -54,13 +51,13 @@ class S2FrbcDevicePlanner(DevicePlanner):
                 profile_metadata,
                 plan_due_by_date,
             )
-        self.priority_class = 1
+        self._priority_class = 1
         self.latest_plan: Optional[S2FrbcPlan] = None
         self.accepted_plan: Optional[S2FrbcPlan] = None
 
     def is_storage_available(self, storage_state: S2FrbcDeviceState) -> bool:
         latest_before_first_ptu = OperationModeProfileTree.get_latest_before(
-            self.profile_metadata.get_profile_start().replace(tzinfo=None),
+            self.profile_metadata.profile_start.replace(tzinfo=None),
             storage_state.get_system_descriptions(),
             lambda sd: sd.valid_from.replace(tzinfo=None),
         )
@@ -69,31 +66,42 @@ class S2FrbcDevicePlanner(DevicePlanner):
         if latest_before_first_ptu is None:
             active_and_upcoming_system_descriptions_has_active_storage = any(
                 # TODO: ask if TypeError: can't compare offset-naive and offset-aware datetimes could be solved differently
-                self.profile_metadata.get_profile_end().replace(tzinfo=None)
+                self.profile_metadata.profile_end.replace(tzinfo=None)
                 >= sd.valid_from.replace(tzinfo=None)
-                >= self.profile_metadata.get_profile_start().replace(tzinfo=None)
+                >= self.profile_metadata.profile_start.replace(tzinfo=None)
                 for sd in storage_state.get_system_descriptions()
             )
         else:
             active_and_upcoming_system_descriptions_has_active_storage = any(
-                self.profile_metadata.get_profile_end().replace(tzinfo=None)
+                self.profile_metadata.profile_end.replace(tzinfo=None)
                 >= sd.valid_from.replace(tzinfo=None)
                 >= latest_before_first_ptu.valid_from.replace(tzinfo=None)
                 for sd in storage_state.get_system_descriptions()
             )
         return (
-            storage_state._is_online()
+            storage_state.is_online
             and active_and_upcoming_system_descriptions_has_active_storage
         )
 
-    def get_device_id(self) -> str:
-        return self.s2_frbc_state.get_device_id()
+    @property
+    def priority_class(self) -> int:
+        return self.s2_frbc_state.priority_class
 
-    def get_connection_id(self) -> str:
-        return self.s2_frbc_state.get_connection_id()
+    @property
+    def device_id(self) -> str:
+        return self.s2_frbc_state.device_id
 
-    def get_device_name(self) -> str:
-        return self.s2_frbc_state.get_device_name()
+    @property
+    def connection_id(self) -> str:
+        return self.s2_frbc_state.connection_id
+
+    @property
+    def congestion_point_id(self) -> str:
+        return self._congestion_point_id
+
+    @property
+    def device_name(self) -> str:
+        return self.s2_frbc_state.device_name
 
     def create_improved_planning(
         self,
@@ -105,10 +113,10 @@ class S2FrbcDevicePlanner(DevicePlanner):
         if self.accepted_plan is None:
             raise ValueError("No accepted plan found")
 
-        target = diff_to_global_target.add(self.accepted_plan.get_energy())
+        target = diff_to_global_target.add(self.accepted_plan.energy)
 
-        max_profile = diff_to_max.add(self.accepted_plan.get_energy())
-        min_profile = diff_to_min.add(self.accepted_plan.get_energy())
+        max_profile = diff_to_max.add(self.accepted_plan.energy)
+        min_profile = diff_to_min.add(self.accepted_plan.energy)
 
         if self.is_storage_available(self.s2_frbc_state):
             self.latest_plan = self.state_tree.find_best_plan(
@@ -127,8 +135,8 @@ class S2FrbcDevicePlanner(DevicePlanner):
             global_diff_target=diff_to_global_target,
             diff_to_congestion_max=diff_to_max,
             diff_to_congestion_min=diff_to_min,
-            proposed_plan=self.latest_plan.get_energy(),
-            old_plan=self.accepted_plan.get_energy(),
+            proposed_plan=self.latest_plan.energy,
+            old_plan=self.accepted_plan.energy,
             origin=self,
         )
         return proposal
@@ -158,42 +166,47 @@ class S2FrbcDevicePlanner(DevicePlanner):
                 operation_mode_id=[],
             )
         self.accepted_plan = self.latest_plan
-        return self.latest_plan.get_energy()  # type: ignore
+        return self.latest_plan
 
     def accept_proposal(self, accepted_proposal: Proposal) -> None:
         if self.latest_plan is None:
             raise ValueError("No latest plan found")
-        if accepted_proposal.get_origin() != self:
+        if accepted_proposal.origin != self:
             raise ValueError(
-                f"Storage controller '{self.get_device_id()}' received a proposal that he did not send."
+                f"Storage controller '{self.device_id}' received a proposal that he did not send."
             )
-        if not accepted_proposal.get_proposed_plan() == self.latest_plan.get_energy():
+        if not accepted_proposal.proposed_plan == self.latest_plan.energy:
             raise ValueError(
-                f"Storage controller '{self.get_device_id()}' received a proposal that he did not send."
+                f"Storage controller '{self.device_id}' received a proposal that he did not send."
             )
         if accepted_proposal.get_congestion_improvement_value() < 0:
             raise ValueError(
-                f"Storage controller '{self.get_device_id()}' received a proposal with negative improvement"
+                f"Storage controller '{self.device_id}' received a proposal with negative improvement"
             )
         self.accepted_plan = self.latest_plan
 
-    def get_current_profile(self) -> JouleProfile:
-        if self.accepted_plan is None:
-            raise ValueError("No accepted plan found")
-        return self.accepted_plan.get_energy()
-
     def get_latest_plan(self) -> Optional[S2FrbcPlan]:
         return self.latest_plan
+
+    def set_accepted_plan(self, plan: S2FrbcPlan) -> None:
+        if not isinstance(plan, S2FrbcPlan):
+            raise TypeError(f"Expected S2FrbcPlan, but got {type(plan)}")
+        self.accepted_plan = plan
+
+    def current_profile(self) -> JouleProfile:
+        if self.accepted_plan is None:
+            raise ValueError("No accepted plan found")
+        return self.accepted_plan.energy
 
     def get_device_plan(self) -> Optional[DevicePlan]:
         if self.accepted_plan is None:
             return None
         return DevicePlan(
-            device_id=self.get_device_id(),
-            device_name=self.get_device_name(),
-            connection_id=self.get_connection_id(),
-            energy_profile=self.accepted_plan.get_energy(),
-            fill_level_profile=self.accepted_plan.get_fill_level(),
+            device_id=self.device_id,
+            device_name=self.device_name,
+            connection_id=self.connection_id,
+            energy_profile=self.accepted_plan.energy,
+            fill_level_profile=self.accepted_plan.fill_level,
             instruction_profile=self.convert_plan_to_instructions(
                 self.profile_metadata, self.accepted_plan
             ),
@@ -212,12 +225,9 @@ class S2FrbcDevicePlanner(DevicePlanner):
                 )
                 elements.append(new_element)
         else:
-            elements = [None] * profile_metadata.get_nr_of_timesteps()
+            elements = [None] * profile_metadata.nr_of_timesteps
         return S2FrbcInstructionProfile(
-            profile_start=profile_metadata.get_profile_start(),
-            timestep_duration=profile_metadata.get_timestep_duration(),
+            profile_start=profile_metadata.profile_start,
+            timestep_duration=profile_metadata.timestep_duration,
             elements=elements,
         )
-
-    def get_priority_class(self) -> int:
-        return self.priority_class

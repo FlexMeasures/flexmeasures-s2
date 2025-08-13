@@ -1,6 +1,6 @@
 from datetime import datetime
-from typing import List, Optional, Dict
-from s2python.common import CommodityQuantity, PowerForecast
+from typing import List, Optional
+from s2python.common import PowerForecast
 from s2python.frbc import (
     FRBCSystemDescription,
     FRBCLeakageBehaviour,
@@ -63,23 +63,8 @@ class S2FrbcDeviceState:
     def get_leakage_behaviours(self) -> List[FRBCLeakageBehaviour]:
         return self.leakage_behaviours
 
-    def get_usage_forecasts(self) -> List[FRBCUsageForecast]:
-        return self.usage_forecasts
-
-    def get_fill_level_target_profiles(self) -> List[FRBCFillLevelTargetProfile]:
-        return self.fill_level_target_profiles
-
-    def get_device_id(self) -> str:
-        return self.device_id
-
     def get_device_name(self) -> str:
         return self.device_name
-
-    def get_connection_id(self) -> str:
-        return self.connection_id
-
-    def _is_online(self) -> bool:
-        return self.is_online
 
     def get_computational_parameters(self) -> ComputationalParameters:
         return self.computational_parameters
@@ -87,11 +72,5 @@ class S2FrbcDeviceState:
     def get_power_forecast(self) -> Optional[PowerForecast]:
         return self.power_forecast
 
-    def get_energy_in_current_timestep(self) -> CommodityQuantity:
+    def get_energy_in_current_timestep(self) -> PowerValue:
         return self.energy_in_current_timestep
-
-    def get_actuator_statuses(self) -> List[FRBCActuatorStatus]:
-        return self.actuator_statuses
-
-    def get_storage_status(self) -> List[FRBCStorageStatus]:
-        return self.storage_status

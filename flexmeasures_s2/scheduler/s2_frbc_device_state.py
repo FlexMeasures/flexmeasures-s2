@@ -3,8 +3,9 @@ from s2python.frbc import (
 )
 
 from typing import List
-from pydantic import BaseModel
+from flexmeasures_s2.profile_steering.common.pydantic_base import FlexMeasuresBaseModel
 
 
-class S2FrbcDeviceState(BaseModel):
+class S2FrbcDeviceState(FlexMeasuresBaseModel):
+
     system_descriptions: List[FRBCSystemDescription]

@@ -113,7 +113,9 @@ class ClusterTarget:
         """
         return self._congestion_point_targets
 
-    def get_congestion_point_target(self, congestion_point_id: str) -> Optional[JouleRangeProfile]:
+    def get_congestion_point_target(
+        self, congestion_point_id: str
+    ) -> Optional[JouleRangeProfile]:
         """
         Get the target for a specific congestion point.
 
@@ -125,7 +127,8 @@ class ClusterTarget:
         """
         return self._congestion_point_targets.get(congestion_point_id)
 
-    def get_profile_metadata(self) -> Any:
+    @property
+    def metadata(self) -> Any:
         """
         Get the profile metadata.
 
@@ -221,4 +224,4 @@ class ClusterTarget:
         self._congestion_point_targets[congestion_point_id] = congestion_point_target
 
         if elements is not None:
-            self._congestion_point_targets[congestion_point_id].set_elements(elements)
+            self._congestion_point_targets[congestion_point_id].elements = elements
