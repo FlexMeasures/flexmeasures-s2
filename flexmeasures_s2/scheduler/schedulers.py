@@ -282,15 +282,24 @@ class S2Scheduler(Scheduler):
         # 3. Call planning_service.plan()
         # 4. Convert the result to pandas.Series
 
-        raise NotImplementedError("S2Scheduler.compute() needs to be implemented")
+        # Workaround
+        instructions = []  # Instruction objects
 
         # Placeholder return
-        return pd.Series(
-            self.sensor.get_attribute("capacity_in_mw"),
-            index=pd.date_range(
-                self.start, self.end, freq=self.resolution, inclusive="left"
+        schedule_1 = dict(
+            name=self.sensor.name,
+            sensor=self.sensor,
+            data=pd.Series(
+                self.sensor.get_attribute("capacity_in_mw"),
+                index=pd.date_range(
+                    self.start, self.end, freq=self.resolution, inclusive="left"
+                ),
             ),
+            unit=self.sensor.unit,
         )
+        device_schedules = [schedule_1]  # dictionaries with keys: name, sensor, data, unit
+
+        return instructions + device_schedules
 
     def deserialize_config(self):
         """Deserialize the flex configuration from asset attributes."""
