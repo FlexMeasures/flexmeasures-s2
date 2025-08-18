@@ -45,7 +45,7 @@ import json
 ids = []
 
 # -> todo: plot of run time vs D, vs B, vs S and vs T
-D = 10  # number of devices  -> todo: multiprocessing on create_improved_planning
+D = 5  # number of devices  -> todo: multiprocessing on create_improved_planning
 B = 100  # number of buckets  -> todo: vectorize computation of next state from current state
 S = 20  # number of stratification layers
 PLANNING_WINDOW = pd.Timedelta("PT24H")
@@ -691,8 +691,8 @@ def test_planning_service_impl_with_ev_device():
     energy_profile = cluster_plan.get_joule_profile()
 
     # Save the energy profile to a file,
-    with open(f"energy_profile-D={D}_B={B}_S={S}_T={T}.json", "w") as f:
-        json.dump(energy_profile.elements, f)
+    # with open(f"energy_profile-D={D}_B={B}_S={S}_T={T}.json", "w") as f:
+    #     json.dump(energy_profile.elements, f)
 
     # Plot the planning results
     plot_planning_results(
@@ -702,6 +702,10 @@ def test_planning_service_impl_with_ev_device():
         target_energy_elements=target_profile_elements,
     )
 
+    if D == 3 or D == 10 or D == 5:
+        with open(f"energy_profile-D={D}_B={B}_S={S}_T={T}.json", "r") as f:
+            assert energy_profile.elements == json.load(f)
+            print("Energy profile matches expected values")
     # Get only the non-None plans
     device_plans = [plan for plan in device_plans if plan is not None]
 
