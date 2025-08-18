@@ -177,3 +177,6 @@ cython_debug/
 *.pickle
 flexmeasures.log
 *.png
+
+#MacOS
+.DS_Store

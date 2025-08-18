@@ -13,6 +13,7 @@ class RootPlanner:
         target: TargetProfile,
         energy_iteration_criterion: float,
         cost_iteration_criterion: float,
+        always_accept_all_proposals: bool,
         context: Any,
     ):
         """
@@ -20,12 +21,14 @@ class RootPlanner:
                 It must support a method get_profile_start(),
                 have attributes timestep_duration and nr_of_timesteps,
                 and (for optimization purposes) support a subtract() method.
+        always_accept_all_proposals: If True, accept all valid proposals (for pure cost targets)
         context: In a full implementation, this might be an executor or similar. Here it is passed along.
         """
         self.context = context
         self.target = self.remove_null_values(target)
         self.energy_iteration_criterion = energy_iteration_criterion
         self.cost_iteration_criterion = cost_iteration_criterion
+        self.always_accept_all_proposals = always_accept_all_proposals
         # Create an empty JouleProfile.
         # We assume that target exposes get_profile_start(), timestep_duration and nr_of_timesteps.
         self.empty_profile = JouleProfile(
@@ -95,6 +98,7 @@ class RootPlanner:
                 best_proposal = None
 
                 # Get proposals from each congestion point controller
+                proposals = []
                 for cpc in self.cp_controllers:
                     print("Improving------------------------->")
                     try:
@@ -104,6 +108,7 @@ class RootPlanner:
                             plan_due_by_date,
                         )
                         if proposal is not None:
+                            proposals.append(proposal)
                             if best_proposal is None or proposal.is_preferred_to(
                                 best_proposal
                             ):
@@ -116,49 +121,40 @@ class RootPlanner:
                     # No proposal could be generated; exit inner loop.
                     break
 
-                # Update the root controller's planning based on the best proposal.
-                self.root_ctrl_planning = self.root_ctrl_planning.subtract(
-                    best_proposal.old_plan
-                )
-                self.root_ctrl_planning = self.root_ctrl_planning.add(
-                    best_proposal.proposed_plan
-                )
-
-                # Find the real device object and explicitly update its state.
-                # This is crucial for parallel execution as best_proposal.origin is a copy.
-                cp_id_of_origin = best_proposal.origin.congestion_point_id
-                congestion_point_controller = self.get_congestion_point_controller(
-                    cp_id_of_origin
-                )
-                if congestion_point_controller is None:
-                    raise Exception(
-                        f"Could not find CongestionPointController with id {cp_id_of_origin}"
-                    )
-
-                real_device = None
-                for dev in congestion_point_controller.devices:
-                    if dev.device_id == best_proposal.origin.device_id:
-                        real_device = dev
-                        break
-
-                if real_device is None:
-                    raise Exception(
-                        f"Could not find device with id {best_proposal.origin.device_id} in CP {cp_id_of_origin}"
-                    )
-                plan_to_accept = best_proposal.origin.get_latest_plan()
-                real_device.set_accepted_plan(plan_to_accept)
+                # Update root controller's own planning
+                accepted_proposals = 0
+                if self.always_accept_all_proposals:
+                    # If we're NOT optimizing for a Joule target or congestion target, we can
+                    # accept all proposals for efficiency
+                    accepted_proposals = len(proposals)
+                    for proposal in proposals:
+                        self._accept_proposal(proposal)
+                else:
+                    # If we're optimizing for a Joule target or congestion target we only accept
+                    # one proposal
+                    accepted_proposals = 1
+                    self._accept_proposal(best_proposal)
 
                 i += 1
                 print(
-                    f"Root controller: selected best controller '{best_proposal.origin.device_name}' with global energy impr {best_proposal.get_global_improvement_value()}, congestion impr {best_proposal.get_congestion_improvement_value()}, iteration {i}."
+                    f"Root controller: selected best controller '{best_proposal.origin.device_name}' with global energy impr {best_proposal.get_global_improvement_value()}, cost impr {best_proposal.get_cost_improvement_value()}, CP impr {best_proposal.get_congestion_improvement_value()}. Accepted {accepted_proposals} proposal(s). Iteration {i}."
                 )
 
                 # Check stopping criteria: if improvement values are below thresholds or max iterations reached.
-                if (
-                    best_proposal.get_global_improvement_value()
-                    <= self.energy_iteration_criterion
-                ) or i >= self.MAX_ITERATIONS:
-                    break
+                if self.always_accept_all_proposals:
+                    # For pure cost targets, check cost improvement
+                    if (
+                        best_proposal.get_cost_improvement_value()
+                        <= self.cost_iteration_criterion
+                    ) or i >= self.MAX_ITERATIONS:
+                        break
+                else:
+                    # For energy targets, check energy improvement (original behavior)
+                    if (
+                        best_proposal.get_global_improvement_value()
+                        <= self.energy_iteration_criterion
+                    ) or i >= self.MAX_ITERATIONS:
+                        break
 
             print(
                 f"Optimizing priority class {priority_class} was done after {i} iterations."
@@ -167,3 +163,33 @@ class RootPlanner:
                 print(
                     f"Warning: Optimization stopped due to iteration limit. Priority class: {priority_class}, Iterations: {i}"
                 )
+
+    def _accept_proposal(self, proposal):
+        """Accept a proposal and update the planning accordingly."""
+        # Update the root controller's planning based on the proposal.
+        self.root_ctrl_planning = self.root_ctrl_planning.subtract(proposal.old_plan)
+        self.root_ctrl_planning = self.root_ctrl_planning.add(proposal.proposed_plan)
+
+        # Find the real device object and explicitly update its state.
+        # This is crucial for parallel execution as proposal.origin is a copy.
+        cp_id_of_origin = proposal.origin.congestion_point_id
+        congestion_point_controller = self.get_congestion_point_controller(
+            cp_id_of_origin
+        )
+        if congestion_point_controller is None:
+            raise Exception(
+                f"Could not find CongestionPointController with id {cp_id_of_origin}"
+            )
+
+        real_device = None
+        for dev in congestion_point_controller.devices:
+            if dev.device_id == proposal.origin.device_id:
+                real_device = dev
+                break
+
+        if real_device is None:
+            raise Exception(
+                f"Could not find device with id {proposal.origin.device_id} in CP {cp_id_of_origin}"
+            )
+        plan_to_accept = proposal.origin.get_latest_plan()
+        real_device.set_accepted_plan(plan_to_accept)

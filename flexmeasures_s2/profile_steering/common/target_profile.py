@@ -15,6 +15,13 @@ class TargetProfile(
         def __init__(self, joules: int):
             self.joules = joules
 
+    class TariffElement(Element):
+        def __init__(self, tariff: float):
+            self.tariff = tariff
+
+        def get_tariff(self) -> float:
+            return self.tariff
+
     class NullElement(Element):
         pass
 
@@ -168,4 +175,31 @@ class TargetProfile(
             joule_profile.metadata.profile_start,
             joule_profile.metadata.timestep_duration,
             [TargetProfile.JouleElement(e) for e in joule_profile.elements],
+        )
+
+    @staticmethod
+    def from_tariff_values(
+        metadata: ProfileMetadata, tariff_values: List[float]
+    ) -> "TargetProfile":
+        """Create a TargetProfile with TariffElement instances from tariff values.
+
+        Args:
+            metadata: ProfileMetadata for the target profile
+            tariff_values: List of tariff values (cost per kWh)
+
+        Returns:
+            TargetProfile with TariffElement instances
+        """
+        if len(tariff_values) != metadata.nr_of_timesteps:
+            raise ValueError(
+                f"Number of tariff values ({len(tariff_values)}) must match nr_of_timesteps ({metadata.nr_of_timesteps})"
+            )
+
+        elements: List[Union["TargetProfile.Element", None]] = [
+            TargetProfile.TariffElement(tariff) for tariff in tariff_values
+        ]
+        return TargetProfile(
+            metadata.profile_start,
+            metadata.timestep_duration,
+            elements,
         )

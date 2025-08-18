@@ -225,3 +225,17 @@ class ClusterTarget:
 
         if elements is not None:
             self._congestion_point_targets[congestion_point_id].elements = elements
+
+    def contains_energy_target(self) -> bool:
+        """
+        Check if this cluster target contains any energy targets (JouleElement instances).
+
+        Returns:
+            True if there are any JouleElement instances in the global target profile, False otherwise
+        """
+        from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
+
+        for element in self._global_target_profile.elements:
+            if isinstance(element, TargetProfile.JouleElement):
+                return True
+        return False
