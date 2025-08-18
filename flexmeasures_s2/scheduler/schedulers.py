@@ -128,10 +128,14 @@ class PlanningServiceImpl(PlanningService):
         Returns:
             A RootPlanner with appropriate device planners added
         """
+        # Always accepting all targets is NOT possible if there is an energy target
+        always_accept_all_proposals = not target.contains_energy_target()
+
         root_planner = RootPlanner(
             target.get_global_target_profile(),
             self.config.energy_improvement_criterion(),
             self.config.cost_improvement_criterion(),
+            always_accept_all_proposals,
             self.context,
         )
 
