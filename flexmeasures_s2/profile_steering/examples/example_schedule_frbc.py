@@ -45,7 +45,7 @@ import json
 ids = []
 
 # -> todo: plot of run time vs D, vs B, vs S and vs T
-D = 5  # number of devices  -> todo: multiprocessing on create_improved_planning
+D = 2  # number of devices  -> todo: multiprocessing on create_improved_planning
 B = 100  # number of buckets  -> todo: vectorize computation of next state from current state
 S = 20  # number of stratification layers
 PLANNING_WINDOW = pd.Timedelta("PT24H")
@@ -59,8 +59,9 @@ TIMESTEP_DURATION = PLANNING_RESOLUTION / pd.Timedelta(
 """
 # Ideas for speeding up
 
-- Parallelize device planning
-- Precompute UUIDs
+- Parallelize device planning - done
+- Precompute UUIDs - done
+- Use numpy for vectorized computation instead of list operations - done
 """
 
 

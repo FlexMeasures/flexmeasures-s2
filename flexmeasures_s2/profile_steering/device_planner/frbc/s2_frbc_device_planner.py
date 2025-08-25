@@ -21,9 +21,11 @@ from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state i
 from flexmeasures_s2.profile_steering.device_planner.device_planner_abstract import (
     DevicePlanner,
 )
-
+from s2python.frbc import FRBCInstruction
 
 # make sure this is a DevicePlanner
+
+
 class S2FrbcDevicePlanner(DevicePlanner):
     def __init__(
         self,
@@ -216,16 +218,44 @@ class S2FrbcDevicePlanner(DevicePlanner):
     def convert_plan_to_instructions(
         profile_metadata: ProfileMetadata, device_plan: S2FrbcPlan
     ) -> S2FrbcInstructionProfile:
+        import uuid
+        from datetime import timedelta
+
         elements = []
         actuator_configurations_per_timestep = device_plan.get_operation_mode_id()
+
         if actuator_configurations_per_timestep is not None:
-            for actuator_configurations in actuator_configurations_per_timestep:
-                new_element = S2FrbcInstructionProfile.Element(
-                    not actuator_configurations, actuator_configurations
+            for timestep_index, actuator_configurations_dict in enumerate(
+                actuator_configurations_per_timestep
+            ):
+                # Calculate execution time for this timestep
+                execution_time = profile_metadata.profile_start + timedelta(
+                    seconds=timestep_index
+                    * profile_metadata.timestep_duration.total_seconds()
                 )
-                elements.append(new_element)
-        else:
-            elements = [None] * profile_metadata.nr_of_timesteps
+                # Ensure timezone-aware datetime
+                if execution_time.tzinfo is None:
+                    from datetime import timezone
+
+                    execution_time = execution_time.replace(tzinfo=timezone.utc)
+
+                # Create instructions for each actuator at this timestep
+                for (
+                    actuator_id,
+                    actuator_config,
+                ) in actuator_configurations_dict.items():
+                    if actuator_config is not None:
+                        instruction = FRBCInstruction(
+                            message_id=str(uuid.uuid4()),
+                            id=str(uuid.uuid4()),
+                            actuator_id=str(actuator_id),
+                            operation_mode=str(actuator_config.operation_mode_id),
+                            operation_mode_factor=float(actuator_config.factor),
+                            execution_time=execution_time,
+                            abnormal_condition=False,
+                        )
+                        elements.append(instruction)
+
         return S2FrbcInstructionProfile(
             profile_start=profile_metadata.profile_start,
             timestep_duration=profile_metadata.timestep_duration,
