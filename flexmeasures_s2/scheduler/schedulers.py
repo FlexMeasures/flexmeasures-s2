@@ -326,7 +326,7 @@ class S2Scheduler(Scheduler):
                     logger.info("Falling back to simple FRBC instruction generation")
                     instructions = self._generate_simple_frbc_instructions()
                 else:
-                    instructions = self._create_minimal_fallback_instruction()
+                    instructions = []
 
                 # Create empty energy data
                 num_timesteps = int((self.end - self.start) / self.resolution)
@@ -356,13 +356,6 @@ class S2Scheduler(Scheduler):
                     "No instructions from planning service, generating simple FRBC instructions"
                 )
                 instructions = self._generate_simple_frbc_instructions()
-
-            # Ensure we have at least one instruction for testing
-            if not instructions and self.frbc_device_data is not None:
-                logger.warning(
-                    "No instructions generated, creating minimal fallback instruction"
-                )
-                instructions = self._create_minimal_fallback_instruction()
 
             # Add energy data entry for potential storage
             try:
@@ -752,30 +745,3 @@ class S2Scheduler(Scheduler):
                 logger.info(f"Generated FRBC instruction: {instruction.to_json()}")
 
         return instructions
-
-    def _create_minimal_fallback_instruction(self) -> list:
-        """
-        Create a minimal fallback instruction when all other methods fail.
-
-        Returns:
-            List containing a single basic FRBCInstruction
-        """
-        from s2python.frbc import FRBCInstruction
-        from datetime import timezone
-        import uuid
-
-        # Create a basic instruction with minimal data
-        execution_time = self.start.replace(tzinfo=timezone.utc)
-
-        instruction = FRBCInstruction(
-            message_id=str(uuid.uuid4()),
-            id=str(uuid.uuid4()),
-            actuator_id="fallback-actuator",
-            operation_mode="fallback-mode",
-            operation_mode_factor=0.0,
-            execution_time=execution_time,
-            abnormal_condition=False,
-        )
-
-        logger.info(f"Created minimal fallback instruction: {instruction.to_json()}")
-        return [instruction]
