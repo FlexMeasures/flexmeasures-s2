@@ -311,7 +311,7 @@ class S2FrbcDeviceStateWrapper:
         timer = next(
             (t for t in actuator_description.timers if str(t.id) == timer_id), None
         )
-        return timer.duration.__root__ if timer else 0
+        return timer.duration.root if timer else 0
 
     @staticmethod
     @lru_cache(maxsize=None)
