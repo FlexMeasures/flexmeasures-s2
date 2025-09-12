@@ -343,6 +343,9 @@ class S2Scheduler(Scheduler):
 
         except Exception as e:
             logger.error(f"Error in S2Scheduler.compute(): {e}")
+            import traceback
+
+            logger.debug(f"Traceback: {traceback.format_exc()}")
             # Return empty list on error
             return []
 
