@@ -597,7 +597,6 @@ class S2Scheduler(Scheduler):
                         start=self.start, end=self.end, resolution=self.resolution
                     )
                 ).ffill()
-            breakpoint()
             global_target_profile = TargetProfile.from_tariff_values(
                 metadata=profile_metadata,
                 tariff_values=tariffs.values,
