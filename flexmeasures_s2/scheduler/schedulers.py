@@ -2,8 +2,10 @@ import pandas as pd
 from datetime import datetime
 from typing import Any, Dict, Optional
 import logging
+from flask import current_app as app
 
-from flexmeasures import Scheduler
+from flexmeasures import Scheduler, Sensor
+from flexmeasures.data import db
 
 # Profile steering imports
 from flexmeasures_s2.profile_steering.root_planner import RootPlanner
@@ -561,11 +563,30 @@ class S2Scheduler(Scheduler):
         )
 
         # Type ignore: TargetProfile constructor accepts List[int] and converts to JouleElement
-        global_target_profile = TargetProfile(
-            profile_start=profile_metadata.profile_start,
-            timestep_duration=profile_metadata.timestep_duration,
-            elements=target_elements,  # type: ignore[arg-type]
-        )
+        target_mode = app.config.get("FLEXMEASURES_S2_TARGET_MODE", "costs")
+        app.logger.debug(f"Target mode = {target_mode}")
+        if target_mode == "energy":
+            global_target_profile = TargetProfile(
+                profile_start=profile_metadata.profile_start,
+                timestep_duration=profile_metadata.timestep_duration,
+                elements=target_elements,  # type: ignore[arg-type]
+            )
+        elif target_mode == "costs":
+            price_sensor_id = app.config.get("FLEXMEASURES_S2_PRICE_SENSOR", 2)
+            price_sensor = db.session.get(Sensor, price_sensor_id)
+            assert price_sensor.unit == "EUR/MWh"
+            tariffs = price_sensor.search_beliefs(
+                event_starts_after=self.start,
+                event_ends_before=self.end,
+                resolution=self.resolution,
+            )
+            breakpoint()
+            global_target_profile = TargetProfile.from_tariff_values(
+                metadata=profile_metadata,
+                tariff_values=tariffs.values,
+            )
+        else:
+            raise ValueError(f"Unknown FLEXMEASURES_S2_TARGET_MODE='{target_mode}'")
 
         return ClusterTarget(
             generated_at=self.start,
