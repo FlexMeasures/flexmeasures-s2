@@ -585,8 +585,8 @@ class S2Scheduler(Scheduler):
                 one_deterministic_belief_per_event=True,
             )
             if (
-                n_missing_prices := len(tariffs)
-                - (self.end - self.start) // self.resolution
+                n_missing_prices := (self.end - self.start) // self.resolution
+                - len(tariffs)
             ) > 0:
                 app.logger.warning(
                     f"Missing {n_missing_prices} {pluralize('price', n_missing_prices)} in the period {self.start.isoformat()} until {self.end.isoformat()}"
