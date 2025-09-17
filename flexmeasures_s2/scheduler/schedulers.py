@@ -589,7 +589,7 @@ class S2Scheduler(Scheduler):
                 - len(tariffs)
             ) > 0:
                 app.logger.warning(
-                    f"Missing {n_missing_prices} {pluralize('price', n_missing_prices)} in the period {self.start.isoformat()} until {self.end.isoformat()}"
+                    f"Forward filling {n_missing_prices} {pluralize('price', n_missing_prices)} in the period {self.start.isoformat()} until {self.end.isoformat()}"
                 )
                 tariffs = simplify_index(tariffs)
                 tariffs = tariffs.reindex(
@@ -597,6 +597,11 @@ class S2Scheduler(Scheduler):
                         start=self.start, end=self.end, resolution=self.resolution
                     )
                 ).ffill()
+                if n_missing_prices == len(tariffs):
+                    app.logger.warning(
+                        f"All prices are missing; assuming a constant energy price of 1 EUR/MWh"
+                    )
+                    tariffs = tariffs.fillna(1)
             global_target_profile = TargetProfile.from_tariff_values(
                 metadata=profile_metadata,
                 tariff_values=tariffs.values,
