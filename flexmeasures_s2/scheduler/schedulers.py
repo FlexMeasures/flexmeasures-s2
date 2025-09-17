@@ -154,7 +154,9 @@ class PlanningServiceImpl(PlanningService):
                     # This is a dummy congestion point. We will give it an empty profile.
                     congestion_point_target = JouleRangeProfile(
                         target.get_global_target_profile().metadata,
-                        elements=congestion_point_target.elements,  # type: ignore[union-attr]
+                        elements=congestion_point_target.elements
+                        if congestion_point_target is not None
+                        else [],
                     )
 
                 cpc = CongestionPointPlanner(congestion_point, congestion_point_target, self.config.multithreaded())  # type: ignore[arg-type]
@@ -408,6 +410,9 @@ class S2Scheduler(Scheduler):
 
         except Exception as e:
             logger.error(f"Error in S2Scheduler.compute(): {e}")
+            import traceback
+
+            logger.debug(f"Traceback: {traceback.format_exc()}")
             # Return empty list on error
             return []
 
