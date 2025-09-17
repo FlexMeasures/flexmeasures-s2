@@ -6,6 +6,9 @@ from flask import current_app as app
 
 from flexmeasures import Scheduler, Sensor
 from flexmeasures.data import db
+from flexmeasures.data.models.planning.utils import initialize_index
+from flexmeasures.data.queries.utils import simplify_index
+from flexmeasures.utils.flexmeasures_inflection import pluralize
 
 # Profile steering imports
 from flexmeasures_s2.profile_steering.root_planner import RootPlanner
@@ -579,7 +582,21 @@ class S2Scheduler(Scheduler):
                 event_starts_after=self.start,
                 event_ends_before=self.end,
                 resolution=self.resolution,
+                one_deterministic_belief_per_event=True,
             )
+            if (
+                n_missing_prices := len(tariffs)
+                - (self.end - self.start) // self.resolution
+            ) > 0:
+                app.logger.warning(
+                    f"Missing {n_missing_prices} {pluralize('price', n_missing_prices)} in the period {self.start.isoformat()} until {self.end.isoformat()}"
+                )
+                tariffs = simplify_index(tariffs)
+                tariffs = tariffs.reindex(
+                    initialize_index(
+                        start=self.start, end=self.end, resolution=self.resolution
+                    )
+                ).ffill()
             breakpoint()
             global_target_profile = TargetProfile.from_tariff_values(
                 metadata=profile_metadata,
