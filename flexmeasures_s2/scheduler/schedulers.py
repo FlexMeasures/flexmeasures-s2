@@ -642,37 +642,48 @@ class S2Scheduler(Scheduler):
         elif target_mode == "costs":
             price_sensor_id = app.config.get("FLEXMEASURES_S2_PRICE_SENSOR", 2)
             price_sensor = db.session.get(Sensor, price_sensor_id)
-            assert price_sensor.unit == "EUR/MWh"
-            tariffs = price_sensor.search_beliefs(
-                event_starts_after=self.start,
-                event_ends_before=self.end,
-                resolution=self.resolution,
-                one_deterministic_belief_per_event=True,
-            )
-            if (
-                n_missing_prices := (self.end - self.start) // self.resolution
-                - len(tariffs)
-            ) > 0:
-                tariffs = simplify_index(tariffs)
-                tariffs = tariffs.reindex(
-                    initialize_index(
-                        start=self.start, end=self.end, resolution=self.resolution
-                    )
+            if price_sensor is None:
+                logger.warning(
+                    f"Price sensor with ID {price_sensor_id} not found, falling back to energy target mode"
                 )
-                if n_missing_prices == len(tariffs):
-                    app.logger.warning(
-                        f"All prices are missing in the period {self.start.isoformat()} until {self.end.isoformat()}; assuming a constant energy price of 1 EUR/MWh"
+                # Fall back to creating a simple energy target
+                global_target_profile = TargetProfile(
+                    profile_start=profile_metadata.profile_start,
+                    timestep_duration=profile_metadata.timestep_duration,
+                    elements=target_elements,  # type: ignore[arg-type]
+                )
+            else:
+                assert price_sensor.unit == "EUR/MWh"
+                tariffs = price_sensor.search_beliefs(
+                    event_starts_after=self.start,
+                    event_ends_before=self.end,
+                    resolution=self.resolution,
+                    one_deterministic_belief_per_event=True,
+                )
+                if (
+                    n_missing_prices := (self.end - self.start) // self.resolution
+                    - len(tariffs)
+                ) > 0:
+                    tariffs = simplify_index(tariffs)
+                    tariffs = tariffs.reindex(
+                        initialize_index(
+                            start=self.start, end=self.end, resolution=self.resolution
+                        )
                     )
-                    tariffs = tariffs.fillna(1)
-                else:
-                    app.logger.warning(
-                        f"Forward filling {n_missing_prices} {pluralize('price', n_missing_prices)} in the period {self.start.isoformat()} until {self.end.isoformat()}"
-                    )
-                    tariffs = tariffs.ffill()
-            global_target_profile = TargetProfile.from_tariff_values(
-                metadata=profile_metadata,
-                tariff_values=tariffs.values,
-            )
+                    if n_missing_prices == len(tariffs):
+                        app.logger.warning(
+                            f"All prices are missing in the period {self.start.isoformat()} until {self.end.isoformat()}; assuming a constant energy price of 1 EUR/MWh"
+                        )
+                        tariffs = tariffs.fillna(1)
+                    else:
+                        app.logger.warning(
+                            f"Forward filling {n_missing_prices} {pluralize('price', n_missing_prices)} in the period {self.start.isoformat()} until {self.end.isoformat()}"
+                        )
+                        tariffs = tariffs.ffill()
+                global_target_profile = TargetProfile.from_tariff_values(
+                    metadata=profile_metadata,
+                    tariff_values=tariffs.values,
+                )
         else:
             raise ValueError(f"Unknown FLEXMEASURES_S2_TARGET_MODE='{target_mode}'")
 
