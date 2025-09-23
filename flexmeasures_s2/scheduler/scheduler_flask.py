@@ -4,7 +4,8 @@ from typing import Any, Dict
 
 from flask import current_app as app
 
-from flexmeasures import Scheduler
+from flexmeasures import Scheduler, Sensor
+from flexmeasures.data import db
 from flexmeasures.data.models.planning.utils import initialize_index
 from flexmeasures.utils.flexmeasures_inflection import pluralize
 
@@ -178,7 +179,9 @@ class S2FlaskScheduler(Scheduler):
                 )
             else:
                 # Query tariff data for the planning period
-                tariffs = self.sensor.search_beliefs(
+                price_sensor_id = app.config.get("FLEXMEASURES_S2_PRICE_SENSOR", 2)
+                price_sensor = db.session.get(Sensor, price_sensor_id)
+                tariffs = price_sensor.search_beliefs(
                     event_starts_after=self.start,
                     event_ends_before=self.end,
                     resolution=self.resolution,
