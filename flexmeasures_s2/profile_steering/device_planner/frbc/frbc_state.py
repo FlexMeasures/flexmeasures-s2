@@ -153,11 +153,6 @@ class FrbcState:
 
             self.selection_reason: Optional[SelectionReason] = None
             self.actuator_configurations = actuator_configurations or {}
-            for k in list(self.actuator_configurations.keys()):
-                if isinstance(k, str):
-                    self.actuator_configurations[k] = self.actuator_configurations.pop(
-                        k
-                    )
 
             self.timestep.add_state(self)
 
