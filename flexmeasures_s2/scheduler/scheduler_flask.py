@@ -1,4 +1,3 @@
-import pandas as pd
 from datetime import datetime
 from typing import Any, Dict
 
@@ -7,6 +6,7 @@ from flask import current_app as app
 from flexmeasures import Scheduler, Sensor
 from flexmeasures.data import db
 from flexmeasures.data.models.planning.utils import initialize_index
+from flexmeasures.data.queries.utils import simplify_index
 from flexmeasures.utils.flexmeasures_inflection import pluralize
 
 # Profile steering imports
@@ -187,27 +187,13 @@ class S2FlaskScheduler(Scheduler):
                     resolution=self.resolution,
                     beliefs_before=self.belief_time,
                     most_recent_beliefs_only=True,
-                ).droplevel([0, 1])
+                )
 
-                # Handle missing tariff data
-                if tariffs.empty:
-                    app.logger.warning(
-                        f"No tariff data found for period {self.start.isoformat()} until {self.end.isoformat()}. Using default values."
-                    )
-                    tariffs = pd.Series(
-                        1,  # 1 EUR/MWh default
-                        index=initialize_index(
-                            start=self.start, end=self.end, resolution=self.resolution
-                        ),
-                    )
-                else:
-                    n_missing_prices = (
-                        initialize_index(
-                            start=self.start, end=self.end, resolution=self.resolution
-                        )
-                        .difference(tariffs.index)
-                        .size
-                    )
+                if (
+                    n_missing_prices := (self.end - self.start) // self.resolution
+                    - len(tariffs)
+                ) > 0:
+                    tariffs = simplify_index(tariffs)
                     tariffs = tariffs.reindex(
                         initialize_index(
                             start=self.start, end=self.end, resolution=self.resolution
