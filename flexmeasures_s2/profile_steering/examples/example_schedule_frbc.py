@@ -254,7 +254,7 @@ def create_recharge_system_description(
     on_to_off_timer = Timer(
         id=id_on_to_off_timer,
         diagnostic_label="charge_on.to.off.timer",
-        duration=Duration(__root__=30),
+        duration=Duration(root=30),
     )
     id_off_to_on_timer = str(uuid.uuid4())
     logging.debug(f"id_off_to_on_timer: {id_off_to_on_timer}")
@@ -262,7 +262,7 @@ def create_recharge_system_description(
     off_to_on_timer = Timer(
         id=id_off_to_on_timer,
         diagnostic_label="charge_off.to.on.timer",
-        duration=Duration(__root__=30),
+        duration=Duration(root=30),
     )
     transition_id_from_on_to_off = str(uuid.uuid4())
     logging.debug(f"transition_id_from_on_to_off: {transition_id_from_on_to_off}")

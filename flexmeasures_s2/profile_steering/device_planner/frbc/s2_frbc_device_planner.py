@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Optional
-
-from flask import current_app as app
+import logging
 
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.common.proposal import Proposal
@@ -205,7 +204,7 @@ class S2FrbcDevicePlanner(DevicePlanner):
     def get_device_plan(self) -> Optional[DevicePlan]:
         if self.accepted_plan is None:
             return None
-        app.logger.debug(
+        logging.debug(
             dict(
                 device_id=self.device_id,
                 device_name=self.device_name,

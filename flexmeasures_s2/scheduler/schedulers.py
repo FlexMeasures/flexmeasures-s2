@@ -2,13 +2,8 @@ import pandas as pd
 from datetime import datetime
 from typing import Any, Dict, Optional
 import logging
-from flask import current_app as app
 
-from flexmeasures import Scheduler, Sensor
-from flexmeasures.data import db
-from flexmeasures.data.models.planning.utils import initialize_index
-from flexmeasures.data.queries.utils import simplify_index
-from flexmeasures.utils.flexmeasures_inflection import pluralize
+from flexmeasures import Scheduler
 
 # Profile steering imports
 from flexmeasures_s2.profile_steering.root_planner import RootPlanner
@@ -286,13 +281,6 @@ class S2Scheduler(Scheduler):
         """
         if not self.config_deserialized:
             self.deserialize_config()
-
-        # TODO: Implement the actual scheduling logic
-        # This should:
-        # 1. Create ClusterState from FlexMeasures data
-        # 2. Create ClusterTarget from flex_model
-        # 3. Call planning_service.plan()
-        # 4. Extract FRBCInstructions from device plans
 
         try:
             # Create planning service
@@ -631,8 +619,8 @@ class S2Scheduler(Scheduler):
         )
 
         # Type ignore: TargetProfile constructor accepts List[int] and converts to JouleElement
-        target_mode = app.config.get("FLEXMEASURES_S2_TARGET_MODE", "costs")
-        app.logger.debug(f"Target mode = {target_mode}")
+        target_mode = "costs"  # Default mode when running outside Flask context
+        logging.debug(f"Target mode = {target_mode}")
         if target_mode == "energy":
             global_target_profile = TargetProfile(
                 profile_start=profile_metadata.profile_start,
@@ -640,50 +628,16 @@ class S2Scheduler(Scheduler):
                 elements=target_elements,  # type: ignore[arg-type]
             )
         elif target_mode == "costs":
-            price_sensor_id = app.config.get("FLEXMEASURES_S2_PRICE_SENSOR", 2)
-            price_sensor = db.session.get(Sensor, price_sensor_id)
-            if price_sensor is None:
-                logger.warning(
-                    f"Price sensor with ID {price_sensor_id} not found, falling back to energy target mode"
-                )
-                # Fall back to creating a simple energy target
-                global_target_profile = TargetProfile(
-                    profile_start=profile_metadata.profile_start,
-                    timestep_duration=profile_metadata.timestep_duration,
-                    elements=target_elements,  # type: ignore[arg-type]
-                )
-            else:
-                assert price_sensor.unit == "EUR/MWh"
-                tariffs = price_sensor.search_beliefs(
-                    event_starts_after=self.start,
-                    event_ends_before=self.end,
-                    resolution=self.resolution,
-                    one_deterministic_belief_per_event=True,
-                )
-                if (
-                    n_missing_prices := (self.end - self.start) // self.resolution
-                    - len(tariffs)
-                ) > 0:
-                    tariffs = simplify_index(tariffs)
-                    tariffs = tariffs.reindex(
-                        initialize_index(
-                            start=self.start, end=self.end, resolution=self.resolution
-                        )
-                    )
-                    if n_missing_prices == len(tariffs):
-                        app.logger.warning(
-                            f"All prices are missing in the period {self.start.isoformat()} until {self.end.isoformat()}; assuming a constant energy price of 1 EUR/MWh"
-                        )
-                        tariffs = tariffs.fillna(1)
-                    else:
-                        app.logger.warning(
-                            f"Forward filling {n_missing_prices} {pluralize('price', n_missing_prices)} in the period {self.start.isoformat()} until {self.end.isoformat()}"
-                        )
-                        tariffs = tariffs.ffill()
-                global_target_profile = TargetProfile.from_tariff_values(
-                    metadata=profile_metadata,
-                    tariff_values=tariffs.values,
-                )
+            # For standalone operation, fall back to energy target mode
+            logging.warning(
+                "Cost target mode requires Flask context, falling back to energy target mode"
+            )
+            # Fall back to creating a simple energy target
+            global_target_profile = TargetProfile(
+                profile_start=profile_metadata.profile_start,
+                timestep_duration=profile_metadata.timestep_duration,
+                elements=target_elements,  # type: ignore[arg-type]
+            )
         else:
             raise ValueError(f"Unknown FLEXMEASURES_S2_TARGET_MODE='{target_mode}'")
 
