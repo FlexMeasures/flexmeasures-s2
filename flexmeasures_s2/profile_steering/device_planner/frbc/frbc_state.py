@@ -152,7 +152,15 @@ class FrbcState:
             )
 
             self.selection_reason: Optional[SelectionReason] = None
-            self.actuator_configurations = actuator_configurations or {}
+            self.actuator_configurations = {
+                **previous_state.actuator_configurations,
+                **(actuator_configurations or {}),
+            }
+            app.logger.debug(
+                "FrbcState %s actuator_configurations: %s",
+                timestep.start_date.isoformat(),
+                list(self.actuator_configurations.keys()),
+            )
 
             self.timestep.add_state(self)
 
