@@ -58,7 +58,7 @@ class S2FlaskScheduler(Scheduler):
         try:
             app.logger.info("S2FlaskScheduler.compute() called")
 
-            if self.frbc_device_data is None:
+            if not hasattr(self, "frbc_device_data") or self.frbc_device_data is None:
                 app.logger.error("No FRBC device data available for planning")
                 return []
 
@@ -121,7 +121,7 @@ class S2FlaskScheduler(Scheduler):
 
     def _get_planning_service(self) -> PlanningServiceImpl:
         """Get or create the planning service instance."""
-        if self.planning_service is None:
+        if not hasattr(self, "planning_service") or self.planning_service is None:
             config = PlanningServiceConfig(
                 energy_improvement_criterion=10.0,
                 cost_improvement_criterion=1.0,
@@ -293,10 +293,17 @@ class S2FlaskScheduler(Scheduler):
 
         return instructions
 
-    def set_frbc_device_data(self, device_data: Dict[str, Any]):
+    def set_frbc_device_data(self, device_data: Any):
         """Set FRBC device data for planning."""
         self.frbc_device_data = device_data
-        app.logger.debug(f"FRBC device data set for {len(device_data)} devices")
+        if hasattr(device_data, "resource_id"):
+            app.logger.debug(
+                f"FRBC device data set for device {device_data.resource_id}"
+            )
+        elif isinstance(device_data, dict):
+            app.logger.debug(f"FRBC device data set for {len(device_data)} devices")
+        else:
+            app.logger.debug(f"FRBC device data set: {type(device_data)}")
 
     def create_device_states_from_frbc_data(self) -> Dict[str, Any]:
         """
@@ -307,7 +314,7 @@ class S2FlaskScheduler(Scheduler):
         """
         from s2python.common import PowerValue, CommodityQuantity
 
-        if self.frbc_device_data is None:
+        if not hasattr(self, "frbc_device_data") or self.frbc_device_data is None:
             app.logger.warning("No FRBC device data available")
             return {}
 
