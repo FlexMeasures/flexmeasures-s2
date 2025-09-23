@@ -168,7 +168,9 @@ class S2FlaskScheduler(Scheduler):
                 elements=target_elements,  # type: ignore[arg-type]
             )
         else:  # target_mode == "costs"
-            if self.sensor is None:
+            price_sensor_id = app.config.get("FLEXMEASURES_S2_PRICE_SENSOR", 2)
+            price_sensor = db.session.get(Sensor, price_sensor_id)
+            if price_sensor is None:
                 app.logger.warning(
                     "Cannot create cost-based target without sensor. Using default energy target."
                 )
@@ -179,8 +181,6 @@ class S2FlaskScheduler(Scheduler):
                 )
             else:
                 # Query tariff data for the planning period
-                price_sensor_id = app.config.get("FLEXMEASURES_S2_PRICE_SENSOR", 2)
-                price_sensor = db.session.get(Sensor, price_sensor_id)
                 tariffs = price_sensor.search_beliefs(
                     event_starts_after=self.start,
                     event_ends_before=self.end,
