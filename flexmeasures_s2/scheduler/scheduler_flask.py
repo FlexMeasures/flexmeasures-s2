@@ -134,41 +134,10 @@ class S2FlaskScheduler(Scheduler):
 
     def _create_cluster_state_and_target(self):
         """Create cluster state and target from FRBC device data."""
-        device_states = {}
+        device_states = self.create_device_states_from_frbc_data()
 
-        if not self.frbc_device_data:
+        if not device_states:
             return device_states, None
-
-        # Process each device's FRBC data
-        for device_id, frbc_data in self.frbc_device_data.items():
-            try:
-                app.logger.debug(f"Processing device {device_id}")
-
-                # Create S2FrbcDeviceState from FRBC data
-                device_state = S2FrbcDeviceState.from_frbc_messages(
-                    device_id=device_id,
-                    device_name=device_id,
-                    connection_id=f"{device_id}_connection",
-                    priority_class=1,
-                    frbc_system_descriptions=frbc_data.get("system_descriptions", []),
-                    frbc_actuator_statuses=frbc_data.get("actuator_statuses", []),
-                    frbc_storage_statuses=frbc_data.get("storage_statuses", []),
-                    frbc_usage_forecasts=frbc_data.get("usage_forecasts", []),
-                    frbc_fill_level_target_profiles=frbc_data.get(
-                        "fill_level_target_profiles", []
-                    ),
-                    frbc_leakage_behaviours=frbc_data.get("leakage_behaviours", []),
-                    timestamp=self.start,
-                    planning_window=self.end - self.start,
-                    resolution=self.resolution,
-                )
-
-                device_states[device_id] = device_state
-                app.logger.debug(f"Device state created for {device_id}")
-
-            except Exception as e:
-                app.logger.error(f"Error creating device state for {device_id}: {e}")
-                continue
 
         # Create cluster target
         cluster_target = self._create_cluster_target()
@@ -344,16 +313,19 @@ class S2FlaskScheduler(Scheduler):
 
         device_states = {}
 
-        # Process each device's FRBC data
-        for device_id, frbc_data in self.frbc_device_data.items():
+        # Handle single FRBCDeviceData object from WebSocket
+        if hasattr(self.frbc_device_data, "resource_id"):
+            frbc_data = self.frbc_device_data
+            device_id = frbc_data.resource_id or "frbc_device_1"
+
             try:
                 app.logger.debug(f"Creating device state for {device_id}")
 
-                # Extract information from received FRBC data
-                system_desc = frbc_data.get("system_description")
-                storage_status = frbc_data.get("storage_status")
-                actuator_status = frbc_data.get("actuator_status")
-                fill_level_target_profile = frbc_data.get("fill_level_target_profile")
+                # Extract information from received FRBC data object
+                system_desc = frbc_data.system_description
+                storage_status = frbc_data.storage_status
+                actuator_status = frbc_data.actuator_status
+                fill_level_target_profile = frbc_data.fill_level_target_profile
 
                 # Create device state using the received FRBC data
                 device_state = S2FrbcDeviceState(
@@ -385,7 +357,59 @@ class S2FlaskScheduler(Scheduler):
 
             except Exception as e:
                 app.logger.error(f"Error creating device state for {device_id}: {e}")
-                continue
+
+        # Handle dictionary of device data (backward compatibility)
+        elif isinstance(self.frbc_device_data, dict):
+            for device_id, frbc_data in self.frbc_device_data.items():
+                try:
+                    app.logger.debug(f"Creating device state for {device_id}")
+
+                    # Extract information from received FRBC data
+                    system_desc = frbc_data.get("system_description")
+                    storage_status = frbc_data.get("storage_status")
+                    actuator_status = frbc_data.get("actuator_status")
+                    fill_level_target_profile = frbc_data.get(
+                        "fill_level_target_profile"
+                    )
+
+                    # Create device state using the received FRBC data
+                    device_state = S2FrbcDeviceState(
+                        device_id=device_id,
+                        device_name=f"FRBC Device {device_id}",
+                        connection_id=f"{device_id}_connection",
+                        priority_class=1,
+                        timestamp=self.start,
+                        energy_in_current_timestep=PowerValue(
+                            value=0,
+                            commodity_quantity=CommodityQuantity.ELECTRIC_POWER_L1,
+                        ),
+                        is_online=True,
+                        power_forecast=None,
+                        system_descriptions=[system_desc] if system_desc else [],
+                        leakage_behaviours=[],
+                        usage_forecasts=[],
+                        fill_level_target_profiles=[fill_level_target_profile]
+                        if fill_level_target_profile
+                        else [],
+                        computational_parameters=S2FrbcDeviceState.ComputationalParameters(
+                            100, 20
+                        ),
+                        actuator_statuses=[actuator_status] if actuator_status else [],
+                        storage_status=[storage_status] if storage_status else [],
+                    )
+
+                    device_states[device_id] = device_state
+                    app.logger.debug(f"Device state created for {device_id}")
+
+                except Exception as e:
+                    app.logger.error(
+                        f"Error creating device state for {device_id}: {e}"
+                    )
+                    continue
+        else:
+            app.logger.error(
+                f"Unexpected FRBC device data type: {type(self.frbc_device_data)}"
+            )
 
         return device_states
 
