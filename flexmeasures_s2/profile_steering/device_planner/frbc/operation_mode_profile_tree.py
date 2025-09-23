@@ -136,8 +136,6 @@ class OperationModeProfileTree:
     def generate_timesteps(self) -> None:
         time_step_start = self.profile_metadata.profile_start
         for i in range(self.profile_metadata.nr_of_timesteps):
-            if i == 187:
-                print("here")
             time_step_end = time_step_start + self.profile_metadata.timestep_duration
 
             if i == 0:
