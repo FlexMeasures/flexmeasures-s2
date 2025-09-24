@@ -1,11 +1,12 @@
-import pandas as pd
 from datetime import datetime
 from typing import Any, Dict
 
 from flask import current_app as app
 
-from flexmeasures import Scheduler
+from flexmeasures import Scheduler, Sensor
+from flexmeasures.data import db
 from flexmeasures.data.models.planning.utils import initialize_index
+from flexmeasures.data.queries.utils import simplify_index
 from flexmeasures.utils.flexmeasures_inflection import pluralize
 
 # Profile steering imports
@@ -167,7 +168,9 @@ class S2FlaskScheduler(Scheduler):
                 elements=target_elements,  # type: ignore[arg-type]
             )
         else:  # target_mode == "costs"
-            if self.sensor is None:
+            price_sensor_id = app.config.get("FLEXMEASURES_S2_PRICE_SENSOR", 2)
+            price_sensor = db.session.get(Sensor, price_sensor_id)
+            if price_sensor is None:
                 app.logger.warning(
                     "Cannot create cost-based target without sensor. Using default energy target."
                 )
@@ -178,33 +181,19 @@ class S2FlaskScheduler(Scheduler):
                 )
             else:
                 # Query tariff data for the planning period
-                tariffs = self.sensor.search_beliefs(
+                tariffs = price_sensor.search_beliefs(
                     event_starts_after=self.start,
                     event_ends_before=self.end,
                     resolution=self.resolution,
                     beliefs_before=self.belief_time,
                     most_recent_beliefs_only=True,
-                ).droplevel([0, 1])
+                )
 
-                # Handle missing tariff data
-                if tariffs.empty:
-                    app.logger.warning(
-                        f"No tariff data found for period {self.start.isoformat()} until {self.end.isoformat()}. Using default values."
-                    )
-                    tariffs = pd.Series(
-                        1,  # 1 EUR/MWh default
-                        index=initialize_index(
-                            start=self.start, end=self.end, resolution=self.resolution
-                        ),
-                    )
-                else:
-                    n_missing_prices = (
-                        initialize_index(
-                            start=self.start, end=self.end, resolution=self.resolution
-                        )
-                        .difference(tariffs.index)
-                        .size
-                    )
+                if (
+                    n_missing_prices := (self.end - self.start) // self.resolution
+                    - len(tariffs)
+                ) > 0:
+                    tariffs = simplify_index(tariffs)
                     tariffs = tariffs.reindex(
                         initialize_index(
                             start=self.start, end=self.end, resolution=self.resolution
