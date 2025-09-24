@@ -400,14 +400,10 @@ class FrbcState:
                         actuator_id
                     ].operation_mode_id
                 except KeyError:
-                    app.logger.error(
-                        f"UUID {actuator_id} not in actuator configurations"
-                    )
                     app.logger.debug(
                         f"previous_state.actuator_configurations = {previous_state.actuator_configurations}"
                     )
-                    previous_operation_mode_id = None
-                    # raise KeyError(f"UUID {actuator_id} not in actuator configurations")
+                    raise KeyError(f"UUID {actuator_id} not in actuator configurations")
 
                 new_operation_mode_id = actuator_configuration.operation_mode_id
                 if previous_operation_mode_id != new_operation_mode_id:
