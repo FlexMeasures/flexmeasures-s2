@@ -331,7 +331,11 @@ class S2FlaskScheduler(Scheduler):
                 # Extract information from received FRBC data object
                 system_desc = frbc_data.system_description
                 storage_status = frbc_data.storage_status
-                actuator_status = frbc_data.actuator_status
+                actuator_statuses = (
+                    list(frbc_data.actuator_statuses.values())
+                    if hasattr(frbc_data, "actuator_statuses")
+                    else []
+                )
                 fill_level_target_profile = frbc_data.fill_level_target_profile
 
                 # Create device state using the received FRBC data
@@ -355,7 +359,7 @@ class S2FlaskScheduler(Scheduler):
                     computational_parameters=S2FrbcDeviceState.ComputationalParameters(
                         100, 20
                     ),
-                    actuator_statuses=[actuator_status] if actuator_status else [],
+                    actuator_statuses=actuator_statuses,
                     storage_status=[storage_status] if storage_status else [],
                 )
 
@@ -374,7 +378,13 @@ class S2FlaskScheduler(Scheduler):
                     # Extract information from received FRBC data
                     system_desc = frbc_data.get("system_description")
                     storage_status = frbc_data.get("storage_status")
-                    actuator_status = frbc_data.get("actuator_status")
+                    actuator_statuses = (
+                        list(frbc_data.get("actuator_statuses", {}).values())
+                        if "actuator_statuses" in frbc_data
+                        else [frbc_data.get("actuator_status")]
+                        if frbc_data.get("actuator_status")
+                        else []
+                    )
                     fill_level_target_profile = frbc_data.get(
                         "fill_level_target_profile"
                     )
@@ -401,7 +411,7 @@ class S2FlaskScheduler(Scheduler):
                         computational_parameters=S2FrbcDeviceState.ComputationalParameters(
                             100, 20
                         ),
-                        actuator_statuses=[actuator_status] if actuator_status else [],
+                        actuator_statuses=actuator_statuses,
                         storage_status=[storage_status] if storage_status else [],
                     )
 

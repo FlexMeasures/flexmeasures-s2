@@ -578,8 +578,8 @@ class S2Scheduler(Scheduler):
             if self.frbc_device_data.fill_level_target_profile
             else [],
             computational_parameters=S2FrbcDeviceState.ComputationalParameters(100, 20),
-            actuator_statuses=[self.frbc_device_data.actuator_status]
-            if self.frbc_device_data.actuator_status
+            actuator_statuses=list(self.frbc_device_data.actuator_statuses.values())
+            if hasattr(self.frbc_device_data, "actuator_statuses")
             else [],
             storage_status=[storage_status] if storage_status else [],
         )
