@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Tuple, TYPE_CHECKING
 
+from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 from flexmeasures_s2.profile_steering.s2_utils.number_range_wrapper import (
     NumberRangeWrapper,
 )
@@ -56,7 +57,7 @@ class FrbcTimestep:
         self.end_date = end_date
         self.best_plan: Optional[FrbcState] = None
         self.emergency_state: Optional[FrbcState] = None
-        self.target: float = 0.0
+        self.target: Optional[TargetProfile.Element] = None
         self.min_constraint: float = 0.0
         self.max_constraint: float = 0.0
 
@@ -79,7 +80,10 @@ class FrbcTimestep:
         return self.computational_parameters.get_nr_of_buckets()
 
     def set_targets(
-        self, target: float, min_constraint: float, max_constraint: float
+        self,
+        target: TargetProfile.Element,
+        min_constraint: float,
+        max_constraint: float,
     ) -> None:
         self.target = target
         self.min_constraint = min_constraint
@@ -122,7 +126,7 @@ class FrbcTimestep:
     def get_duration_seconds(self) -> int:
         return int(self.duration.total_seconds())
 
-    def get_target(self) -> float:
+    def get_target(self) -> Optional[TargetProfile.Element]:
         return self.target
 
     def get_final_states(self) -> List["FrbcState"]:

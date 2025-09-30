@@ -113,7 +113,15 @@ class S2FrbcDevicePlanner(DevicePlanner):
         if self.accepted_plan is None:
             raise ValueError("No accepted plan found")
 
-        target = diff_to_global_target.add(self.accepted_plan.energy)
+        # TODO: check if diff_to_global_target has tarrif elements
+        # TODO: check for NULL elements in target
+        if diff_to_global_target.nr_of_joule_target_elements() != 0:
+            target = diff_to_global_target.add(self.accepted_plan.energy)
+        else:
+            target = diff_to_global_target
+            print(
+                "diff_to_global_target has no Joule elements, using the target directly"
+            )
 
         max_profile = diff_to_max.add(self.accepted_plan.energy)
         min_profile = diff_to_min.add(self.accepted_plan.energy)

@@ -125,9 +125,16 @@ class FrbcState:
                     + (target.joules - self.timestep_energy) ** 2
                 )
                 self.sum_energy_cost = previous_state.sum_energy_cost
+            elif isinstance(target, TargetProfile.TariffElement):
+                self.sum_squared_distance = previous_state.sum_squared_distance
+                self.sum_energy_cost = (
+                    previous_state.sum_energy_cost
+                    + target.tariff * self.timestep_energy
+                )
             else:
                 self.sum_squared_distance = previous_state.sum_squared_distance
                 self.sum_energy_cost = previous_state.sum_energy_cost
+
             squared_constraint_violation = (
                 previous_state.sum_squared_constraint_violation
             )

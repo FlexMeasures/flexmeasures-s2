@@ -45,11 +45,11 @@ import json
 ids = []
 
 # -> todo: plot of run time vs D, vs B, vs S and vs T
-D = 5  # number of devices  -> todo: multiprocessing on create_improved_planning
-B = 100  # number of buckets  -> todo: vectorize computation of next state from current state
-S = 20  # number of stratification layers
+D = 1  # number of devices  -> todo: multiprocessing on create_improved_planning
+B = 200  # number of buckets  -> todo: vectorize computation of next state from current state
+S = 30  # number of stratification layers
 PLANNING_WINDOW = pd.Timedelta("PT24H")
-PLANNING_RESOLUTION = pd.Timedelta("PT5M")
+PLANNING_RESOLUTION = pd.Timedelta("PT15M")
 
 T = PLANNING_WINDOW // PLANNING_RESOLUTION  # number of time steps
 TIMESTEP_DURATION = PLANNING_RESOLUTION / pd.Timedelta(
@@ -253,7 +253,7 @@ def create_recharge_system_description(
     on_to_off_timer = Timer(
         id=id_on_to_off_timer,
         diagnostic_label="charge_on.to.off.timer",
-        duration=Duration(__root__=30),
+        duration=Duration(30),
     )
     id_off_to_on_timer = str(uuid.uuid4())
     logging.debug(f"id_off_to_on_timer: {id_off_to_on_timer}")
@@ -261,7 +261,7 @@ def create_recharge_system_description(
     off_to_on_timer = Timer(
         id=id_off_to_on_timer,
         diagnostic_label="charge_off.to.on.timer",
-        duration=Duration(__root__=30),
+        duration=Duration(30),
     )
     transition_id_from_on_to_off = str(uuid.uuid4())
     logging.debug(f"transition_id_from_on_to_off: {transition_id_from_on_to_off}")
@@ -924,7 +924,7 @@ def test_planning_service_impl_with_cost_target():
         timestep_duration=timedelta(seconds=TIMESTEP_DURATION),
         nr_of_timesteps=T,
         predicted_energy_elements=energy_profile.elements,
-        target_energy_elements=[0] * T,  # No energy target for cost optimization
+        target_energy_elements=[0] * T,  # use the energy target just for plotting
         cost_elements=cost_elements,
         target_cost_elements=cost_target_elements,
     )
@@ -938,7 +938,7 @@ def test_planning_service_impl_with_cost_target():
 # Main function
 if __name__ == "__main__":
     # Test energy targeting (original functionality)
-    test_planning_service_impl_with_ev_device()
+    # test_planning_service_impl_with_ev_device()
 
     print("\n" + "=" * 60 + "\n")
 
