@@ -152,12 +152,6 @@ class FrbcState:
             )
 
             self.selection_reason: Optional[SelectionReason] = None
-            app.logger.debug(
-                f"Actuator IDs in previous_state.actuator_configurations = {list(previous_state.actuator_configurations.keys())}"
-            )
-            app.logger.debug(
-                f"Actuator IDs in actuator_configurations = {list(actuator_configurations.keys())}"
-            )
             self.actuator_configurations = {
                 **previous_state.actuator_configurations,
                 **(actuator_configurations or {}),
