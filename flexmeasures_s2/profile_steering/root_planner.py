@@ -1,4 +1,4 @@
-from typing import List, Any
+from typing import List, Any, Optional
 from datetime import datetime
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from .congestion_point_planner import CongestionPointPlanner
@@ -49,7 +49,7 @@ class RootPlanner:
 
     def get_congestion_point_controller(
         self, cp_id: str
-    ) -> CongestionPointPlanner | None:
+    ) -> Optional[CongestionPointPlanner]:
         for cp in self.cp_controllers:
             if cp.congestion_point_id == cp_id:
                 return cp

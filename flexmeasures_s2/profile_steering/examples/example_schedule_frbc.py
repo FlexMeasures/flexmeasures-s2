@@ -59,8 +59,9 @@ TIMESTEP_DURATION = PLANNING_RESOLUTION / pd.Timedelta(
 """
 # Ideas for speeding up
 
-- Parallelize device planning
-- Precompute UUIDs
+- Parallelize device planning - done
+- Precompute UUIDs - done
+- Use numpy for vectorized computation instead of list operations - done
 """
 
 
@@ -253,7 +254,7 @@ def create_recharge_system_description(
     on_to_off_timer = Timer(
         id=id_on_to_off_timer,
         diagnostic_label="charge_on.to.off.timer",
-        duration=Duration(30),
+        duration=Duration(root=30),
     )
     id_off_to_on_timer = str(uuid.uuid4())
     logging.debug(f"id_off_to_on_timer: {id_off_to_on_timer}")
@@ -261,7 +262,7 @@ def create_recharge_system_description(
     off_to_on_timer = Timer(
         id=id_off_to_on_timer,
         diagnostic_label="charge_off.to.on.timer",
-        duration=Duration(30),
+        duration=Duration(root=30),
     )
     transition_id_from_on_to_off = str(uuid.uuid4())
     logging.debug(f"transition_id_from_on_to_off: {transition_id_from_on_to_off}")
@@ -810,7 +811,50 @@ def test_planning_service_impl_with_ev_device():
     # Assert that we got a plan for our device
     assert len(device_plans) > 0
     print("Got device plan")
-    # Print and verify the energy profile
+
+    # Print instructions and analyze operation mode changes
+    all_instructions = []
+    for device_plan in device_plans:
+        if device_plan and device_plan.instruction_profile:
+            instructions = device_plan.instruction_profile.elements
+            all_instructions.extend(instructions)
+            print(
+                f"Device {device_plan.device_id} has {len(instructions)} instructions"
+            )
+
+    print(f"Total number of instructions: {len(all_instructions)}")
+
+    # Find instructions with different operation modes than previous instruction
+    mode_changes = []
+    previous_mode = None
+
+    for i, instruction in enumerate(all_instructions):
+        if hasattr(instruction, "operation_mode"):
+            current_mode = instruction.operation_mode
+            if previous_mode is not None and current_mode != previous_mode:
+                mode_changes.append(
+                    {
+                        "index": i,
+                        "instruction": instruction,
+                        "previous_mode": previous_mode,
+                        "current_mode": current_mode,
+                        "execution_time": getattr(instruction, "execution_time", "N/A"),
+                        "operation_mode_factor": getattr(
+                            instruction, "operation_mode_factor", "N/A"
+                        ),
+                    }
+                )
+            previous_mode = current_mode
+
+    print(f"Found {len(mode_changes)} operation mode changes:")
+    for change in mode_changes:
+        print(
+            f"  Instruction {change['index']}: {change['previous_mode']} -> {change['current_mode']}"
+        )
+        print(f"    Execution time: {change['execution_time']}")
+        print(f"    Operation mode factor: {change['operation_mode_factor']}")
+        print(f"    Instruction ID: {getattr(change['instruction'], 'id', 'N/A')}")
+        print()
 
     # Basic assertion - the energy profile should have the expected number of elements
     assert len(energy_profile.elements) == target_metadata.nr_of_timesteps

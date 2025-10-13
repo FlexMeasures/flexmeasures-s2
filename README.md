@@ -10,7 +10,14 @@
    using the FLEXMEASURES_PLUGINS setting (a list).
    Alternatively, if you installed this plugin as a package (e.g. via `python setup.py install`, `pip install -e` or `pip install flexmeasures_s2` should this project be on Pypi), then "flexmeasures_s2" suffices.
 
-2.  
+2. Config settings (during development)
+
+In your `flexmeasures.cfg`, you can set the following config settings for this plugin:
+
+- `FLEXMEASURES_S2_TARGET_MODE`: "energy" or "costs"
+- `FLEXMEASURES_S2_PRICE_SENSOR`: sensor ID of the price sensor
+
+To do: move these settings to the db asset (preferred scheduler and flex-context).
 
 
 ## Development

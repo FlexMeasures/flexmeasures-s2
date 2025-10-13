@@ -1,7 +1,11 @@
 from datetime import datetime
+from typing import Dict, Optional, Any, Tuple
+
+from flask import current_app as app
 from s2python.frbc import (
     FRBCSystemDescription,
 )
+
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 import flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state_wrapper as s2_frbc_device_state_wrapper
 
@@ -15,8 +19,6 @@ from flexmeasures_s2.profile_steering.device_planner.frbc.selection_reason_resul
     SelectionResult,
     SelectionReason,
 )
-
-from typing import Dict, Optional, Any, Tuple
 
 
 class FrbcState:
@@ -157,12 +159,10 @@ class FrbcState:
             )
 
             self.selection_reason: Optional[SelectionReason] = None
-            self.actuator_configurations = actuator_configurations or {}
-            for k in list(self.actuator_configurations.keys()):
-                if isinstance(k, str):
-                    self.actuator_configurations[k] = self.actuator_configurations.pop(
-                        k
-                    )
+            self.actuator_configurations = {
+                **previous_state.actuator_configurations,
+                **(actuator_configurations or {}),
+            }
 
             self.timestep.add_state(self)
 
@@ -402,6 +402,9 @@ class FrbcState:
                         actuator_id
                     ].operation_mode_id
                 except KeyError:
+                    app.logger.debug(
+                        f"previous_state.actuator_configurations = {previous_state.actuator_configurations}"
+                    )
                     raise KeyError(f"UUID {actuator_id} not in actuator configurations")
 
                 new_operation_mode_id = actuator_configuration.operation_mode_id
