@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict
 
 from flask import current_app as app
@@ -57,7 +57,7 @@ class S2FlaskScheduler(Scheduler):
             self.deserialize_config()
 
         try:
-            self.start = datetime.now()
+            self.start = datetime.now(timezone.utc)
             self.end = self.start + timedelta(hours=24)
 
             app.logger.info("S2FlaskScheduler.compute() called")
