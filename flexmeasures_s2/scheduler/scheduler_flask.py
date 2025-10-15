@@ -58,7 +58,7 @@ class S2FlaskScheduler(Scheduler):
             self.deserialize_config()
 
         try:
-            self.start = datetime.now(pytz.utc)
+            self.start = floor_datetime(datetime.now(pytz.utc), self.resolution)
             self.end = self.start + timedelta(hours=24)
 
             app.logger.info("S2FlaskScheduler.compute() called")
@@ -429,3 +429,21 @@ class S2FlaskScheduler(Scheduler):
         # This could be extended to read from self.flex_model if needed
         self.config_deserialized = True
         app.logger.debug("S2FlaskScheduler config deserialized")
+
+
+def floor_datetime(dt, resolution):
+    # Ensure dt is timezone-aware
+    if dt.tzinfo is None:
+        raise ValueError("Input datetime must be timezone-aware")
+
+    # Get total seconds since midnight
+    midnight = dt.replace(hour=0, minute=0, second=0, microsecond=0)
+    seconds_since_midnight = (dt - midnight).total_seconds()
+
+    # Floor the seconds to the nearest resolution
+    floored_seconds = int(seconds_since_midnight // resolution.total_seconds()) * int(
+        resolution.total_seconds()
+    )
+
+    # Return the floored datetime
+    return midnight + timedelta(seconds=floored_seconds)
