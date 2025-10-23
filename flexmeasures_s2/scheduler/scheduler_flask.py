@@ -12,12 +12,14 @@ from flexmeasures.utils.flexmeasures_inflection import pluralize
 
 # Profile steering imports
 from flexmeasures_s2.profile_steering.common_data_structures import ClusterState
+from flexmeasures_s2.profile_steering.cluster_plan import ClusterPlan
 from flexmeasures_s2.profile_steering.cluster_target import ClusterTarget
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import (
     S2FrbcDeviceState,
 )
 from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
+from s2python.frbc import FRBCInstruction
 
 from flexmeasures_s2.scheduler.schedulers import (
     PlanningServiceConfig,
@@ -110,7 +112,7 @@ class S2FlaskScheduler(Scheduler):
             app.logger.info("Plan generated successfully")
 
             # Convert cluster plan to instructions
-            instructions = cluster_plan.instructions
+            instructions = self._convert_cluster_plan_to_instructions(cluster_plan)
             app.logger.info(f"Generated {len(instructions)} instructions")
 
             return instructions
@@ -249,6 +251,40 @@ class S2FlaskScheduler(Scheduler):
                 target_elements.append(8800000)  # 8.8 MJ
 
         return target_elements
+
+    def _convert_cluster_plan_to_instructions(self, cluster_plan: ClusterPlan) -> list:
+        """Convert cluster plan to FRBC instructions."""
+        instructions = []
+
+        # Get device plans from cluster plan
+        device_plans = cluster_plan.get_plan_data().get_device_plans()
+
+        for device_plan in device_plans:
+            if device_plan is None:
+                continue
+
+            try:
+                # Convert device plan to instructions
+                device_instructions = device_plan.instruction_profile.elements
+
+                for instruction in device_instructions:
+                    if isinstance(instruction, FRBCInstruction):
+                        instructions.append(instruction)
+
+                # Add metadata about the plan
+                instructions.append(
+                    {
+                        "device_id": device_plan.device_id,
+                        "plan_type": "FRBC",
+                        "num_instructions": len(device_instructions),
+                    }
+                )
+
+            except Exception as e:
+                app.logger.error(f"Error converting device plan to instructions: {e}")
+                continue
+
+        return instructions
 
     def set_frbc_device_data(self, device_data: Any):
         """Set FRBC device data for planning."""
