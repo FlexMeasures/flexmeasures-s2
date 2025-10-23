@@ -132,6 +132,7 @@ class S2FlaskScheduler(Scheduler):
                                     inclusive="left",
                                 ),
                             ),
+                            "unit": "J",
                         }
                     )
             except Exception as exc:
