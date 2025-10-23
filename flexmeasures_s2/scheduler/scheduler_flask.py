@@ -114,7 +114,9 @@ class S2FlaskScheduler(Scheduler):
 
             # Convert cluster plan to instructions
             instructions = self._convert_cluster_plan_to_instructions(cluster_plan)
-            app.logger.info(f"Generated {len(instructions)} instructions")
+            app.logger.info(
+                f"Generated {len(instructions) - 1} instructions"
+            )  # -1 for the metadata
 
             # Add energy data entry for potential storage
             try:
