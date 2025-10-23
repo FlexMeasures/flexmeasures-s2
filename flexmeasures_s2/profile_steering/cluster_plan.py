@@ -2,6 +2,9 @@ from datetime import datetime
 from typing import List, Dict, Any, Optional
 import uuid
 
+from flask import current_app as app
+from s2python.frbc import FRBCInstruction
+
 # Common data types
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 
@@ -677,3 +680,38 @@ class ClusterPlan:
             sum_profile = sum_profile.add(device_plan.energy_profile)
 
         return sum_profile
+
+    @property
+    def instructions(self) -> list:
+        """Convert cluster plan to FRBC instructions."""
+        instructions = []
+
+        # Get device plans from cluster plan
+        device_plans = self.get_plan_data().get_device_plans()
+
+        for device_plan in device_plans:
+            if device_plan is None:
+                continue
+
+            try:
+                # Convert device plan to instructions
+                device_instructions = device_plan.instruction_profile.elements
+
+                for instruction in device_instructions:
+                    if isinstance(instruction, FRBCInstruction):
+                        instructions.append(instruction)
+
+                # Add metadata about the plan
+                instructions.append(
+                    {
+                        "device_id": device_plan.device_id,
+                        "plan_type": "FRBC",
+                        "num_instructions": len(device_instructions),
+                    }
+                )
+
+            except Exception as e:
+                app.logger.error(f"Error converting device plan to instructions: {e}")
+                continue
+
+        return instructions
