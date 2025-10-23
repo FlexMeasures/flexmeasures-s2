@@ -3,6 +3,7 @@ from typing import Any, Dict
 import pytz
 
 from flask import current_app as app
+import pandas as pd
 
 from flexmeasures import Scheduler, Sensor
 from flexmeasures.data import db
@@ -115,6 +116,28 @@ class S2FlaskScheduler(Scheduler):
             instructions = self._convert_cluster_plan_to_instructions(cluster_plan)
             app.logger.info(f"Generated {len(instructions)} instructions")
 
+            # Add energy data entry for potential storage
+            try:
+                device_plans = cluster_plan.get_plan_data().get_device_plans()
+                for device_plan in device_plans:
+                    instructions.append(
+                        {
+                            "device": device_plan.device_id,
+                            "data": pd.Series(
+                                device_plan.energy_profile.elements,
+                                index=pd.date_range(
+                                    self.start,
+                                    self.end,
+                                    freq=self.resolution,
+                                    inclusive="left",
+                                ),
+                            ),
+                        }
+                    )
+            except Exception as exc:
+                self.app.logger.warning(
+                    f"Energy profiles of devices could not be retrieved: {str(exc)}"
+                )
             return instructions
 
         except Exception as e:
