@@ -1,7 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict
 
 from flask import current_app as app
+import pandas as pd
 
 from flexmeasures import Scheduler, Sensor
 from flexmeasures.data import db
@@ -57,18 +58,30 @@ class S2FlaskScheduler(Scheduler):
             self.deserialize_config()
 
         try:
-            app.logger.info("S2FlaskScheduler.compute() called")
+            # Update start/end times if not already set or if they're outdated
+            # Always align to resolution boundary to avoid validation errors
+            now = datetime.now(timezone.utc)
+
+            # Align to resolution boundary
+            resolution_seconds = int(self.resolution.total_seconds())
+            total_seconds = int(now.timestamp())
+            aligned_seconds = (total_seconds // resolution_seconds) * resolution_seconds
+            start_aligned = datetime.fromtimestamp(aligned_seconds, tz=timezone.utc)
+
+            self.start = start_aligned
+            self.end = start_aligned + timedelta(hours=24)
+
+            app.logger.info("🧮 S2FlaskScheduler started")
 
             if not hasattr(self, "frbc_device_data") or self.frbc_device_data is None:
-                app.logger.error("No FRBC device data available for planning")
+                app.logger.error("❌ No FRBC device data available")
                 return []
 
             # Create device states from FRBC data
-            app.logger.info("Creating device states and cluster target from FRBC data")
             device_states, cluster_target = self._create_cluster_state_and_target()
 
             if not device_states:
-                app.logger.warning("No device states created, returning empty result")
+                app.logger.warning("⚠️ No device states created")
                 return []
 
             # Create cluster state
@@ -80,17 +93,24 @@ class S2FlaskScheduler(Scheduler):
                 },
             )
 
+            app.logger.debug(f"📊 Cluster: {len(device_states)} device(s) in state")
+
             # Get planning service
             planning_service = self._get_planning_service()
 
             # Calculate planning window
             planning_window_seconds = (self.end - self.start).total_seconds()
+            planning_hours = planning_window_seconds / 3600
 
-            app.logger.info(f"Planning window: {planning_window_seconds} seconds")
-            app.logger.info(f"Planning period: {self.start} to {self.end}")
+            app.logger.info(
+                f"📊 Planning: {planning_hours:.1f}h window ({self.start.strftime('%H:%M')} → {self.end.strftime('%H:%M')})"
+            )
+            app.logger.debug(
+                f"   ⏱️ Resolution: {self.resolution}, Belief time: {self.belief_time.strftime('%H:%M:%S') if self.belief_time else 'N/A'}"
+            )
 
             # Generate plan
-            app.logger.info("Generating cluster plan")
+            app.logger.debug("🧮 Running optimization algorithm...")
             cluster_plan = planning_service.plan(
                 state=cluster_state,
                 target=cluster_target,
@@ -102,22 +122,74 @@ class S2FlaskScheduler(Scheduler):
             )
 
             if cluster_plan is None:
-                app.logger.error("Planning service returned None")
+                app.logger.error("❌ Planning failed: returned None")
                 return []
 
-            app.logger.info("Plan generated successfully")
-
             # Convert cluster plan to instructions
+            app.logger.debug("🔄 Converting cluster plan to instructions...")
             instructions = self._convert_cluster_plan_to_instructions(cluster_plan)
-            app.logger.info(f"Generated {len(instructions)} instructions")
+            n_frbc_instructions = sum(
+                1 for i in instructions if isinstance(i, FRBCInstruction)
+            )
+
+            # Log instruction details
+            if n_frbc_instructions > 0:
+                frbc_only = [i for i in instructions if isinstance(i, FRBCInstruction)]
+                # Group by operation mode
+                mode_counts = {}
+                for instr in frbc_only:
+                    mode_id = str(instr.operation_mode)[:8]
+                    mode_counts[mode_id] = mode_counts.get(mode_id, 0) + 1
+
+                app.logger.info(
+                    f"✅ Generated {n_frbc_instructions} FRBC instruction(s)"
+                )
+                for mode_id, count in mode_counts.items():
+                    app.logger.debug(f"   📊 Mode {mode_id}...: {count} instruction(s)")
+
+            # Add energy data entry for potential storage
+            try:
+                device_plans = cluster_plan.get_plan_data().get_device_plans()
+                n_devices = len(device_plans) if device_plans else 0
+                if n_devices > 0:
+                    app.logger.debug(
+                        f"📊 Processing energy profiles for {n_devices} device(s)"
+                    )
+
+                for device_plan in device_plans:
+                    n_energy_values = (
+                        len(device_plan.energy_profile.elements)
+                        if device_plan.energy_profile
+                        else 0
+                    )
+                    app.logger.debug(
+                        f"   💡 Device {device_plan.device_id[:8]}...: {n_energy_values} energy values"
+                    )
+                    instructions.append(
+                        {
+                            "device": device_plan.device_id,
+                            "data": pd.Series(
+                                device_plan.energy_profile.elements,
+                                index=pd.date_range(
+                                    self.start,
+                                    self.end,
+                                    freq=self.resolution,
+                                    inclusive="left",
+                                ),
+                            ),
+                            "unit": "J",
+                        }
+                    )
+            except Exception as exc:
+                app.logger.warning(f"⚠️ Energy profile retrieval failed: {str(exc)}")
 
             return instructions
 
         except Exception as e:
-            app.logger.error(f"Error in S2FlaskScheduler.compute(): {e}")
+            app.logger.error(f"❌ Scheduler error: {e}")
             import traceback
 
-            app.logger.error(f"Traceback: {traceback.format_exc()}")
+            app.logger.debug(f"Traceback: {traceback.format_exc()}")
             return []
 
     def _get_planning_service(self) -> PlanningServiceImpl:
@@ -130,7 +202,7 @@ class S2FlaskScheduler(Scheduler):
                 multithreaded=False,
             )
             self.planning_service = PlanningServiceImpl(config)
-            app.logger.info("Planning service initialized")
+            app.logger.debug("⚙️ Planning service initialized")
         return self.planning_service
 
     def _create_cluster_state_and_target(self):
@@ -160,7 +232,6 @@ class S2FlaskScheduler(Scheduler):
 
         # Type ignore: TargetProfile constructor accepts List[int] and converts to JouleElement
         target_mode = app.config.get("FLEXMEASURES_S2_TARGET_MODE", "costs")
-        app.logger.debug(f"Target mode = {target_mode}")
         if target_mode == "energy":
             global_target_profile = TargetProfile(
                 profile_start=profile_metadata.profile_start,
@@ -171,9 +242,7 @@ class S2FlaskScheduler(Scheduler):
             price_sensor_id = app.config.get("FLEXMEASURES_S2_PRICE_SENSOR", 2)
             price_sensor = db.session.get(Sensor, price_sensor_id)
             if price_sensor is None:
-                app.logger.warning(
-                    "Cannot create cost-based target without sensor. Using default energy target."
-                )
+                app.logger.warning("⚠️ No price sensor found, using energy target")
                 global_target_profile = TargetProfile(
                     profile_start=profile_metadata.profile_start,
                     timestep_duration=profile_metadata.timestep_duration,
@@ -200,13 +269,11 @@ class S2FlaskScheduler(Scheduler):
                         )
                     )
                     if n_missing_prices == len(tariffs):
-                        app.logger.warning(
-                            f"All prices are missing in the period {self.start.isoformat()} until {self.end.isoformat()}; assuming a constant energy price of 1 EUR/MWh"
-                        )
+                        app.logger.warning("⚠️ All prices missing, assuming 1 EUR/MWh")
                         tariffs = tariffs.fillna(1)
                     else:
-                        app.logger.warning(
-                            f"Forward filling {n_missing_prices} {pluralize('price', n_missing_prices)} in the period {self.start.isoformat()} until {self.end.isoformat()}"
+                        app.logger.debug(
+                            f"Forward filling {n_missing_prices} missing {pluralize('price', n_missing_prices)}"
                         )
                         tariffs = tariffs.ffill()
 
@@ -263,6 +330,13 @@ class S2FlaskScheduler(Scheduler):
                 # Convert device plan to instructions
                 device_instructions = device_plan.instruction_profile.elements
 
+                frbc_count = sum(
+                    1 for i in device_instructions if isinstance(i, FRBCInstruction)
+                )
+                app.logger.debug(
+                    f"🔧 Device {device_plan.device_id[:8]}...: converting {frbc_count} FRBC instructions"
+                )
+
                 for instruction in device_instructions:
                     if isinstance(instruction, FRBCInstruction):
                         instructions.append(instruction)
@@ -277,7 +351,9 @@ class S2FlaskScheduler(Scheduler):
                 )
 
             except Exception as e:
-                app.logger.error(f"Error converting device plan to instructions: {e}")
+                app.logger.error(
+                    f"❌ Conversion failed for device {device_plan.device_id[:8] if hasattr(device_plan, 'device_id') else 'unknown'}...: {e}"
+                )
                 continue
 
         return instructions
@@ -304,7 +380,7 @@ class S2FlaskScheduler(Scheduler):
         from s2python.common import PowerValue, CommodityQuantity
 
         if not hasattr(self, "frbc_device_data") or self.frbc_device_data is None:
-            app.logger.warning("No FRBC device data available")
+            app.logger.warning("⚠️ No FRBC device data")
             return {}
 
         device_states = {}
@@ -315,7 +391,7 @@ class S2FlaskScheduler(Scheduler):
             device_id = frbc_data.resource_id or "frbc_device_1"
 
             try:
-                app.logger.debug(f"Creating device state for {device_id}")
+                app.logger.debug(f"🔧 Creating device state for {device_id[:8]}...")
 
                 # Extract information from received FRBC data object
                 system_desc = frbc_data.system_description
@@ -353,16 +429,18 @@ class S2FlaskScheduler(Scheduler):
                 )
 
                 device_states[device_id] = device_state
-                app.logger.debug(f"Device state created for {device_id}")
+                app.logger.debug(f"✅ Device state ready: {device_id[:8]}...")
 
             except Exception as e:
-                app.logger.error(f"Error creating device state for {device_id}: {e}")
+                app.logger.error(
+                    f"❌ Device state creation failed for {device_id[:8]}...: {e}"
+                )
 
         # Handle dictionary of device data (backward compatibility)
         elif isinstance(self.frbc_device_data, dict):
             for device_id, frbc_data in self.frbc_device_data.items():
                 try:
-                    app.logger.debug(f"Creating device state for {device_id}")
+                    app.logger.debug(f"🔧 Creating device state for {device_id[:8]}...")
 
                     # Extract information from received FRBC data
                     system_desc = frbc_data.get("system_description")
@@ -405,16 +483,16 @@ class S2FlaskScheduler(Scheduler):
                     )
 
                     device_states[device_id] = device_state
-                    app.logger.debug(f"Device state created for {device_id}")
+                    app.logger.debug(f"✅ Device state ready: {device_id[:8]}...")
 
                 except Exception as e:
                     app.logger.error(
-                        f"Error creating device state for {device_id}: {e}"
+                        f"❌ Device state creation failed for {device_id[:8]}...: {e}"
                     )
                     continue
         else:
             app.logger.error(
-                f"Unexpected FRBC device data type: {type(self.frbc_device_data)}"
+                f"❌ Unexpected FRBC data type: {type(self.frbc_device_data)}"
             )
 
         return device_states
@@ -424,4 +502,4 @@ class S2FlaskScheduler(Scheduler):
         # For now, we use default configuration
         # This could be extended to read from self.flex_model if needed
         self.config_deserialized = True
-        app.logger.debug("S2FlaskScheduler config deserialized")
+        app.logger.debug("⚙️ Config deserialized")
