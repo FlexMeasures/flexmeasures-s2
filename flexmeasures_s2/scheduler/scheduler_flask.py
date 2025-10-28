@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Dict
 
 from flask import current_app as app
+import pandas as pd
 
 from flexmeasures import Scheduler, Sensor
 from flexmeasures.data import db
@@ -92,6 +93,8 @@ class S2FlaskScheduler(Scheduler):
                 },
             )
 
+            app.logger.debug(f"📊 Cluster: {len(device_states)} device(s) in state")
+
             # Get planning service
             planning_service = self._get_planning_service()
 
@@ -102,8 +105,12 @@ class S2FlaskScheduler(Scheduler):
             app.logger.info(
                 f"📊 Planning: {planning_hours:.1f}h window ({self.start.strftime('%H:%M')} → {self.end.strftime('%H:%M')})"
             )
+            app.logger.debug(
+                f"   ⏱️ Resolution: {self.resolution}, Belief time: {self.belief_time.strftime('%H:%M:%S') if self.belief_time else 'N/A'}"
+            )
 
             # Generate plan
+            app.logger.debug("🧮 Running optimization algorithm...")
             cluster_plan = planning_service.plan(
                 state=cluster_state,
                 target=cluster_target,
@@ -119,11 +126,62 @@ class S2FlaskScheduler(Scheduler):
                 return []
 
             # Convert cluster plan to instructions
+            app.logger.debug("🔄 Converting cluster plan to instructions...")
             instructions = self._convert_cluster_plan_to_instructions(cluster_plan)
             n_frbc_instructions = sum(
                 1 for i in instructions if isinstance(i, FRBCInstruction)
             )
-            app.logger.info(f"✅ Generated {n_frbc_instructions} FRBC instruction(s)")
+
+            # Log instruction details
+            if n_frbc_instructions > 0:
+                frbc_only = [i for i in instructions if isinstance(i, FRBCInstruction)]
+                # Group by operation mode
+                mode_counts = {}
+                for instr in frbc_only:
+                    mode_id = str(instr.operation_mode)[:8]
+                    mode_counts[mode_id] = mode_counts.get(mode_id, 0) + 1
+
+                app.logger.info(
+                    f"✅ Generated {n_frbc_instructions} FRBC instruction(s)"
+                )
+                for mode_id, count in mode_counts.items():
+                    app.logger.debug(f"   📊 Mode {mode_id}...: {count} instruction(s)")
+
+            # Add energy data entry for potential storage
+            try:
+                device_plans = cluster_plan.get_plan_data().get_device_plans()
+                n_devices = len(device_plans) if device_plans else 0
+                if n_devices > 0:
+                    app.logger.debug(
+                        f"📊 Processing energy profiles for {n_devices} device(s)"
+                    )
+
+                for device_plan in device_plans:
+                    n_energy_values = (
+                        len(device_plan.energy_profile.elements)
+                        if device_plan.energy_profile
+                        else 0
+                    )
+                    app.logger.debug(
+                        f"   💡 Device {device_plan.device_id[:8]}...: {n_energy_values} energy values"
+                    )
+                    instructions.append(
+                        {
+                            "device": device_plan.device_id,
+                            "data": pd.Series(
+                                device_plan.energy_profile.elements,
+                                index=pd.date_range(
+                                    self.start,
+                                    self.end,
+                                    freq=self.resolution,
+                                    inclusive="left",
+                                ),
+                            ),
+                            "unit": "J",
+                        }
+                    )
+            except Exception as exc:
+                app.logger.warning(f"⚠️ Energy profile retrieval failed: {str(exc)}")
 
             return instructions
 
@@ -272,6 +330,13 @@ class S2FlaskScheduler(Scheduler):
                 # Convert device plan to instructions
                 device_instructions = device_plan.instruction_profile.elements
 
+                frbc_count = sum(
+                    1 for i in device_instructions if isinstance(i, FRBCInstruction)
+                )
+                app.logger.debug(
+                    f"🔧 Device {device_plan.device_id[:8]}...: converting {frbc_count} FRBC instructions"
+                )
+
                 for instruction in device_instructions:
                     if isinstance(instruction, FRBCInstruction):
                         instructions.append(instruction)
@@ -286,7 +351,9 @@ class S2FlaskScheduler(Scheduler):
                 )
 
             except Exception as e:
-                app.logger.error(f"Error converting device plan to instructions: {e}")
+                app.logger.error(
+                    f"❌ Conversion failed for device {device_plan.device_id[:8] if hasattr(device_plan, 'device_id') else 'unknown'}...: {e}"
+                )
                 continue
 
         return instructions
