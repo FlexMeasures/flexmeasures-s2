@@ -46,10 +46,10 @@ ids = []
 
 # -> todo: plot of run time vs D, vs B, vs S and vs T
 D = 1  # number of devices  -> todo: multiprocessing on create_improved_planning
-B = 100  # number of buckets  -> todo: vectorize computation of next state from current state
-S = 20  # number of stratification layers
+B = 200  # number of buckets  -> todo: vectorize computation of next state from current state
+S = 30  # number of stratification layers
 PLANNING_WINDOW = pd.Timedelta("PT24H")
-PLANNING_RESOLUTION = pd.Timedelta("PT5M")
+PLANNING_RESOLUTION = pd.Timedelta("PT15M")
 
 T = PLANNING_WINDOW // PLANNING_RESOLUTION  # number of time steps
 TIMESTEP_DURATION = PLANNING_RESOLUTION / pd.Timedelta(
@@ -968,7 +968,7 @@ def test_planning_service_impl_with_cost_target():
         timestep_duration=timedelta(seconds=TIMESTEP_DURATION),
         nr_of_timesteps=T,
         predicted_energy_elements=energy_profile.elements,
-        target_energy_elements=[0] * T,  # No energy target for cost optimization
+        target_energy_elements=[0] * T,  # use the energy target just for plotting
         cost_elements=cost_elements,
         target_cost_elements=cost_target_elements,
     )
@@ -982,7 +982,7 @@ def test_planning_service_impl_with_cost_target():
 # Main function
 if __name__ == "__main__":
     # Test energy targeting (original functionality)
-    test_planning_service_impl_with_ev_device()
+    # test_planning_service_impl_with_ev_device()
 
     print("\n" + "=" * 60 + "\n")
 

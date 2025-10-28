@@ -27,6 +27,7 @@ from flexmeasures_s2.profile_steering.common.soc_profile import SoCProfile
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import (
     S2FrbcDeviceState,
 )
+from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 from pint import UnitRegistry
 
 SI = UnitRegistry()
@@ -252,18 +253,20 @@ class OperationModeProfileTree:
 
     def find_best_plan(
         self,
-        target_profile: Any,
+        target_profile: TargetProfile,
         diff_to_min_profile: Any,
         diff_to_max_profile: Any,
         ids: Optional[dict] = None,
     ) -> S2FrbcPlan:
         for i, ts in enumerate(self.timesteps):
             ts.clear()
-            ts.set_targets(
-                target_profile.elements[i],
-                diff_to_min_profile.elements[i],
-                diff_to_max_profile.elements[i],
-            )
+            target_element = target_profile.elements[i]
+            if target_element is not None:
+                ts.set_targets(
+                    target_element,
+                    diff_to_min_profile.elements[i],
+                    diff_to_max_profile.elements[i],
+                )
         first_timestep_index = next(
             (i for i, ts in enumerate(self.timesteps) if ts.system_description),
             -1,
