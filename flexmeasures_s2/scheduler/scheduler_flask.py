@@ -442,6 +442,7 @@ class S2FlaskScheduler(Scheduler):
                     actuator_statuses=actuator_statuses,
                     storage_status=[storage_status] if storage_status else [],
                 )
+                app.logger.debug(f"Device state: {device_state}")
 
                 device_states[device_id] = device_state
                 app.logger.debug(f"✅ Device state ready: {device_id[:8]}...")
