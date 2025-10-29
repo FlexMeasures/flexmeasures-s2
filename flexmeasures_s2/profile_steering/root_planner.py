@@ -92,9 +92,16 @@ class RootPlanner:
             # Simulate a do-while loop: we run at least once.
             while True:
                 # Compute the difference profile
-                difference_profile: TargetProfile = self.target.subtract(
-                    self.root_ctrl_planning
-                )
+                if self.target.nr_of_joule_target_elements() != 0:
+                    difference_profile: TargetProfile = self.target.subtract(
+                        self.root_ctrl_planning
+                    )
+                else:
+                    difference_profile = self.target
+                    print(
+                        "difference_profile has no Joule elements, using the target directly"
+                    )
+
                 best_proposal = None
 
                 # Get proposals from each congestion point controller
