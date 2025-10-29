@@ -137,6 +137,21 @@ class S2FlaskScheduler(Scheduler):
                             "unit": "J",
                         }
                     )
+                    instructions.append(
+                        {
+                            "fill level": device_plan.device_id,
+                            "data": pd.Series(
+                                device_plan.fill_level_profile.elements,
+                                index=pd.date_range(
+                                    self.start,
+                                    self.end,
+                                    freq=self.resolution,
+                                    inclusive="left",
+                                ),
+                            ),
+                            "unit": "",
+                        }
+                    )
             except Exception as exc:
                 self.app.logger.warning(
                     f"Energy profiles of devices could not be retrieved: {str(exc)}"
