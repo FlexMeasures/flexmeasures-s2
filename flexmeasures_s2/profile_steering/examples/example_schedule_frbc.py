@@ -49,7 +49,7 @@ D = 1  # number of devices  -> todo: multiprocessing on create_improved_planning
 B = 200  # number of buckets  -> todo: vectorize computation of next state from current state
 S = 30  # number of stratification layers
 PLANNING_WINDOW = pd.Timedelta("PT24H")
-PLANNING_RESOLUTION = pd.Timedelta("PT15M")
+PLANNING_RESOLUTION = pd.Timedelta("PT5M")
 
 T = PLANNING_WINDOW // PLANNING_RESOLUTION  # number of time steps
 TIMESTEP_DURATION = PLANNING_RESOLUTION / pd.Timedelta(
@@ -824,37 +824,37 @@ def test_planning_service_impl_with_ev_device():
 
     print(f"Total number of instructions: {len(all_instructions)}")
 
-    # Find instructions with different operation modes than previous instruction
-    mode_changes = []
-    previous_mode = None
+    # Commented out: Find instructions with different operation modes than previous instruction
+    # mode_changes = []
+    # previous_mode = None
 
-    for i, instruction in enumerate(all_instructions):
-        if hasattr(instruction, "operation_mode"):
-            current_mode = instruction.operation_mode
-            if previous_mode is not None and current_mode != previous_mode:
-                mode_changes.append(
-                    {
-                        "index": i,
-                        "instruction": instruction,
-                        "previous_mode": previous_mode,
-                        "current_mode": current_mode,
-                        "execution_time": getattr(instruction, "execution_time", "N/A"),
-                        "operation_mode_factor": getattr(
-                            instruction, "operation_mode_factor", "N/A"
-                        ),
-                    }
-                )
-            previous_mode = current_mode
+    # for i, instruction in enumerate(all_instructions):
+    #     if hasattr(instruction, "operation_mode"):
+    #         current_mode = instruction.operation_mode
+    #         if previous_mode is not None and current_mode != previous_mode:
+    #             mode_changes.append(
+    #                 {
+    #                     "index": i,
+    #                     "instruction": instruction,
+    #                     "previous_mode": previous_mode,
+    #                     "current_mode": current_mode,
+    #                     "execution_time": getattr(instruction, "execution_time", "N/A"),
+    #                     "operation_mode_factor": getattr(
+    #                         instruction, "operation_mode_factor", "N/A"
+    #                     ),
+    #                 }
+    #             )
+    #         previous_mode = current_mode
 
-    print(f"Found {len(mode_changes)} operation mode changes:")
-    for change in mode_changes:
-        print(
-            f"  Instruction {change['index']}: {change['previous_mode']} -> {change['current_mode']}"
-        )
-        print(f"    Execution time: {change['execution_time']}")
-        print(f"    Operation mode factor: {change['operation_mode_factor']}")
-        print(f"    Instruction ID: {getattr(change['instruction'], 'id', 'N/A')}")
-        print()
+    # print(f"Found {len(mode_changes)} operation mode changes:")
+    # for change in mode_changes:
+    #     print(
+    #         f"  Instruction {change['index']}: {change['previous_mode']} -> {change['current_mode']}"
+    #     )
+    #     print(f"    Execution time: {change['execution_time']}")
+    #     print(f"    Operation mode factor: {change['operation_mode_factor']}")
+    #     print(f"    Instruction ID: {getattr(change['instruction'], 'id', 'N/A')}")
+    #     print()
 
     # Basic assertion - the energy profile should have the expected number of elements
     assert len(energy_profile.elements) == target_metadata.nr_of_timesteps
@@ -982,7 +982,7 @@ def test_planning_service_impl_with_cost_target():
 # Main function
 if __name__ == "__main__":
     # Test energy targeting (original functionality)
-    # test_planning_service_impl_with_ev_device()
+    test_planning_service_impl_with_ev_device()
 
     print("\n" + "=" * 60 + "\n")
 
