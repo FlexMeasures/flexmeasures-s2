@@ -24,6 +24,18 @@ from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_planner
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import (
     S2FrbcDeviceState,
 )
+from flexmeasures_s2.profile_steering.device_planner.nocontrol.s2_nocontrol_device_planner import (
+    S2NoControlDevicePlanner,
+)
+from flexmeasures_s2.profile_steering.device_planner.nocontrol.s2_nocontrol_device_state import (
+    S2NoControlDeviceState,
+)
+from flexmeasures_s2.profile_steering.device_planner.ddbc.s2_ddbc_device_planner import (
+    S2DdbcDevicePlanner,
+)
+from flexmeasures_s2.profile_steering.device_planner.ddbc.s2_ddbc_device_state import (
+    S2DdbcDeviceState,
+)
 
 # Schema imports
 from flexmeasures_s2.scheduler.schemas import S2FlexModelSchema, TNOFlexContextSchema
@@ -167,6 +179,25 @@ class PlanningServiceImpl(PlanningService):
                 logger.debug("S2 FRBC planner created!")
                 cpc.add_device_controller(
                     S2FrbcDevicePlanner(
+                        device_state,
+                        target.metadata,
+                        plan_due_by_date,
+                        congestion_point,
+                    )
+                )
+            elif isinstance(device_state, S2NoControlDeviceState):
+                logger.debug("S2 NoControl planner created!")
+                cpc.add_device_controller(
+                    S2NoControlDevicePlanner(
+                        device_state,
+                        target.metadata,
+                        congestion_point,
+                    )
+                )
+            elif isinstance(device_state, S2DdbcDeviceState):
+                logger.debug("S2 DDBC planner created!")
+                cpc.add_device_controller(
+                    S2DdbcDevicePlanner(
                         device_state,
                         target.metadata,
                         plan_due_by_date,
