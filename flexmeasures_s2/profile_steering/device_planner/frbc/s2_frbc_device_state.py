@@ -38,8 +38,8 @@ class S2FrbcDeviceState:
         usage_forecasts: List[FRBCUsageForecast],
         fill_level_target_profiles: List[FRBCFillLevelTargetProfile],
         computational_parameters: ComputationalParameters,
+        storage_status: FRBCStorageStatus = None,
         actuator_statuses: Optional[List[FRBCActuatorStatus]] = None,
-        storage_status: Optional[List[FRBCStorageStatus]] = None,
     ):
         self.device_id = device_id
         self.device_name = device_name
@@ -54,8 +54,8 @@ class S2FrbcDeviceState:
         self.usage_forecasts = usage_forecasts
         self.fill_level_target_profiles = fill_level_target_profiles
         self.computational_parameters = computational_parameters
-        self.actuator_statuses = actuator_statuses
         self.storage_status = storage_status
+        self.actuator_statuses = actuator_statuses
 
     def get_system_descriptions(self) -> List[FRBCSystemDescription]:
         return self.system_descriptions

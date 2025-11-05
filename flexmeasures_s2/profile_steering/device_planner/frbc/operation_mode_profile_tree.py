@@ -274,9 +274,11 @@ class OperationModeProfileTree:
         first_timestep = self.timesteps[first_timestep_index]
         last_timestep = self.timesteps[-1]
         state_zero = FrbcState(
+            # TODO : add frbcstorage statuse
             device_state=self.device_state.device_state,
             timestep=first_timestep,
-            present_fill_level=0,
+            # TODO: Add present fill level based on the storage statuses
+            initial_fill_level=self.device_state.device_state.storage_status.present_fill_level,
         )
         state_zero.generate_next_timestep_states(first_timestep)
 
@@ -298,7 +300,7 @@ class OperationModeProfileTree:
         # timestep_start_times = [ts.start_date for ts in self.timesteps]
 
         # Now use this list in the plot function
-        # plot_planning_results(timestep_start_times, plan.get_energy().elements, plan.fill_level.elements, plan.get_operation_mode_id(), ids)
+        # plot_planning_results(timestep_start_times, plan.get_ene rgy().elements, plan.fill_level.elements, plan.get_operation_mode_id(), ids)
 
         return plan
 

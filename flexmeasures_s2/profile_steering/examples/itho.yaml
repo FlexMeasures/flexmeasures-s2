@@ -1,0 +1,192 @@
+ INFO: 📋 FRBC.SystemDescription
+[FLEXMEASURES][2025-11-03 08:13:02,259] DEBUG: {"message_type":"FRBC.SystemDescription","message_id":"56b1c93f-7bf9-4f40-a0c2-8996309bad87","valid_from":"2025-11-03T08:12:42.561432Z","actuators":[{"id":"189f6a58-e78a-4c3f-bcda-6cd151342285","diagnostic_label":"Heat Pump (DHW)","supported_commodities":["ELECTRICITY"],"operation_modes":[{"id":"959eb2c3-3d92-4ca1-8005-1d9caab972a5","diagnostic_label":"DHW_OFF","elements":[{"fill_level_range":{"start_of_range":0.0,"end_of_range":100.0},"fill_rate":{"start_of_range":0.0,"end_of_range":0.0},"power_ranges":[{"start_of_range":0.0,"end_of_range":0.0,"commodity_quantity":"ELECTRIC.POWER.L1"}],"running_costs":{"start_of_range":0.0,"end_of_range":0.0}}],"abnormal_condition_only":false},{"id":"31314092-4456-43f8-89dd-0421194bc821","diagnostic_label":"DHW_ON","elements":[{"fill_level_range":{"start_of_range":10.0,"end_of_range":61.5},"fill_rate":{"start_of_range":0.002031807896078361,"end_of_range":0.002031807896078361},"power_ranges":[{"start_of_range":1100.0,"end_of_range":1100.0,"commodity_quantity":"ELECTRIC.POWER.L1"}]}],"abnormal_condition_only":false}],"transitions":[{"id":"4359a2e3-8782-4192-9775-2a29b828c45e","from":"959eb2c3-3d92-4ca1-8005-1d9caab972a5","to":"31314092-4456-43f8-89dd-0421194bc821","start_timers":["702cd17f-ac40-429e-93d4-ce69c8eb8040"],"blocking_timers":["b27ef8c9-c440-44cb-8deb-f7f85f491a92"],"transition_duration":300000,"abnormal_condition_only":false},{"id":"8d3bdeae-5052-4579-a62b-a36b427df63a","from":"31314092-4456-43f8-89dd-0421194bc821","to":"959eb2c3-3d92-4ca1-8005-1d9caab972a5","start_timers":["b27ef8c9-c440-44cb-8deb-f7f85f491a92"],"blocking_timers":["702cd17f-ac40-429e-93d4-ce69c8eb8040"],"transition_duration":180000,"abnormal_condition_only":false}],"timers":[{"id":"702cd17f-ac40-429e-93d4-ce69c8eb8040","diagnostic_label":"DHW Minimum On Time","duration":1800000},{"id":"b27ef8c9-c440-44cb-8deb-f7f85f491a92","diagnostic_label":"DHW Minimum Off Time","duration":600000}]}],"storage":{"diagnostic_label":"DHW Buffer","fill_level_label":"Temperature in degrees Celcius","provides_leakage_behaviour":true,"provides_fill_level_target_profile":true,"provides_usage_forecast":true,"fill_level_range":{"start_of_range":10.0,"end_of_range":61.5}}}
+[FLEXMEASURES][2025-11-03 08:13:02,264] DEBUG: ✅ ReceptionStatus: OK
+[FLEXMEASURES][2025-11-03 08:13:02,302] DEBUG:    ⚙️ Actuator 189f6a58...: 2 modes, 2 transitions, 2 timers
+[FLEXMEASURES][2025-11-03 08:13:02,310] DEBUG:    💾 Storage: 10.0-61.5 Temperature in degrees Celcius
+[FLEXMEASURES][2025-11-03 08:13:02,311] INFO: 📋 SystemDescription: 1 actuator(s)
+[FLEXMEASURES][2025-11-03 08:13:02,311] DEBUG:    ⏳ Missing actuator status for: 189f6a58-e78a-4c3f-bcda-6cd151342285
+[FLEXMEASURES][2025-11-03 08:13:02,312] DEBUG: 📊 Device readiness: ✅ SystemDescription | ❌ FillLevelTargetProfile | ❌ StorageStatus | ❌ ActuatorStatus (0/1 received)
+[FLEXMEASURES][2025-11-03 08:13:02,312] INFO: ⏳ Waiting for: FillLevelTargetProfile, StorageStatus, ActuatorStatus
+[FLEXMEASURES][2025-11-03 08:13:03,996] INFO: 📋 FRBC.SystemDescription
+[FLEXMEASURES][2025-11-03 08:13:04,006] DEBUG: {"message_type":"FRBC.SystemDescription","message_id":"ae668e82-c315-48a3-80be-7d3389b3e4b4","valid_from":"2025-11-03T08:12:44.399427Z","actuators":[{"id":"189f6a58-e78a-4c3f-bcda-6cd151342285","diagnostic_label":"Heat Pump (DHW)","supported_commodities":["ELECTRICITY"],"operation_modes":[{"id":"959eb2c3-3d92-4ca1-8005-1d9caab972a5","diagnostic_label":"DHW_OFF","elements":[{"fill_level_range":{"start_of_range":0.0,"end_of_range":100.0},"fill_rate":{"start_of_range":0.0,"end_of_range":0.0},"power_ranges":[{"start_of_range":0.0,"end_of_range":0.0,"commodity_quantity":"ELECTRIC.POWER.3_PHASE_SYMMETRIC"}],"running_costs":{"start_of_range":0.0,"end_of_range":0.0}}],"abnormal_condition_only":false},{"id":"31314092-4456-43f8-89dd-0421194bc821","diagnostic_label":"DHW_ON","elements":[{"fill_level_range":{"start_of_range":10.0,"end_of_range":61.5},"fill_rate":{"start_of_range":0.010397806827295799,"end_of_range":0.010397806827295799},"power_ranges":[{"start_of_range":2060.9,"end_of_range":2060.9,"commodity_quantity":"ELECTRIC.POWER.3_PHASE_SYMMETRIC"}]}],"abnormal_condition_only":false}],"transitions":[{"id":"4359a2e3-8782-4192-9775-2a29b828c45e","from":"959eb2c3-3d92-4ca1-8005-1d9caab972a5","to":"31314092-4456-43f8-89dd-0421194bc821","start_timers":["702cd17f-ac40-429e-93d4-ce69c8eb8040"],"blocking_timers":["b27ef8c9-c440-44cb-8deb-f7f85f491a92"],"transition_duration":300000,"abnormal_condition_only":false},{"id":"8d3bdeae-5052-4579-a62b-a36b427df63a","from":"31314092-4456-43f8-89dd-0421194bc821","to":"959eb2c3-3d92-4ca1-8005-1d9caab972a5","start_timers":["b27ef8c9-c440-44cb-8deb-f7f85f491a92"],"blocking_timers":["702cd17f-ac40-429e-93d4-ce69c8eb8040"],"transition_duration":180000,"abnormal_condition_only":false}],"timers":[{"id":"702cd17f-ac40-429e-93d4-ce69c8eb8040","diagnostic_label":"DHW Minimum On Time","duration":1800000},{"id":"b27ef8c9-c440-44cb-8deb-f7f85f491a92","diagnostic_label":"DHW Minimum Off Time","duration":600000}]}],"storage":{"diagnostic_label":"DHW Buffer","fill_level_label":"Temperature in degrees Celcius","provides_leakage_behaviour":true,"provides_fill_level_target_profile":true,"provides_usage_forecast":true,"fill_level_range":{"start_of_range":10.0,"end_of_range":61.5}}}
+[FLEXMEASURES][2025-11-03 08:13:04,008] DEBUG: ✅ ReceptionStatus: OK
+[FLEXMEASURES][2025-11-03 08:13:04,034] INFO: 📋 FRBC.SystemDescription
+[FLEXMEASURES][2025-11-03 08:13:04,037] DEBUG: {"message_type":"FRBC.SystemDescription","message_id":"d8d28734-7073-4a7a-967c-6047f4f35e1f","valid_from":"2025-11-03T08:12:44.405821Z","actuators":[{"id":"189f6a58-e78a-4c3f-bcda-6cd151342285","diagnostic_label":"Heat Pump (DHW)","supported_commodities":["ELECTRICITY"],"operation_modes":[{"id":"959eb2c3-3d92-4ca1-8005-1d9caab972a5","diagnostic_label":"DHW_OFF","elements":[{"fill_level_range":{"start_of_range":0.0,"end_of_range":100.0},"fill_rate":{"start_of_range":0.0,"end_of_range":0.0},"power_ranges":[{"start_of_range":0.0,"end_of_range":0.0,"commodity_quantity":"ELECTRIC.POWER.3_PHASE_SYMMETRIC"}],"running_costs":{"start_of_range":0.0,"end_of_range":0.0}}],"abnormal_condition_only":false},{"id":"31314092-4456-43f8-89dd-0421194bc821","diagnostic_label":"DHW_ON","elements":[{"fill_level_range":{"start_of_range":10.0,"end_of_range":45.0},"fill_rate":{"start_of_range":0.010657432945423886,"end_of_range":0.010657432945423886},"power_ranges":[{"start_of_range":1596.1,"end_of_range":1596.1,"commodity_quantity":"ELECTRIC.POWER.3_PHASE_SYMMETRIC"}]}],"abnormal_condition_only":false}],"transitions":[{"id":"4359a2e3-8782-4192-9775-2a29b828c45e","from":"959eb2c3-3d92-4ca1-8005-1d9caab972a5","to":"31314092-4456-43f8-89dd-0421194bc821","start_timers":["702cd17f-ac40-429e-93d4-ce69c8eb8040"],"blocking_timers":["b27ef8c9-c440-44cb-8deb-f7f85f491a92"],"transition_duration":300000,"abnormal_condition_only":false},{"id":"8d3bdeae-5052-4579-a62b-a36b427df63a","from":"31314092-4456-43f8-89dd-0421194bc821","to":"959eb2c3-3d92-4ca1-8005-1d9caab972a5","start_timers":["b27ef8c9-c440-44cb-8deb-f7f85f491a92"],"blocking_timers":["702cd17f-ac40-429e-93d4-ce69c8eb8040"],"transition_duration":180000,"abnormal_condition_only":false}],"timers":[{"id":"702cd17f-ac40-429e-93d4-ce69c8eb8040","diagnostic_label":"DHW Minimum On Time","duration":1800000},{"id":"b27ef8c9-c440-44cb-8deb-f7f85f491a92","diagnostic_label":"DHW Minimum Off Time","duration":600000}]}],"storage":{"diagnostic_label":"DHW Buffer","fill_level_label":"Temperature in degrees Celcius","provides_leakage_behaviour":true,"provides_fill_level_target_profile":true,"provides_usage_forecast":true,"fill_level_range":{"start_of_range":10.0,"end_of_range":45.0}}}
+[FLEXMEASURES][2025-11-03 08:13:04,037] DEBUG: ✅ ReceptionStatus: OK
+[FLEXMEASURES][2025-11-03 08:13:04,043] DEBUG:    ⚙️ Actuator 189f6a58...: 2 modes, 2 transitions, 2 timers
+[FLEXMEASURES][2025-11-03 08:13:04,052] DEBUG:    💾 Storage: 10.0-61.5 Temperature in degrees Celcius
+[FLEXMEASURES][2025-11-03 08:13:04,053] DEBUG:    ⚙️ Actuator 189f6a58...: 2 modes, 2 transitions, 2 timers
+[FLEXMEASURES][2025-11-03 08:13:04,053] INFO: 📋 SystemDescription: 1 actuator(s)
+[FLEXMEASURES][2025-11-03 08:13:04,054] DEBUG:    ⏳ Missing actuator status for: 189f6a58-e78a-4c3f-bcda-6cd151342285
+[FLEXMEASURES][2025-11-03 08:13:04,054] DEBUG: 📊 Device readiness: ✅ SystemDescription | ❌ FillLevelTargetProfile | ❌ StorageStatus | ❌ ActuatorStatus (0/1 received)
+[FLEXMEASURES][2025-11-03 08:13:04,054] INFO: ⏳ Waiting for: FillLevelTargetProfile, StorageStatus, ActuatorStatus
+[FLEXMEASURES][2025-11-03 08:13:04,064] DEBUG:    💾 Storage: 10.0-45.0 Temperature in degrees Celcius
+[FLEXMEASURES][2025-11-03 08:13:04,065] INFO: 📋 SystemDescription: 1 actuator(s)
+[FLEXMEASURES][2025-11-03 08:13:04,065] DEBUG:    ⏳ Missing actuator status for: 189f6a58-e78a-4c3f-bcda-6cd151342285
+[FLEXMEASURES][2025-11-03 08:13:04,065] DEBUG: 📊 Device readiness: ✅ SystemDescription | ❌ FillLevelTargetProfile | ❌ StorageStatus | ❌ ActuatorStatus (0/1 received)
+[FLEXMEASURES][2025-11-03 08:13:04,066] INFO: ⏳ Waiting for: FillLevelTargetProfile, StorageStatus, ActuatorStatus
+[FLEXMEASURES][2025-11-03 08:13:23,415] INFO: 📥 PowerMeasurement
+[FLEXMEASURES][2025-11-03 08:13:26,546] DEBUG: {"message_type":"PowerMeasurement","message_id":"51a2cb16-7482-4d83-b821-4650ad7ac4e4","measurement_timestamp":"2025-11-03T08:13:03.688588Z","values":[{"commodity_quantity":"ELECTRIC.POWER.L1","value":1100.0}]}
+[FLEXMEASURES][2025-11-03 08:13:27,227] INFO: 📥 PowerMeasurement
+[FLEXMEASURES][2025-11-03 08:13:28,343] INFO: 📥 PowerMeasurement
+[FLEXMEASURES][2025-11-03 08:13:28,484] DEBUG: ✅ ReceptionStatus: OK
+[FLEXMEASURES][2025-11-03 08:13:31,850] DEBUG: {"message_type":"PowerMeasurement","message_id":"9df1cb51-2a02-467b-8491-2eed109fa8b9","measurement_timestamp":"2025-11-03T08:13:05.588639Z","values":[{"commodity_quantity":"ELECTRIC.POWER.3_PHASE_SYMMETRIC","value":2.2}]}
+[FLEXMEASURES][2025-11-03 08:13:32,776] DEBUG: ✅ ReceptionStatus: OK
+[FLEXMEASURES][2025-11-03 08:13:32,593] DEBUG: {"message_type":"PowerMeasurement","message_id":"c8d6c04a-eb31-46d6-a307-f5de1c6e8375","measurement_timestamp":"2025-11-03T08:13:05.725115Z","values":[{"commodity_quantity":"ELECTRIC.POWER.3_PHASE_SYMMETRIC","value":2.8}]}
+[FLEXMEASURES][2025-11-03 08:13:34,551] DEBUG: ✅ ReceptionStatus: OK
+[FLEXMEASURES][2025-11-03 08:13:36,544] INFO: ⚙️ FRBC.ActuatorStatus
+[FLEXMEASURES][2025-11-03 08:13:37,444] INFO: ⚙️ FRBC.ActuatorStatus
+[FLEXMEASURES][2025-11-03 08:13:37,447] DEBUG: ✅ ReceptionStatus: OK
+[FLEXMEASURES][2025-11-03 08:13:37,449] DEBUG: ✅ ReceptionStatus: OK
+[FLEXMEASURES][2025-11-03 08:13:37,450] INFO: ⚙️ FRBC.ActuatorStatus
+[FLEXMEASURES][2025-11-03 08:13:37,450] DEBUG: ✅ ReceptionStatus: OK
+[FLEXMEASURES][2025-11-03 08:13:37,548] DEBUG: ⚙️ ActuatorStatus: factor=0.0
+[FLEXMEASURES][2025-11-03 08:13:37,553] DEBUG: 📊 Device readiness: ✅ SystemDescription | ❌ FillLevelTargetProfile | ❌ StorageStatus | ✅ ActuatorStatus (all 1 received)
+[FLEXMEASURES][2025-11-03 08:13:37,553] INFO: ⏳ Waiting for: FillLevelTargetProfile, StorageStatus
+[FLEXMEASURES][2025-11-03 08:13:37,553] DEBUG: ⚙️ ActuatorStatus: factor=0.0
+[FLEXMEASURES][2025-11-03 08:13:37,554] DEBUG: ⚙️ ActuatorStatus: factor=1.0
+[FLEXMEASURES][2025-11-03 08:13:37,554] DEBUG: 📊 Device readiness: ✅ SystemDescription | ❌ FillLevelTargetProfile | ❌ StorageStatus | ✅ ActuatorStatus (all 1 received)
+[FLEXMEASURES][2025-11-03 08:13:37,555] INFO: ⏳ Waiting for: FillLevelTargetProfile, StorageStatus
+[FLEXMEASURES][2025-11-03 08:13:37,554] DEBUG: 📊 Device readiness: ✅ SystemDescription | ❌ FillLevelTargetProfile | ❌ StorageStatus | ✅ ActuatorStatus (all 1 received)
+[FLEXMEASURES][2025-11-03 08:13:37,555] INFO: ⏳ Waiting for: FillLevelTargetProfile, StorageStatus
+[FLEXMEASURES][2025-11-03 08:13:55,822] ERROR: NotFound:"The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again." [occurred at /usr/local/lib/python3.10/dist-packages/werkzeug/routing/map.py(match):629,URL was: /cgi-bin/luci/;stok=/locale]
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/dist-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/usr/local/lib/python3.10/dist-packages/flask/app.py", line 854, in dispatch_request
+    self.raise_routing_exception(req)
+  File "/usr/local/lib/python3.10/dist-packages/flask/app.py", line 463, in raise_routing_exception
+    raise request.routing_exception  # type: ignore[misc]
+  File "/usr/local/lib/python3.10/dist-packages/flask/ctx.py", line 362, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+  File "/usr/local/lib/python3.10/dist-packages/werkzeug/routing/map.py", line 629, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+[FLEXMEASURES][2025-11-03 08:14:02,291] INFO: ⚙️ FRBC.ActuatorStatus
+[FLEXMEASURES][2025-11-03 08:14:02,297] DEBUG: ✅ ReceptionStatus: OK
+[FLEXMEASURES][2025-11-03 08:14:02,321] DEBUG: ⚙️ ActuatorStatus: factor=1.0
+[FLEXMEASURES][2025-11-03 08:14:02,322] DEBUG: 📊 Device readiness: ✅ SystemDescription | ❌ FillLevelTargetProfile | ❌ StorageStatus | ✅ ActuatorStatus (all 1 received)
+[FLEXMEASURES][2025-11-03 08:14:02,322] INFO: ⏳ Waiting for: FillLevelTargetProfile, StorageStatus
+[FLEXMEASURES][2025-11-03 08:14:02,323] INFO: 📥 FRBC.LeakageBehaviour
+[FLEXMEASURES][2025-11-03 08:14:02,324] DEBUG: {"message_type":"FRBC.LeakageBehaviour","message_id":"34c000d1-0140-4589-988f-12c80902169f","valid_from":"2025-11-03T08:13:42.632614Z","elements":[{"fill_level_range":{"start_of_range":10.0,"end_of_range":61.5},"leakage_rate":0.00004464134898917508}]}
+[FLEXMEASURES][2025-11-03 08:14:02,325] DEBUG: ✅ ReceptionStatus: OK
+[FLEXMEASURES][2025-11-03 08:14:04,030] INFO: ⚙️ FRBC.ActuatorStatus
+[FLEXMEASURES][2025-11-03 08:14:04,037] DEBUG: ✅ ReceptionStatus: OK
+[FLEXMEASURES][2025-11-03 08:14:04,057] DEBUG: ⚙️ ActuatorStatus: factor=0.0
+[FLEXMEASURES][2025-11-03 08:14:04,057] DEBUG: 📊 Device readiness: ✅ SystemDescription | ❌ FillLevelTargetProfile | ❌ StorageStatus | ✅ ActuatorStatus (all 1 received)
+[FLEXMEASURES][2025-11-03 08:14:04,058] INFO: ⏳ Waiting for: FillLevelTargetProfile, StorageStatus
+[FLEXMEASURES][2025-11-03 08:14:04,060] INFO: 📥 FRBC.LeakageBehaviour
+[FLEXMEASURES][2025-11-03 08:14:04,061] DEBUG: {"message_type":"FRBC.LeakageBehaviour","message_id":"301c976d-a646-4711-95af-37a69bf14b1b","valid_from":"2025-11-03T08:13:44.451202Z","elements":[{"fill_level_range":{"start_of_range":10.0,"end_of_range":61.5},"leakage_rate":0.00004222830309786831}]}
+[FLEXMEASURES][2025-11-03 08:14:04,061] DEBUG: ✅ ReceptionStatus: OK
+[FLEXMEASURES][2025-11-03 08:14:04,091] INFO: ⚙️ FRBC.ActuatorStatus
+[FLEXMEASURES][2025-11-03 08:14:04,091] DEBUG: ✅ ReceptionStatus: OK
+[FLEXMEASURES][2025-11-03 08:14:04,100] DEBUG: ⚙️ ActuatorStatus: factor=0.0
+[FLEXMEASURES][2025-11-03 08:14:04,100] DEBUG: 📊 Device readiness: ✅ SystemDescription | ❌ FillLevelTargetProfile | ❌ StorageStatus | ✅ ActuatorStatus (all 1 received)
+[FLEXMEASURES][2025-11-03 08:14:04,100] INFO: ⏳ Waiting for: FillLevelTargetProfile, StorageStatus
+[FLEXMEASURES][2025-11-03 08:14:04,102] INFO: 📥 FRBC.LeakageBehaviour
+[FLEXMEASURES][2025-11-03 08:14:04,103] DEBUG: {"message_type":"FRBC.LeakageBehaviour","message_id":"80a4c0a4-8814-4e21-9f1f-5cd038d4de6d","valid_from":"2025-11-03T08:13:44.479542Z","elements":[{"fill_level_range":{"start_of_range":10.0,"end_of_range":45.0},"leakage_rate":0.00004464134898917508}]}
+[FLEXMEASURES][2025-11-03 08:14:04,103] DEBUG: ✅ ReceptionStatus: OK
+[FLEXMEASURES][2025-11-03 08:15:14,782] INFO: 🔋 FRBC.StorageStatus
+[FLEXMEASURES][2025-11-03 08:15:19,702] INFO: 🔋 FRBC.StorageStatus
+[FLEXMEASURES][2025-11-03 08:15:19,700] INFO: 🔋 FRBC.StorageStatus
+[FLEXMEASURES][2025-11-03 08:15:19,798] DEBUG: {"message_type":"FRBC.StorageStatus","message_id":"d0970b64-b069-4738-96c5-b4318e6ce5cf","present_fill_level":42.4669997}
+[FLEXMEASURES][2025-11-03 08:15:19,858] DEBUG: ✅ ReceptionStatus: OK
+[FLEXMEASURES][2025-11-03 08:15:19,861] DEBUG: {"message_type":"FRBC.StorageStatus","message_id":"e101ac35-566d-4a27-8055-625ea344f50b","present_fill_level":16.182}
+[FLEXMEASURES][2025-11-03 08:15:19,902] DEBUG: {"message_type":"FRBC.StorageStatus","message_id":"fdef46a5-c812-4167-a3db-22518aa18654","present_fill_level":29.5889991}
+[FLEXMEASURES][2025-11-03 08:15:19,900] DEBUG: ✅ ReceptionStatus: OK
+[FLEXMEASURES][2025-11-03 08:15:19,939] DEBUG: ✅ ReceptionStatus: OK
+[FLEXMEASURES][2025-11-03 08:15:20,022] WARNING: Resource could not be saved as an asset: This session is provisioning a new connection; concurrent operations are not permitted (Background on this error at: https://sqlalche.me/e/20/isce)
+/usr/local/lib/python3.10/dist-packages/timely_beliefs/beliefs/classes.py:633: SAWarning: Object of type <TimedBelief> not in session, add operation along 'Sensor.beliefs' will not proceed (This warning originated from the Session 'autoflush' process, which was invoked automatically in response to a user-initiated operation.)
+  df = pd.DataFrame(session.execute(q))
+/usr/local/lib/python3.10/dist-packages/timely_beliefs/beliefs/classes.py:633: SAWarning: Object of type <TimedBelief> not in session, add operation along 'DataSource.beliefs' will not proceed (This warning originated from the Session 'autoflush' process, which was invoked automatically in response to a user-initiated operation.)
+  df = pd.DataFrame(session.execute(q))
+/usr/local/lib/python3.10/dist-packages/timely_beliefs/beliefs/classes.py:633: SAWarning: Object of type <TimedBelief> not in session, add operation along 'Sensor.beliefs' will not proceed (This warning originated from the Session 'autoflush' process, which was invoked automatically in response to a user-initiated operation.)
+  df = pd.DataFrame(session.execute(q))
+/usr/local/lib/python3.10/dist-packages/timely_beliefs/beliefs/classes.py:633: SAWarning: Object of type <TimedBelief> not in session, add operation along 'DataSource.beliefs' will not proceed (This warning originated from the Session 'autoflush' process, which was invoked automatically in response to a user-initiated operation.)
+  df = pd.DataFrame(session.execute(q))
+[FLEXMEASURES][2025-11-03 08:15:21,233] INFO: SAVING TO DB...
+/usr/local/lib/python3.10/dist-packages/timely_beliefs/beliefs/classes.py:332: SAWarning: Object of type <TimedBelief> not in session, add operation along 'Sensor.beliefs' will not proceed (This warning originated from the Session 'autoflush' process, which was invoked automatically in response to a user-initiated operation.)
+  session.execute(smt)
+/usr/local/lib/python3.10/dist-packages/timely_beliefs/beliefs/classes.py:332: SAWarning: Object of type <TimedBelief> not in session, add operation along 'DataSource.beliefs' will not proceed (This warning originated from the Session 'autoflush' process, which was invoked automatically in response to a user-initiated operation.)
+  session.execute(smt)
+[FLEXMEASURES][2025-11-03 08:15:21,464] INFO: 🔋 StorageStatus: 16.2%
+[FLEXMEASURES][2025-11-03 08:15:21,471] DEBUG: 📊 Device readiness: ✅ SystemDescription | ❌ FillLevelTargetProfile | ✅ StorageStatus | ✅ ActuatorStatus (all 1 received)
+[FLEXMEASURES][2025-11-03 08:15:21,471] INFO: ⏳ Waiting for: FillLevelTargetProfile
+[FLEXMEASURES][2025-11-03 08:15:21,516] INFO: 🎯 FRBC.FillLevelTargetProfile
+[FLEXMEASURES][2025-11-03 08:15:21,528] DEBUG: {"message_type":"FRBC.FillLevelTargetProfile","message_id":"a9fbad67-2b93-493e-8c95-11098f9ba85a","start_time":"2025-11-02T23:00:00Z","elements":[{"duration":23400000,"fill_level_range":{"start_of_range":10.0,"end_of_range":55.0}},{"duration":5400000,"fill_level_range":{"start_of_range":51.5,"end_of_range":55.0}},{"duration":32400000,"fill_level_range":{"start_of_range":10.0,"end_of_range":55.0}},{"duration":10800000,"fill_level_range":{"start_of_range":51.5,"end_of_range":55.0}},{"duration":14400000,"fill_level_range":{"start_of_range":10.0,"end_of_range":55.0}},{"duration":23400000,"fill_level_range":{"start_of_range":10.0,"end_of_range":55.0}},{"duration":5400000,"fill_level_range":{"start_of_range":51.5,"end_of_range":55.0}},{"duration":32400000,"fill_level_range":{"start_of_range":10.0,"end_of_range":55.0}},{"duration":10800000,"fill_level_range":{"start_of_range":51.5,"end_of_range":55.0}},{"duration":14400000,"fill_level_range":{"start_of_range":10.0,"end_of_range":55.0}}]}
+[FLEXMEASURES][2025-11-03 08:15:21,531] DEBUG: ✅ ReceptionStatus: OK
+[FLEXMEASURES][2025-11-03 08:15:21,587] DEBUG:    🎯 Start: 23:00:00
+[FLEXMEASURES][2025-11-03 08:15:21,591] INFO: 🎯 TargetProfile: 10 element(s)
+[FLEXMEASURES][2025-11-03 08:15:21,592] DEBUG: 📊 Device readiness: ✅ SystemDescription | ✅ FillLevelTargetProfile | ✅ StorageStatus | ✅ ActuatorStatus (all 1 received)
+[FLEXMEASURES][2025-11-03 08:15:21,594] INFO: 🎯 Generating instructions for 3c4cdc54...
+[FLEXMEASURES][2025-11-03 08:15:21,595] DEBUG: 🔧 Creating device state for 3c4cdc54...
+[FLEXMEASURES][2025-11-03 08:15:21,636] DEBUG: Storage status used for scheduler: message_type='FRBC.StorageStatus' message_id=UUID('e101ac35-566d-4a27-8055-625ea344f50b') present_fill_level=16.182
+[FLEXMEASURES][2025-11-03 08:15:21,642] DEBUG: Present fill level used for scheduler: 16.182
+[FLEXMEASURES][2025-11-03 08:15:21,642] DEBUG: ✅ Device state ready: 3c4cdc54...
+[FLEXMEASURES][2025-11-03 08:15:21,644] INFO: 🧮 S2FlaskScheduler started
+[FLEXMEASURES][2025-11-03 08:15:21,646] DEBUG: 🔧 Creating device state for 3c4cdc54...
+[FLEXMEASURES][2025-11-03 08:15:21,649] DEBUG: Storage status used for scheduler: message_type='FRBC.StorageStatus' message_id=UUID('e101ac35-566d-4a27-8055-625ea344f50b') present_fill_level=16.182
+[FLEXMEASURES][2025-11-03 08:15:21,649] DEBUG: Present fill level used for scheduler: 16.182
+[FLEXMEASURES][2025-11-03 08:15:21,649] DEBUG: ✅ Device state ready: 3c4cdc54...
+[FLEXMEASURES][2025-11-03 08:15:21,814] INFO: SAVING TO DB...
+[FLEXMEASURES][2025-11-03 08:15:21,880] WARNING: ⚠️ All prices missing, assuming 1 EUR/MWh
+[FLEXMEASURES][2025-11-03 08:15:21,923] DEBUG: 📊 Cluster: 1 device(s) in state
+[FLEXMEASURES][2025-11-03 08:15:21,928] INFO: 📊 Planning: 24.0h window (08:15 → 08:15)
+[FLEXMEASURES][2025-11-03 08:15:21,932] DEBUG:    ⏱️ Resolution: 0:05:00, Belief time: 17:05:00
+[FLEXMEASURES][2025-11-03 08:15:21,932] DEBUG: 🧮 Running optimization algorithm...
+[FLEXMEASURES][2025-11-03 08:15:21,932] WARNING: CongestionPoint without target! CongestionPoint: . Generating empty target.
+[FLEXMEASURES][2025-11-03 08:15:21,934] DEBUG: S2 FRBC planner created!
+[FLEXMEASURES][2025-11-03 08:15:22,005] INFO: SAVING TO DB...
+/usr/local/lib/python3.10/dist-packages/timely_beliefs/beliefs/classes.py:332: SAWarning: Object of type <TimedBelief> not in session, add operation along 'Sensor.beliefs' will not proceed (This warning originated from the Session 'autoflush' process, which was invoked automatically in response to a user-initiated operation.)
+  session.execute(smt)
+/usr/local/lib/python3.10/dist-packages/timely_beliefs/beliefs/classes.py:332: SAWarning: Object of type <TimedBelief> not in session, add operation along 'DataSource.beliefs' will not proceed (This warning originated from the Session 'autoflush' process, which was invoked automatically in response to a user-initiated operation.)
+  session.execute(smt)
+[FLEXMEASURES][2025-11-03 08:24:25,249] INFO: 🔋 StorageStatus: 42.5%
+[FLEXMEASURES][2025-11-03 08:24:25,252] INFO: 🔋 StorageStatus: 29.6%
+[FLEXMEASURES][2025-11-03 08:24:25,258] DEBUG: 📊 Device readiness: ✅ SystemDescription | ❌ FillLevelTargetProfile | ✅ StorageStatus | ✅ ActuatorStatus (all 1 received)
+[FLEXMEASURES][2025-11-03 08:24:25,258] INFO: ⏳ Waiting for: FillLevelTargetProfile
+[FLEXMEASURES][2025-11-03 08:24:25,259] DEBUG: 📊 Device readiness: ✅ SystemDescription | ❌ FillLevelTargetProfile | ✅ StorageStatus | ✅ ActuatorStatus (all 1 received)
+[FLEXMEASURES][2025-11-03 08:24:25,259] INFO: ⏳ Waiting for: FillLevelTargetProfile
+[FLEXMEASURES][2025-11-03 08:24:25,327] INFO: 🎯 FRBC.FillLevelTargetProfile
+[FLEXMEASURES][2025-11-03 08:24:25,326] INFO: 🎯 FRBC.FillLevelTargetProfile
+[FLEXMEASURES][2025-11-03 08:24:25,335] DEBUG: {"message_type":"FRBC.FillLevelTargetProfile","message_id":"c208fb58-c2ac-4771-a6cd-77e9a8e4ac86","start_time":"2025-11-02T23:00:00Z","elements":[{"duration":23400000,"fill_level_range":{"start_of_range":10.0,"end_of_range":59.0}},{"duration":5400000,"fill_level_range":{"start_of_range":55.5,"end_of_range":59.0}},{"duration":32400000,"fill_level_range":{"start_of_range":10.0,"end_of_range":59.0}},{"duration":10800000,"fill_level_range":{"start_of_range":55.5,"end_of_range":59.0}},{"duration":14400000,"fill_level_range":{"start_of_range":10.0,"end_of_range":59.0}},{"duration":23400000,"fill_level_range":{"start_of_range":10.0,"end_of_range":59.0}},{"duration":5400000,"fill_level_range":{"start_of_range":55.5,"end_of_range":59.0}},{"duration":32400000,"fill_level_range":{"start_of_range":10.0,"end_of_range":59.0}},{"duration":10800000,"fill_level_range":{"start_of_range":55.5,"end_of_range":59.0}},{"duration":14400000,"fill_level_range":{"start_of_range":10.0,"end_of_range":59.0}}]}
+[FLEXMEASURES][2025-11-03 08:24:25,336] DEBUG: {"message_type":"FRBC.FillLevelTargetProfile","message_id":"936aaf07-3a83-48c2-9e5c-e378f9548146","start_time":"2025-11-02T23:00:00Z","elements":[{"duration":23400000,"fill_level_range":{"start_of_range":10.0,"end_of_range":58.5}},{"duration":5400000,"fill_level_range":{"start_of_range":57.0,"end_of_range":58.5}},{"duration":32400000,"fill_level_range":{"start_of_range":10.0,"end_of_range":58.5}},{"duration":10800000,"fill_level_range":{"start_of_range":57.0,"end_of_range":58.5}},{"duration":14400000,"fill_level_range":{"start_of_range":10.0,"end_of_range":58.5}},{"duration":23400000,"fill_level_range":{"start_of_range":10.0,"end_of_range":58.5}},{"duration":5400000,"fill_level_range":{"start_of_range":57.0,"end_of_range":58.5}},{"duration":32400000,"fill_level_range":{"start_of_range":10.0,"end_of_range":58.5}},{"duration":10800000,"fill_level_range":{"start_of_range":57.0,"end_of_range":58.5}},{"duration":14400000,"fill_level_range":{"start_of_range":10.0,"end_of_range":58.5}}]}
+[FLEXMEASURES][2025-11-03 08:24:25,338] DEBUG: ✅ ReceptionStatus: OK
+[FLEXMEASURES][2025-11-03 08:24:25,338] WARNING: ⚠️ Connection closed during response
+[FLEXMEASURES][2025-11-03 08:24:25,337] DEBUG: ✅ ReceptionStatus: OK
+[FLEXMEASURES][2025-11-03 08:24:25,405] WARNING: ⚠️ Connection closed during response
+[FLEXMEASURES][2025-11-03 08:24:25,591] DEBUG:    🎯 Start: 23:00:00
+[FLEXMEASURES][2025-11-03 08:24:25,593] DEBUG:    🎯 Start: 23:00:00
+[FLEXMEASURES][2025-11-03 08:24:25,594] INFO: 🎯 TargetProfile: 10 element(s)
+[FLEXMEASURES][2025-11-03 08:24:25,594] INFO: 🎯 TargetProfile: 10 element(s)
+[FLEXMEASURES][2025-11-03 08:24:25,596] DEBUG: 📊 Device readiness: ✅ SystemDescription | ✅ FillLevelTargetProfile | ✅ StorageStatus | ✅ ActuatorStatus (all 1 received)
+[FLEXMEASURES][2025-11-03 08:24:25,599] INFO: 🎯 Generating instructions for c88e6893...
+[FLEXMEASURES][2025-11-03 08:24:25,600] DEBUG: 📊 Device readiness: ✅ SystemDescription | ✅ FillLevelTargetProfile | ✅ StorageStatus | ✅ ActuatorStatus (all 1 received)
+[FLEXMEASURES][2025-11-03 08:24:25,602] DEBUG: 🔧 Creating device state for c88e6893...
+[FLEXMEASURES][2025-11-03 08:24:25,602] INFO: 🎯 Generating instructions for 9ec19d27...
+[FLEXMEASURES][2025-11-03 08:24:25,634] DEBUG: Storage status used for scheduler: message_type='FRBC.StorageStatus' message_id=UUID('fdef46a5-c812-4167-a3db-22518aa18654') present_fill_level=29.5889991
+[FLEXMEASURES][2025-11-03 08:24:25,636] DEBUG: Present fill level used for scheduler: 29.5889991
+[FLEXMEASURES][2025-11-03 08:24:25,636] DEBUG: ✅ Device state ready: c88e6893...
+[FLEXMEASURES][2025-11-03 08:24:25,636] DEBUG: 🔧 Creating device state for 9ec19d27...
+[FLEXMEASURES][2025-11-03 08:24:25,637] INFO: 🧮 S2FlaskScheduler started
+[FLEXMEASURES][2025-11-03 08:24:25,639] DEBUG: 🔧 Creating device state for 9ec19d27...
+[FLEXMEASURES][2025-11-03 08:24:25,640] DEBUG: Storage status used for scheduler: message_type='FRBC.StorageStatus' message_id=UUID('d0970b64-b069-4738-96c5-b4318e6ce5cf') present_fill_level=42.4669997
+[FLEXMEASURES][2025-11-03 08:24:25,640] DEBUG: Present fill level used for scheduler: 42.4669997
+[FLEXMEASURES][2025-11-03 08:24:25,641] DEBUG: ✅ Device state ready: 9ec19d27...
+[FLEXMEASURES][2025-11-03 08:24:25,639] DEBUG: Storage status used for scheduler: message_type='FRBC.StorageStatus' message_id=UUID('d0970b64-b069-4738-96c5-b4318e6ce5cf') present_fill_level=42.4669997
+[FLEXMEASURES][2025-11-03 08:24:25,672] DEBUG: Present fill level used for scheduler: 42.4669997
+[FLEXMEASURES][2025-11-03 08:24:25,673] DEBUG: ✅ Device state ready: 9ec19d27...
+[FLEXMEASURES][2025-11-03 08:24:25,673] INFO: 🧮 S2FlaskScheduler started
+[FLEXMEASURES][2025-11-03 08:24:25,680] DEBUG: 🔧 Creating device state for 9ec19d27...
+[FLEXMEASURES][2025-11-03 08:24:25,712] DEBUG: Storage status used for scheduler: message_type='FRBC.StorageStatus' message_id=UUID('d0970b64-b069-4738-96c5-b4318e6ce5cf') present_fill_level=42.4669997
+[FLEXMEASURES][2025-11-03 08:24:25,720] DEBUG: Present fill level used for scheduler: 42.4669997
+[FLEXMEASURES][2025-11-03 08:24:25,720] DEBUG: ✅ Device state ready: 9ec19d27...
+Current planning is within the congestion target range. Returning it.
+difference_profile has no Joule elements, using the target directly
+Improving------------------------->
+diff_to_global_target has no Joule elements, using the target directly
+CP '': Selected best controller 'FRBC Device 3c4cdc54-1852-4fe8-963a-57c03499058f' with improvement of 0.
+Root controller: selected best controller 'FRBC Device 3c4cdc54-1852-4fe8-963a-57c03499058f' with global energy impr 0, cost impr [0.], CP impr 0.0. Accepted 1 proposal(s). Iteration 1.
+Optimizing priority class 1 was done after 1 iterations.
+[FLEXMEASURES][2025-11-03 08:24:25,763] DEBUG: {'device_id': '3c4cdc54-1852-4fe8-963a-57c03499058f', 'device_name': 'FRBC Device 3c4cdc54-1852-4fe8-963a-57c03499058f', 'connection_id': '3c4cdc54-1852-4fe8-963a-57c03499058f_connection', 'energy_profile': <flexmeasures_s2.profile_steering.common.joule_profile.JouleProfile object at 0x7fb53e2a0b80>, 'fill_level_profile': <flexmeasures_s2.profile_steering.common.soc_profile.SoCProfile object at 0x7fb53e597190>, 'instruction_profile': <flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_instruction_profile.S2FrbcInstructionProfile object at 0x7fb53210bdf0>}
+[FLEXMEASURES][2025-11-03 08:24:25,789] INFO: Generated new plan in 543854.231 ms

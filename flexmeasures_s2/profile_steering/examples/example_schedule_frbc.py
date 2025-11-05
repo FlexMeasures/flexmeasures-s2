@@ -44,25 +44,16 @@ import json
 # make a list of tuples with the ids and the names
 ids = []
 
-# -> todo: plot of run time vs D, vs B, vs S and vs T
-D = 1  # number of devices  -> todo: multiprocessing on create_improved_planning
-B = 200  # number of buckets  -> todo: vectorize computation of next state from current state
+D = 2  # number of devices
+B = 200  # number of buckets
 S = 30  # number of stratification layers
 PLANNING_WINDOW = pd.Timedelta("PT24H")
-PLANNING_RESOLUTION = pd.Timedelta("PT15M")
+PLANNING_RESOLUTION = pd.Timedelta("PT5M")
 
 T = PLANNING_WINDOW // PLANNING_RESOLUTION  # number of time steps
 TIMESTEP_DURATION = PLANNING_RESOLUTION / pd.Timedelta(
     "PT1S"
 )  # duration of a time step in seconds
-
-"""
-# Ideas for speeding up
-
-- Parallelize device planning - done
-- Precompute UUIDs - done
-- Use numpy for vectorized computation instead of list operations - done
-"""
 
 
 def create_ev_device_state(
@@ -982,7 +973,7 @@ def test_planning_service_impl_with_cost_target():
 # Main function
 if __name__ == "__main__":
     # Test energy targeting (original functionality)
-    # test_planning_service_impl_with_ev_device()
+    test_planning_service_impl_with_ev_device()
 
     print("\n" + "=" * 60 + "\n")
 

@@ -7,6 +7,7 @@ from s2python.frbc import (
 )
 
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
+import flexmeasures_s2.profile_steering.device_planner.frbc.frbc_timestep as frbc_timestep
 import flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state_wrapper as s2_frbc_device_state_wrapper
 
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_actuator_configuration import (
@@ -28,12 +29,13 @@ class FrbcState:
 
     def __init__(  # noqa: C901
         self,
-        timestep,
-        present_fill_level: float,
+        timestep: frbc_timestep.FrbcTimestep,
         device_state: Optional[S2FrbcDeviceState] = None,
         previous_state: Optional["FrbcState"] = None,
         actuator_configurations: Optional[Dict[str, S2ActuatorConfiguration]] = None,
+        initial_fill_level: float = 0.0,
     ):
+        self.fill_level = initial_fill_level
         self.timer_elapse_map: Dict[tuple, datetime]
         self.actuator_configurations: Dict[str, S2ActuatorConfiguration]
         self.sum_squared_distance: float
@@ -50,10 +52,8 @@ class FrbcState:
             self.timestep = timestep
             self.previous_state = previous_state
             self.system_description = timestep.system_description
-            self.fill_level = present_fill_level
             self.bucket = 0
             self.timestep_energy = 0.0
-            self.fill_level = previous_state.fill_level
             seconds = self.timestep.get_duration_seconds()
             for actuator_id, actuator_configuration in (
                 actuator_configurations or {}
@@ -177,7 +177,7 @@ class FrbcState:
             self.timestep = timestep
             self.previous_state = None  # type: ignore[assignment]
             self.system_description = timestep.system_description
-            self.fill_level = present_fill_level
+            self.fill_level = initial_fill_level
             self.bucket = 0
             self.timestep_energy = 0.0
             self.sum_squared_distance = 0.0
@@ -434,7 +434,7 @@ class FrbcState:
             timestep=target_timestep,
             previous_state=previous_state,
             actuator_configurations=actuator_configs_for_target_timestep,
-            present_fill_level=0,
+            initial_fill_level=previous_state.fill_level,
         )
         return True
 
