@@ -50,14 +50,21 @@ class Proposal:
     @staticmethod
     def get_cost(plan: JouleProfile, target_profile: TargetProfile) -> float:
         cost = 0.0
+        tariff_count = 0
+        null_count = 0
         for i in range(target_profile.metadata.nr_of_timesteps):
             joule_usage = plan.elements[i]
             target_element = target_profile.elements[i]
-            if (
-                isinstance(target_element, TargetProfile.TariffElement)
-                and joule_usage is not None
-            ):
-                cost += (joule_usage / 3_600_000) * target_element.get_tariff()
+            if isinstance(target_element, TargetProfile.TariffElement):
+                tariff_count += 1
+                if joule_usage is not None:
+                    cost += (joule_usage / 3_600_000) * target_element.get_tariff()
+            elif isinstance(target_element, TargetProfile.NullElement):
+                null_count += 1
+        if tariff_count == 0 and null_count > 0:
+            print(
+                f"  WARNING: get_cost called with {null_count} NullElements, {tariff_count} TariffElements - cost will be 0!"
+            )
         return cost
 
     def get_congestion_improvement_value(self) -> float:

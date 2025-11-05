@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from typing import Any, Dict
 
 from flask import current_app as app
@@ -58,18 +58,6 @@ class S2FlaskScheduler(Scheduler):
             self.deserialize_config()
 
         try:
-            # Update start/end times if not already set or if they're outdated
-            # Always align to resolution boundary to avoid validation errors
-            now = datetime.now(timezone.utc)
-
-            # Align to resolution boundary
-            resolution_seconds = int(self.resolution.total_seconds())
-            total_seconds = int(now.timestamp())
-            aligned_seconds = (total_seconds // resolution_seconds) * resolution_seconds
-            start_aligned = datetime.fromtimestamp(aligned_seconds, tz=timezone.utc)
-
-            self.start = start_aligned
-            self.end = start_aligned + timedelta(hours=24)
 
             app.logger.info("🧮 S2FlaskScheduler started")
 
@@ -416,7 +404,46 @@ class S2FlaskScheduler(Scheduler):
                     if hasattr(frbc_data, "actuator_statuses")
                     else []
                 )
-                fill_level_target_profile = frbc_data.fill_level_target_profile
+                fill_level_target_profile = (
+                    frbc_data.fill_level_target_profile
+                    if hasattr(frbc_data, "fill_level_target_profile")
+                    else None
+                )
+                usage_forecast = (
+                    frbc_data.usage_forecast
+                    if hasattr(frbc_data, "usage_forecast")
+                    else None
+                )
+                leakage_behaviour = (
+                    frbc_data.leakage_behaviour
+                    if hasattr(frbc_data, "leakage_behaviour")
+                    else None
+                )
+
+                # Align fill level target profile start_time with scheduler start time
+                if (
+                    fill_level_target_profile
+                    and fill_level_target_profile.start_time != self.start
+                ):
+                    app.logger.debug(
+                        f"Aligning fill level target profile start_time: "
+                        f"{fill_level_target_profile.start_time} → {self.start}"
+                    )
+                    # Create a copy with updated start_time
+                    fill_level_target_profile = fill_level_target_profile.model_copy(
+                        update={"start_time": self.start}
+                    )
+
+                # Align usage forecast start_time with scheduler start time
+                if usage_forecast and usage_forecast.start_time != self.start:
+                    app.logger.debug(
+                        f"Aligning usage forecast start_time: "
+                        f"{usage_forecast.start_time} → {self.start}"
+                    )
+                    # Create a copy with updated start_time
+                    usage_forecast = usage_forecast.model_copy(
+                        update={"start_time": self.start}
+                    )
 
                 # Create device state using the received FRBC data
                 device_state = S2FrbcDeviceState(
@@ -431,8 +458,8 @@ class S2FlaskScheduler(Scheduler):
                     is_online=True,
                     power_forecast=None,
                     system_descriptions=[system_desc] if system_desc else [],
-                    leakage_behaviours=[],
-                    usage_forecasts=[],
+                    leakage_behaviours=[leakage_behaviour] if leakage_behaviour else [],
+                    usage_forecasts=[usage_forecast] if usage_forecast else [],
                     fill_level_target_profiles=[fill_level_target_profile]
                     if fill_level_target_profile
                     else [],
@@ -440,12 +467,44 @@ class S2FlaskScheduler(Scheduler):
                         100, 20
                     ),
                     actuator_statuses=actuator_statuses,
-                    storage_status=[storage_status] if storage_status else [],
+                    storage_status=storage_status,  # Single object, not a list
                 )
                 app.logger.debug(f"Storage status used for scheduler: {storage_status}")
-                app.logger.debug(
-                    f"Present fill level used for scheduler: {storage_status.present_fill_level}"
-                )
+                if storage_status:
+                    app.logger.debug(
+                        f"Present fill level used for scheduler: {storage_status.present_fill_level}"
+                    )
+
+                # Log which profiles are being used
+                if fill_level_target_profile:
+                    n_elements = (
+                        len(fill_level_target_profile.elements)
+                        if fill_level_target_profile.elements
+                        else 0
+                    )
+                    app.logger.debug(
+                        f"Fill level target profile: {n_elements} element(s)"
+                    )
+                else:
+                    app.logger.debug("Fill level target profile: NOT PROVIDED")
+
+                if usage_forecast:
+                    n_elements = (
+                        len(usage_forecast.elements) if usage_forecast.elements else 0
+                    )
+                    app.logger.debug(f"Usage forecast: {n_elements} element(s)")
+                else:
+                    app.logger.debug("Usage forecast: NOT PROVIDED")
+
+                if leakage_behaviour:
+                    n_elements = (
+                        len(leakage_behaviour.elements)
+                        if leakage_behaviour.elements
+                        else 0
+                    )
+                    app.logger.debug(f"Leakage behaviour: {n_elements} element(s)")
+                else:
+                    app.logger.debug("Leakage behaviour: NOT PROVIDED")
 
                 device_states[device_id] = device_state
                 app.logger.debug(f"✅ Device state ready: {device_id[:8]}...")
@@ -474,6 +533,40 @@ class S2FlaskScheduler(Scheduler):
                     fill_level_target_profile = frbc_data.get(
                         "fill_level_target_profile"
                     )
+                    usage_forecast = frbc_data.get("usage_forecast")
+                    leakage_behaviour = frbc_data.get("leakage_behaviour")
+
+                    # Align fill level target profile start_time with scheduler start time
+                    if (
+                        fill_level_target_profile
+                        and hasattr(fill_level_target_profile, "start_time")
+                        and fill_level_target_profile.start_time != self.start
+                    ):
+                        app.logger.debug(
+                            f"Aligning fill level target profile start_time: "
+                            f"{fill_level_target_profile.start_time} → {self.start}"
+                        )
+                        # Create a copy with updated start_time
+                        fill_level_target_profile = (
+                            fill_level_target_profile.model_copy(
+                                update={"start_time": self.start}
+                            )
+                        )
+
+                    # Align usage forecast start_time with scheduler start time
+                    if (
+                        usage_forecast
+                        and hasattr(usage_forecast, "start_time")
+                        and usage_forecast.start_time != self.start
+                    ):
+                        app.logger.debug(
+                            f"Aligning usage forecast start_time: "
+                            f"{usage_forecast.start_time} → {self.start}"
+                        )
+                        # Create a copy with updated start_time
+                        usage_forecast = usage_forecast.model_copy(
+                            update={"start_time": self.start}
+                        )
 
                     # Create device state using the received FRBC data
                     device_state = S2FrbcDeviceState(
@@ -489,8 +582,10 @@ class S2FlaskScheduler(Scheduler):
                         is_online=True,
                         power_forecast=None,
                         system_descriptions=[system_desc] if system_desc else [],
-                        leakage_behaviours=[],
-                        usage_forecasts=[],
+                        leakage_behaviours=[leakage_behaviour]
+                        if leakage_behaviour
+                        else [],
+                        usage_forecasts=[usage_forecast] if usage_forecast else [],
                         fill_level_target_profiles=[fill_level_target_profile]
                         if fill_level_target_profile
                         else [],
@@ -498,7 +593,7 @@ class S2FlaskScheduler(Scheduler):
                             100, 20
                         ),
                         actuator_statuses=actuator_statuses,
-                        storage_status=[storage_status] if storage_status else [],
+                        storage_status=storage_status,  # Single object, not a list
                     )
 
                     device_states[device_id] = device_state

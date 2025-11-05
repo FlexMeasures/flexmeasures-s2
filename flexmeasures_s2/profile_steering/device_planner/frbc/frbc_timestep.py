@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Tuple, TYPE_CHECKING
+import logging
 
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 from flexmeasures_s2.profile_steering.s2_utils.number_range_wrapper import (
@@ -16,6 +17,8 @@ from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state i
     S2FrbcDeviceState,
 )
 from enum import Enum
+
+logger = logging.getLogger(__name__)
 
 
 class SelectionReason(Enum):
@@ -99,14 +102,30 @@ class FrbcTimestep:
             if stored_state is None:
                 self._states_by_bucket[bucket] = state
                 state.set_selection_reason(SelectionReason.NO_ALTERNATIVE)
+                logger.debug(
+                    f"    New state in bucket {bucket}: fill_level={state.fill_level:.2f}, energy={state.timestep_energy:.0f}"
+                )
             else:
                 selection_result = state.is_preferable_than(stored_state)
                 if selection_result.result:
+                    logger.debug(
+                        f"    Bucket {bucket}: Replacing state (fill_level={stored_state.fill_level:.2f}) with better state (fill_level={state.fill_level:.2f})"
+                    )
+                    logger.debug(
+                        f"      Reason: {selection_result.reason.value if hasattr(selection_result.reason, 'value') else selection_result.reason}"
+                    )
                     self._states_by_bucket[bucket] = state
+                else:
+                    logger.debug(
+                        f"    Bucket {bucket}: Keeping existing state (fill_level={stored_state.fill_level:.2f}) over new state (fill_level={state.fill_level:.2f})"
+                    )
                 self._states_by_bucket[bucket].set_selection_reason(
                     selection_result.reason
                 )
         else:
+            logger.debug(
+                f"    State outside fill level range: fill_level={state.fill_level:.2f} (emergency state)"
+            )
             if (
                 self.emergency_state is None
                 or state.get_fill_level_distance()

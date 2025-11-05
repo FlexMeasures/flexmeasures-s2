@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Dict, Optional, Any, Tuple
+import logging
 
 from flask import current_app as app
 from s2python.frbc import (
@@ -20,6 +21,8 @@ from flexmeasures_s2.profile_steering.device_planner.frbc.selection_reason_resul
     SelectionResult,
     SelectionReason,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class FrbcState:
@@ -67,13 +70,15 @@ class FrbcState:
                 self.timestep_energy += power * seconds
                 self.fill_level += fill_rate * seconds
 
-            self.fill_level -= (
+            leakage_rate = (
                 s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_leakage_rate(
                     self.timestep, self.fill_level
                 )
-                * seconds
             )
+            leakage = leakage_rate * seconds
+            self.fill_level -= leakage
             self.fill_level += self.timestep.forecasted_fill_level_usage
+
             self.bucket = (
                 s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.calculate_bucket(
                     self.timestep, self.fill_level
@@ -129,10 +134,11 @@ class FrbcState:
                 self.sum_energy_cost = previous_state.sum_energy_cost
             elif isinstance(target, TargetProfile.TariffElement):
                 self.sum_squared_distance = previous_state.sum_squared_distance
-                self.sum_energy_cost = (
-                    previous_state.sum_energy_cost
-                    + target.tariff * self.timestep_energy
-                )
+                # Convert Joules to kWh before multiplying by tariff
+                # 1 kWh = 3,600,000 Joules
+                energy_kwh = self.timestep_energy / 3_600_000
+                cost_increment = target.tariff * energy_kwh
+                self.sum_energy_cost = previous_state.sum_energy_cost + cost_increment
             else:
                 self.sum_squared_distance = previous_state.sum_squared_distance
                 self.sum_energy_cost = previous_state.sum_energy_cost

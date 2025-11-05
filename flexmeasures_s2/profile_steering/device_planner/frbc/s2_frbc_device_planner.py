@@ -116,6 +116,42 @@ class S2FrbcDevicePlanner(DevicePlanner):
         if self.accepted_plan is None:
             raise ValueError("No accepted plan found")
 
+        print(f"\n{'='*80}")
+        print(f"DEVICE PLANNER: create_improved_planning for {self.device_name}")
+        print(
+            f"  Accepted plan energy: {sum(self.accepted_plan.energy.elements) if self.accepted_plan.energy else 0} J"
+        )
+        print(
+            f"  diff_to_global_target has Joule elements: {diff_to_global_target.nr_of_joule_target_elements()}"
+        )
+        print(
+            f"  diff_to_global_target nr_of_timesteps: {diff_to_global_target.metadata.nr_of_timesteps}"
+        )
+
+        # Count tariff elements
+        tariff_count = sum(
+            1
+            for e in diff_to_global_target.elements
+            if isinstance(e, TargetProfile.TariffElement)
+        )
+        null_count = sum(
+            1
+            for e in diff_to_global_target.elements
+            if isinstance(e, TargetProfile.NullElement)
+        )
+        print(
+            f"  Target elements: {tariff_count} TariffElement, {null_count} NullElement, {len(diff_to_global_target.elements)} total"
+        )
+
+        # Show sample tariff values
+        if tariff_count > 0:
+            sample_tariffs = [
+                e.get_tariff()
+                for e in diff_to_global_target.elements[:10]
+                if isinstance(e, TargetProfile.TariffElement)
+            ]
+            print(f"  Sample tariff values (first 10): {sample_tariffs}")
+
         # TODO: check if diff_to_global_target has tarrif elements
         # TODO: check for NULL elements in target
         if diff_to_global_target.nr_of_joule_target_elements() != 0:
@@ -126,12 +162,33 @@ class S2FrbcDevicePlanner(DevicePlanner):
                 "diff_to_global_target has no Joule elements, using the target directly"
             )
 
+        print("  Final target for find_best_plan:")
+        tariff_count_final = sum(
+            1 for e in target.elements if isinstance(e, TargetProfile.TariffElement)
+        )
+        null_count_final = sum(
+            1 for e in target.elements if isinstance(e, TargetProfile.NullElement)
+        )
+        print(f"    {tariff_count_final} TariffElement, {null_count_final} NullElement")
+        print(f"{'='*80}\n")
+
         max_profile = diff_to_max.add(self.accepted_plan.energy)
         min_profile = diff_to_min.add(self.accepted_plan.energy)
 
         if self.is_storage_available(self.s2_frbc_state):
             self.latest_plan = self.state_tree.find_best_plan(
                 target, min_profile, max_profile
+            )
+
+            # Log the new plan
+            new_energy = (
+                sum(self.latest_plan.energy.elements)
+                if self.latest_plan and self.latest_plan.energy
+                else 0
+            )
+            print(f"  New plan energy: {new_energy} J")
+            print(
+                f"  Energy difference: {new_energy - sum(self.accepted_plan.energy.elements)} J"
             )
         else:
             self.latest_plan = S2FrbcPlan(

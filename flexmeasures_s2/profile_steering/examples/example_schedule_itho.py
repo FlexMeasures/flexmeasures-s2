@@ -50,7 +50,13 @@ T = PLANNING_WINDOW // PLANNING_RESOLUTION
 TIMESTEP_DURATION = PLANNING_RESOLUTION / pd.Timedelta("PT1S")
 
 
-def create_itho_device_state(device_id: str, start_time: datetime) -> S2FrbcDeviceState:
+def create_itho_device_state(
+    device_id: str,
+    start_time: datetime,
+    planning_window_duration: timedelta | None = None,
+    include_fill_level_target: bool = True,
+    include_usage_forecast: bool = True,
+) -> S2FrbcDeviceState:
     """
     Create device state from FRBC messages extracted from itho.yaml
     """
@@ -175,9 +181,10 @@ def create_itho_device_state(device_id: str, start_time: datetime) -> S2FrbcDevi
     )
 
     # FRBC.StorageStatus from line 94
+    present_fill_level = 16.182  # Current fill level from device
     storage_status = FRBCStorageStatus(
         message_id=str(uuid.uuid4()),
-        present_fill_level=16.182,
+        present_fill_level=present_fill_level,
     )
 
     # FRBC.LeakageBehaviour from line 71
@@ -192,70 +199,212 @@ def create_itho_device_state(device_id: str, start_time: datetime) -> S2FrbcDevi
         ],
     )
 
-    # FRBC.FillLevelTargetProfile from line 116
-    # Start time: "2025-11-02T23:00:00Z"
-    target_start_time = datetime(2025, 11, 2, 23, 0, 0, tzinfo=timezone.utc)
+    # Calculate total planning window in milliseconds
+    if planning_window_duration is None:
+        planning_window_duration = PLANNING_WINDOW
 
-    fill_level_target_profile = FRBCFillLevelTargetProfile(
-        message_id=str(uuid.uuid4()),
-        start_time=target_start_time,
-        elements=[
-            FRBCFillLevelTargetProfileElement(
-                duration=23400000,  # milliseconds
-                fill_level_range=NumberRange(start_of_range=10.0, end_of_range=55.0),
-            ),
-            FRBCFillLevelTargetProfileElement(
-                duration=5400000,
-                fill_level_range=NumberRange(start_of_range=51.5, end_of_range=55.0),
-            ),
-            FRBCFillLevelTargetProfileElement(
-                duration=32400000,
-                fill_level_range=NumberRange(start_of_range=10.0, end_of_range=55.0),
-            ),
-            FRBCFillLevelTargetProfileElement(
-                duration=10800000,
-                fill_level_range=NumberRange(start_of_range=51.5, end_of_range=55.0),
-            ),
-            FRBCFillLevelTargetProfileElement(
-                duration=14400000,
-                fill_level_range=NumberRange(start_of_range=10.0, end_of_range=55.0),
-            ),
-            FRBCFillLevelTargetProfileElement(
-                duration=23400000,
-                fill_level_range=NumberRange(start_of_range=10.0, end_of_range=55.0),
-            ),
-            FRBCFillLevelTargetProfileElement(
-                duration=5400000,
-                fill_level_range=NumberRange(start_of_range=51.5, end_of_range=55.0),
-            ),
-            FRBCFillLevelTargetProfileElement(
-                duration=32400000,
-                fill_level_range=NumberRange(start_of_range=10.0, end_of_range=55.0),
-            ),
-            FRBCFillLevelTargetProfileElement(
-                duration=10800000,
-                fill_level_range=NumberRange(start_of_range=51.5, end_of_range=55.0),
-            ),
-            FRBCFillLevelTargetProfileElement(
-                duration=14400000,
-                fill_level_range=NumberRange(start_of_range=10.0, end_of_range=55.0),
-            ),
-        ],
-    )
+    # Create fill level target profile (only if requested)
+    fill_level_target_profile = None
+    if include_fill_level_target:
+        # FRBC.FillLevelTargetProfile - aligned with planning window start time
+        # CRITICAL: target_start_time must match planning window start_time
+        target_start_time = start_time
 
-    # Create usage forecast (no usage expected)
-    usage_forecast = FRBCUsageForecast(
-        message_id=str(uuid.uuid4()),
-        start_time=start_time,
-        elements=[
-            FRBCUsageForecastElement(
-                duration=int(PLANNING_WINDOW.total_seconds()),
-                usage_rate_expected=0.0,
+        # Get heating parameters from SystemDescription
+        # From DHW_ON operation mode: fill_rate = 0.002031807896078361 per second
+        # This means: 0.002031807896078361 °C per second when heating at full power (1100W)
+        fill_rate_per_second = 0.002031807896078361
+        timestep_duration_seconds = TIMESTEP_DURATION
+        fill_level_min = (
+            10.0  # From fill level target profile in itho.yaml (maintenance periods)
+        )
+        fill_level_max = (
+            55.0  # From fill level target profile in itho.yaml (maintenance periods)
+        )
+        peak_target_min = 51.5  # Peak period minimum target
+        peak_target_max = 55.0  # Peak period maximum target
+
+        # Calculate how long it takes to heat from current level to peak target
+        # Time needed = (target_temp - current_temp) / fill_rate
+        temp_rise_needed = peak_target_min - present_fill_level
+        heating_time_seconds = temp_rise_needed / fill_rate_per_second
+        heating_time_timesteps = (
+            int(heating_time_seconds / timestep_duration_seconds) + 1
+        )  # Add 1 for safety margin
+
+        print("=" * 80)
+        print("FILL LEVEL TARGET CONFIGURATION")
+        print("=" * 80)
+        print(f"Current fill level: {present_fill_level}°C")
+        print(f"Peak target: [{peak_target_min}, {peak_target_max}]°C")
+        print(f"Fill rate: {fill_rate_per_second} °C/second (when heating at 1100W)")
+        print(f"Temperature rise needed: {temp_rise_needed:.2f}°C")
+        print(
+            f"Heating time required: {heating_time_seconds/3600:.2f} hours ({heating_time_timesteps} timesteps)"
+        )
+        print("")
+        print("STRATEGY:")
+        print("  - Peak periods require 51.5-55.0°C (constraint: fill_level >= 51.5°C)")
+        print(f"  - Current level ({present_fill_level}°C) is BELOW peak requirement")
+        print("  - Optimizer sees constraint violation at peak times if not heated")
+        print("  - Optimizer MUST heat to 51.5°C before/during peak periods")
+        print("  - Optimizer will minimize cost by heating during CHEAP hours")
+        print(
+            f"  - Target start_time aligned with planning start_time: {target_start_time}"
+        )
+        print("=" * 80)
+
+        # Create fill level target profile elements
+        # Use the EXACT pattern from itho.yaml line 116
+        # Pattern: 10 elements with alternating maintenance and peak periods
+        # Maintenance: [10.0, 55.0]°C, Peak: [51.5, 55.0]°C
+
+        elements = []
+
+        # Original pattern from itho.yaml (durations in milliseconds):
+        # Element 1: 23400000 ms (6.5 hours) - maintenance [10.0, 55.0]
+        # Element 2: 5400000 ms (1.5 hours) - peak [51.5, 55.0]
+        # Element 3: 32400000 ms (9 hours) - maintenance [10.0, 55.0]
+        # Element 4: 10800000 ms (3 hours) - peak [51.5, 55.0]
+        # Element 5: 14400000 ms (4 hours) - maintenance [10.0, 55.0]
+        # Element 6: 23400000 ms (6.5 hours) - maintenance [10.0, 55.0]
+        # Element 7: 5400000 ms (1.5 hours) - peak [51.5, 55.0]
+        # Element 8: 32400000 ms (9 hours) - maintenance [10.0, 55.0]
+        # Element 9: 10800000 ms (3 hours) - peak [51.5, 55.0]
+        # Element 10: 14400000 ms (4 hours) - maintenance [10.0, 55.0]
+
+        # Define the pattern exactly as in itho.yaml
+        fill_level_target_elements = [
+            (23400000, fill_level_min, fill_level_max),  # Maintenance
+            (5400000, peak_target_min, peak_target_max),  # Peak
+            (32400000, fill_level_min, fill_level_max),  # Maintenance
+            (10800000, peak_target_min, peak_target_max),  # Peak
+            (14400000, fill_level_min, fill_level_max),  # Maintenance
+            (23400000, fill_level_min, fill_level_max),  # Maintenance
+            (5400000, peak_target_min, peak_target_max),  # Peak
+            (32400000, fill_level_min, fill_level_max),  # Maintenance
+            (10800000, peak_target_min, peak_target_max),  # Peak
+            (14400000, fill_level_min, fill_level_max),  # Maintenance
+        ]
+
+        for duration_ms, range_min, range_max in fill_level_target_elements:
+            elements.append(
+                FRBCFillLevelTargetProfileElement(
+                    duration=Duration(root=duration_ms),
+                    fill_level_range=NumberRange(
+                        start_of_range=range_min, end_of_range=range_max
+                    ),
+                )
             )
-        ],
-    )
 
-    # Create device state
+        # Verify total duration matches planning window
+        # Extract duration value (Duration objects store milliseconds in .root)
+        def get_duration_ms(elem):
+            duration = elem.duration
+            if isinstance(duration, (int, float)):
+                return int(duration)  # Assume milliseconds if numeric
+            elif hasattr(duration, "root"):
+                return int(duration.root)  # Duration.root is in milliseconds
+            else:
+                return int(duration)
+
+        total_duration_ms = sum(get_duration_ms(elem) for elem in elements)
+        total_duration_seconds = total_duration_ms / 1000.0
+        print(
+            f"\nTarget profile duration: {total_duration_seconds/3600:.2f} hours ({total_duration_ms/1000:.0f} seconds)"
+        )
+        print(
+            f"Planning window duration: {planning_window_duration.total_seconds()/3600:.2f} hours ({planning_window_duration.total_seconds():.0f} seconds)"
+        )
+        print(f"Number of elements: {len(elements)}")
+
+        fill_level_target_profile = FRBCFillLevelTargetProfile(
+            message_id=str(uuid.uuid4()),
+            start_time=target_start_time,
+            elements=elements,
+        )
+    else:
+        print(
+            "\nFill level target profile: NOT CREATED (include_fill_level_target=False)"
+        )
+
+    # Create simulated usage forecast (only if requested)
+    usage_forecast = None
+    if include_usage_forecast:
+        # Usage represents hot water being drawn, which reduces fill level (temperature)
+        # Positive usage_rate_expected means fill level decreases per second
+        # Match the pattern from fill level target profile (10 elements with same durations)
+        # Higher usage during peak periods to force heating
+
+        usage_elements = []
+
+        # Usage rates (fill level decrease per second)
+        # Higher usage during peak periods to force heating
+        base_usage_rate = 0.00001  # Low base usage (0.00001 °C/second = 0.036 °C/hour)
+        peak_usage_rate = (
+            0.0001  # High usage during peaks (0.0001 °C/second = 0.36 °C/hour)
+        )
+
+        # Match the fill level target profile pattern exactly
+        # Use same durations and pattern: maintenance periods have low usage, peak periods have high usage
+        usage_forecast_elements = [
+            (23400000, base_usage_rate),  # Maintenance period 1
+            (5400000, peak_usage_rate),  # Peak period 1
+            (32400000, base_usage_rate),  # Maintenance period 2
+            (10800000, peak_usage_rate),  # Peak period 2
+            (14400000, base_usage_rate),  # Maintenance period 3
+            (23400000, base_usage_rate),  # Maintenance period 4
+            (5400000, peak_usage_rate),  # Peak period 3
+            (32400000, base_usage_rate),  # Maintenance period 5
+            (10800000, peak_usage_rate),  # Peak period 4
+            (14400000, base_usage_rate),  # Maintenance period 6
+        ]
+
+        for duration_ms, usage_rate in usage_forecast_elements:
+            usage_elements.append(
+                FRBCUsageForecastElement(
+                    duration=duration_ms,
+                    usage_rate_expected=usage_rate,
+                )
+            )
+
+        # Verify total duration (extract duration value, handling both int/float and Duration objects)
+        def get_duration_ms_usage(elem):
+            duration = elem.duration
+            if isinstance(duration, (int, float)):
+                return int(duration)  # Assume milliseconds if numeric
+            elif hasattr(duration, "root"):
+                return int(duration.root)  # Duration.root is in milliseconds
+            else:
+                return int(duration)
+
+        total_usage_duration_ms = sum(
+            get_duration_ms_usage(elem) for elem in usage_elements
+        )
+        total_usage_duration_seconds = total_usage_duration_ms / 1000.0
+
+        print("\nUsage forecast created:")
+        print(
+            f"  Total duration: {total_usage_duration_seconds/3600:.2f} hours ({total_usage_duration_ms/1000:.0f} seconds)"
+        )
+        print(f"  Number of elements: {len(usage_elements)}")
+        print(
+            f"  Base usage rate: {base_usage_rate} °C/second ({base_usage_rate*3600:.4f} °C/hour)"
+        )
+        print(
+            f"  Peak usage rate: {peak_usage_rate} °C/second ({peak_usage_rate*3600:.4f} °C/hour)"
+        )
+        print("  Usage during peaks will reduce fill level, forcing optimizer to heat")
+
+        usage_forecast = FRBCUsageForecast(
+            message_id=str(uuid.uuid4()),
+            start_time=start_time,
+            elements=usage_elements,
+        )
+    else:
+        print("\nUsage forecast: NOT CREATED (include_usage_forecast=False)")
+
+    # Create device state with optional fill level target and usage forecast
     device_state = S2FrbcDeviceState(
         device_id=device_id,
         device_name="ITHO DHW Heat Pump",
@@ -269,8 +418,12 @@ def create_itho_device_state(device_id: str, start_time: datetime) -> S2FrbcDevi
         power_forecast=None,
         system_descriptions=[system_description],
         leakage_behaviours=[leakage_behaviour],
-        usage_forecasts=[usage_forecast],
-        fill_level_target_profiles=[fill_level_target_profile],
+        usage_forecasts=[usage_forecast]
+        if (include_usage_forecast and usage_forecast)
+        else [],
+        fill_level_target_profiles=[fill_level_target_profile]
+        if (include_fill_level_target and fill_level_target_profile)
+        else [],
         computational_parameters=S2FrbcDeviceState.ComputationalParameters(B, S),
         actuator_statuses=[actuator_status],
         storage_status=storage_status,
@@ -420,30 +573,49 @@ def plot_planning_results(
 
         # Plot fill level targets if provided
         if fill_level_target_min is not None and fill_level_target_max is not None:
-            ax2.fill_between(
-                timestep_start_times,
-                fill_level_target_min,
-                fill_level_target_max,
-                alpha=0.2,
-                color="blue",
-                label="Target Range (°C)",
-            )
-            ax2.plot(
-                timestep_start_times,
-                fill_level_target_min,
-                color="blue",
-                linestyle="--",
-                linewidth=1,
-                alpha=0.5,
-            )
-            ax2.plot(
-                timestep_start_times,
-                fill_level_target_max,
-                color="blue",
-                linestyle="--",
-                linewidth=1,
-                alpha=0.5,
-            )
+            # Filter out None values and convert to numeric arrays
+            target_min_numeric = []
+            target_max_numeric = []
+            times_numeric = []
+
+            for i, (t, min_val, max_val) in enumerate(
+                zip(timestep_start_times, fill_level_target_min, fill_level_target_max)
+            ):
+                if min_val is not None and max_val is not None:
+                    try:
+                        min_float = float(min_val)
+                        max_float = float(max_val)
+                        target_min_numeric.append(min_float)
+                        target_max_numeric.append(max_float)
+                        times_numeric.append(t)
+                    except (ValueError, TypeError):
+                        continue
+
+            if target_min_numeric and target_max_numeric:
+                ax2.fill_between(
+                    times_numeric,
+                    target_min_numeric,
+                    target_max_numeric,
+                    alpha=0.2,
+                    color="blue",
+                    label="Target Range (°C)",
+                )
+                ax2.plot(
+                    times_numeric,
+                    target_min_numeric,
+                    color="blue",
+                    linestyle="--",
+                    linewidth=1,
+                    alpha=0.5,
+                )
+                ax2.plot(
+                    times_numeric,
+                    target_max_numeric,
+                    color="blue",
+                    linestyle="--",
+                    linewidth=1,
+                    alpha=0.5,
+                )
 
         ax2.set_ylabel("Temperature (°C)", color="red")
         ax2.tick_params(axis="y", labelcolor="red")
@@ -1225,18 +1397,407 @@ def test_itho_planning_with_cost_target():
     return cluster_plan
 
 
+def test_itho_planning_with_usage_forecast_only():
+    """Test the PlanningServiceImpl with ITHO DHW device using ONLY usage forecast (no fill level target)."""
+    print("\n" + "=" * 80)
+    print(
+        "Test 4: ITHO DHW Heat Pump with Usage Forecast ONLY (no FillLevelTargetProfile)"
+    )
+    print("=" * 80)
+
+    # Start time is 15 minutes from now, aligned to 5-minute intervals
+    now = datetime.now(timezone.utc)
+    # Round to nearest 5-minute interval
+    minutes = (now.minute // 5) * 5
+    start_time = now.replace(minute=minutes, second=0, microsecond=0) + timedelta(
+        minutes=15
+    )
+    print(f"Planning start time: {start_time}")
+
+    # Create profile metadata
+    target_metadata = ProfileMetadata(
+        profile_start=start_time,
+        timestep_duration=timedelta(seconds=TIMESTEP_DURATION),
+        nr_of_timesteps=T,
+    )
+
+    # Create device state WITH usage forecast but WITHOUT fill level target
+    device_id = "itho_dhw_device_004"
+    device_state = create_itho_device_state(
+        device_id,
+        start_time,
+        include_fill_level_target=False,  # NO fill level target
+        include_usage_forecast=True,  # YES usage forecast
+    )
+
+    # Create Dictionary of device states
+    device_states_dict = {device_id: device_state}
+
+    # Create congestion points mapping
+    congestion_points_by_connection_id = {device_id: ""}
+
+    # Create a cluster state
+    cluster_state = ClusterState(
+        start_time, device_states_dict, congestion_points_by_connection_id
+    )
+
+    # Create variable cost target profile
+    cost_target_elements = get_cost_target_profile_elements(T)
+
+    # Create a cost-based target profile
+    cost_target_profile = TargetProfile.from_tariff_values(
+        target_metadata, cost_target_elements
+    )
+
+    # Create a cluster target with cost target
+    cluster_target = ClusterTarget(
+        start_time,
+        None,
+        None,
+        global_target_profile=cost_target_profile,
+        congestion_point_targets={},
+    )
+
+    # Configuration similar to example_schedule_frbc.py
+    config = PlanningServiceConfig(
+        energy_improvement_criterion=10.0,
+        cost_improvement_criterion=1.0,
+        congestion_retry_iterations=10,
+        multithreaded=False,
+    )
+
+    print("Generating plan with usage forecast only (no fill level target)...")
+
+    # Create planning service implementation
+    service = PlanningServiceImpl(config)
+
+    # Generate a plan
+    plan_due_by_date = start_time + timedelta(seconds=10)
+    start_planning_time = time.time()
+
+    cluster_plan = service.plan(
+        state=cluster_state,
+        target=cluster_target,
+        planning_window=TIMESTEP_DURATION * T,
+        reason="ITHO DHW Heat Pump with usage forecast only",
+        plan_due_by_date=plan_due_by_date,
+        optimize_for_target=True,
+        max_priority_class=1,
+    )
+
+    end_planning_time = time.time()
+    execution_time = end_planning_time - start_planning_time
+
+    print(f"Plan generated in {execution_time:.2f} seconds")
+
+    # Assert and process results
+    assert cluster_plan is not None, "Cluster plan is None"
+    print("Successfully generated cluster plan with usage forecast only")
+
+    # Get the plan data
+    device_plans = cluster_plan.get_plan_data().get_device_plans()
+    energy_profile = cluster_plan.get_joule_profile()
+
+    # Convert Joules to Watts (W = J / timestep_in_seconds)
+    power_profile_watts = [
+        energy / TIMESTEP_DURATION if energy is not None else 0
+        for energy in energy_profile.elements
+    ]
+
+    # Get fill level profile if available
+    fill_level_profile = None
+    device_plans_list = [plan for plan in device_plans if plan is not None]
+
+    if device_plans_list:
+        device_plan = device_plans_list[0]
+        if (
+            hasattr(device_plan, "fill_level_profile")
+            and device_plan.fill_level_profile
+        ):
+            fill_level_profile = device_plan.fill_level_profile.elements
+            print(
+                f"Fill level profile available with {len(fill_level_profile)} elements"
+            )
+
+        if device_plan.instruction_profile:
+            instructions = device_plan.instruction_profile.elements
+            print(f"Device has {len(instructions)} instructions")
+
+            # Analyze operation mode changes
+            mode_changes = 0
+            previous_mode = None
+            for instruction in instructions:
+                if hasattr(instruction, "operation_mode"):
+                    if previous_mode and instruction.operation_mode != previous_mode:
+                        mode_changes += 1
+                    previous_mode = instruction.operation_mode
+            print(f"Number of operation mode changes: {mode_changes}")
+
+    # Calculate total energy consumption
+    total_energy_kwh = sum(energy_profile.elements) / 3_600_000
+    print(f"Total energy consumption: {total_energy_kwh:.2f} kWh")
+
+    # Calculate the actual costs from the energy profile and tariffs
+    cost_elements = calculate_cost_from_energy_and_tariffs(
+        energy_profile.elements, cost_target_elements
+    )
+    total_cost = sum(cost_elements)
+    print(f"Total cost: ${total_cost:.2f}")
+
+    # No fill level targets to extract (they were not included)
+    fill_level_target_min = None
+    fill_level_target_max = None
+    print("No fill level targets (test uses usage forecast only)")
+
+    # Save instructions to file
+    save_instructions_to_file(
+        device_plans_list, "_usage_only", start_time, device_state
+    )
+
+    # Plot the results with tariff information
+    plot_planning_results(
+        timestep_duration=timedelta(seconds=TIMESTEP_DURATION),
+        nr_of_timesteps=T,
+        predicted_energy_elements=power_profile_watts,
+        fill_level_profile=fill_level_profile,
+        fill_level_target_min=fill_level_target_min,
+        fill_level_target_max=fill_level_target_max,
+        start_time=start_time,
+        suffix="_usage_only",
+        tariff_elements=cost_target_elements,
+    )
+
+    print("ITHO usage forecast only test completed successfully!")
+
+    return cluster_plan
+
+
+def test_itho_planning_with_fill_level_target_only():
+    """Test the PlanningServiceImpl with ITHO DHW device using ONLY fill level target (no usage forecast)."""
+    print("\n" + "=" * 80)
+    print(
+        "Test 5: ITHO DHW Heat Pump with FillLevelTargetProfile ONLY (no UsageForecast)"
+    )
+    print("=" * 80)
+
+    # Start time is 15 minutes from now, aligned to 5-minute intervals
+    now = datetime.now(timezone.utc)
+    # Round to nearest 5-minute interval
+    minutes = (now.minute // 5) * 5
+    start_time = now.replace(minute=minutes, second=0, microsecond=0) + timedelta(
+        minutes=15
+    )
+    print(f"Planning start time: {start_time}")
+
+    # Create profile metadata
+    target_metadata = ProfileMetadata(
+        profile_start=start_time,
+        timestep_duration=timedelta(seconds=TIMESTEP_DURATION),
+        nr_of_timesteps=T,
+    )
+
+    # Create device state WITH fill level target but WITHOUT usage forecast
+    device_id = "itho_dhw_device_005"
+    device_state = create_itho_device_state(
+        device_id,
+        start_time,
+        include_fill_level_target=True,  # YES fill level target
+        include_usage_forecast=False,  # NO usage forecast
+    )
+
+    # Create Dictionary of device states
+    device_states_dict = {device_id: device_state}
+
+    # Create congestion points mapping
+    congestion_points_by_connection_id = {device_id: ""}
+
+    # Create a cluster state
+    cluster_state = ClusterState(
+        start_time, device_states_dict, congestion_points_by_connection_id
+    )
+
+    # Create variable cost target profile
+    cost_target_elements = get_cost_target_profile_elements(T)
+
+    # Create a cost-based target profile
+    cost_target_profile = TargetProfile.from_tariff_values(
+        target_metadata, cost_target_elements
+    )
+
+    # Create a cluster target with cost target
+    cluster_target = ClusterTarget(
+        start_time,
+        None,
+        None,
+        global_target_profile=cost_target_profile,
+        congestion_point_targets={},
+    )
+
+    # Configuration similar to example_schedule_frbc.py
+    config = PlanningServiceConfig(
+        energy_improvement_criterion=10.0,
+        cost_improvement_criterion=1.0,
+        congestion_retry_iterations=10,
+        multithreaded=False,
+    )
+
+    print("Generating plan with fill level target only (no usage forecast)...")
+
+    # Create planning service implementation
+    service = PlanningServiceImpl(config)
+
+    # Generate a plan
+    plan_due_by_date = start_time + timedelta(seconds=10)
+    start_planning_time = time.time()
+
+    cluster_plan = service.plan(
+        state=cluster_state,
+        target=cluster_target,
+        planning_window=TIMESTEP_DURATION * T,
+        reason="ITHO DHW Heat Pump with fill level target only",
+        plan_due_by_date=plan_due_by_date,
+        optimize_for_target=True,
+        max_priority_class=1,
+    )
+
+    end_planning_time = time.time()
+    execution_time = end_planning_time - start_planning_time
+
+    print(f"Plan generated in {execution_time:.2f} seconds")
+
+    # Assert and process results
+    assert cluster_plan is not None, "Cluster plan is None"
+    print("Successfully generated cluster plan with fill level target only")
+
+    # Get the plan data
+    device_plans = cluster_plan.get_plan_data().get_device_plans()
+    energy_profile = cluster_plan.get_joule_profile()
+
+    # Convert Joules to Watts (W = J / timestep_in_seconds)
+    power_profile_watts = [
+        energy / TIMESTEP_DURATION if energy is not None else 0
+        for energy in energy_profile.elements
+    ]
+
+    # Get fill level profile if available
+    fill_level_profile = None
+    device_plans_list = [plan for plan in device_plans if plan is not None]
+
+    if device_plans_list:
+        device_plan = device_plans_list[0]
+        if (
+            hasattr(device_plan, "fill_level_profile")
+            and device_plan.fill_level_profile
+        ):
+            fill_level_profile = device_plan.fill_level_profile.elements
+            print(
+                f"Fill level profile available with {len(fill_level_profile)} elements"
+            )
+
+        if device_plan.instruction_profile:
+            instructions = device_plan.instruction_profile.elements
+            print(f"Device has {len(instructions)} instructions")
+
+            # Analyze operation mode changes
+            mode_changes = 0
+            previous_mode = None
+            for instruction in instructions:
+                if hasattr(instruction, "operation_mode"):
+                    if previous_mode and instruction.operation_mode != previous_mode:
+                        mode_changes += 1
+                    previous_mode = instruction.operation_mode
+            print(f"Number of operation mode changes: {mode_changes}")
+
+    # Calculate total energy consumption
+    total_energy_kwh = sum(energy_profile.elements) / 3_600_000
+    print(f"Total energy consumption: {total_energy_kwh:.2f} kWh")
+
+    # Calculate the actual costs from the energy profile and tariffs
+    cost_elements = calculate_cost_from_energy_and_tariffs(
+        energy_profile.elements, cost_target_elements
+    )
+    total_cost = sum(cost_elements)
+    print(f"Total cost: ${total_cost:.2f}")
+
+    # Extract fill level targets from device state
+    fill_level_target_min = None
+    fill_level_target_max = None
+    if device_state.fill_level_target_profiles:
+        target_profile = device_state.fill_level_target_profiles[0]
+        (
+            fill_level_target_min,
+            fill_level_target_max,
+        ) = convert_fill_level_target_to_timeseries(
+            target_profile,
+            start_time,
+            timedelta(seconds=TIMESTEP_DURATION),
+            T,
+        )
+        print("Fill level targets extracted from device state")
+    else:
+        print("No fill level targets found in device state")
+
+    # Save instructions to file
+    save_instructions_to_file(
+        device_plans_list, "_filltarget_only", start_time, device_state
+    )
+
+    # Plot the results with tariff information
+    plot_planning_results(
+        timestep_duration=timedelta(seconds=TIMESTEP_DURATION),
+        nr_of_timesteps=T,
+        predicted_energy_elements=power_profile_watts,
+        fill_level_profile=fill_level_profile,
+        fill_level_target_min=fill_level_target_min,
+        fill_level_target_max=fill_level_target_max,
+        start_time=start_time,
+        suffix="_filltarget_only",
+        tariff_elements=cost_target_elements,
+    )
+
+    print("ITHO fill level target only test completed successfully!")
+
+    return cluster_plan
+
+
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    # Configure logging to show DEBUG messages
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        datefmt="%H:%M:%S",
+    )
+
+    # Optionally, set specific loggers to different levels
+    # logging.getLogger('matplotlib').setLevel(logging.WARNING)
+
+    print("=" * 80)
+    print("ITHO DHW Heat Pump Planning Examples with DEBUG Logging")
+    print("=" * 80)
+    print()
 
     # Test 1: Energy targeting
     # test_itho_planning_with_energy_target()
 
-    print("\n" + "=" * 80 + "\n")
+    # print("\n" + "=" * 80 + "\n")
 
     # Test 2: Constant cost (1 EUR/kWh)
     # test_itho_planning_with_constant_cost()
 
-    print("\n" + "=" * 80 + "\n")
+    # print("\n" + "=" * 80 + "\n")
 
-    # Test 3: Variable cost targeting
-    test_itho_planning_with_cost_target()
+    # Test 3: Variable cost targeting (with both fill level target and usage forecast)
+    # test_itho_planning_with_cost_target()
+
+    # print("\n" + "=" * 80 + "\n")
+
+    # Test 4: Usage forecast ONLY (no fill level target)
+    # test_itho_planning_with_usage_forecast_only()
+
+    # print("\n" + "=" * 80 + "\n")
+
+    # Test 5: Fill level target ONLY (no usage forecast)
+    test_itho_planning_with_fill_level_target_only()
+
+    # Default: run Test 3 (variable cost with both profiles)
+    # test_itho_planning_with_cost_target()
