@@ -50,6 +50,97 @@ T = PLANNING_WINDOW // PLANNING_RESOLUTION
 TIMESTEP_DURATION = PLANNING_RESOLUTION / pd.Timedelta("PT1S")
 
 
+def adjust_fill_level_target_profile_for_current_time(
+    fill_level_target_profile: FRBCFillLevelTargetProfile,
+    current_time: datetime,
+) -> FRBCFillLevelTargetProfile:
+    """
+    Adjust fill level target profile when current time is ahead of profile start_time.
+
+    Removes elements that have already passed and adjusts the start_time to current_time.
+    This keeps fill_level_ranges at fixed positions in time regardless of when scheduling happens.
+
+    Args:
+        fill_level_target_profile: The original fill level target profile
+        current_time: The current scheduling time (when planning actually happens)
+
+    Returns:
+        Adjusted fill level target profile with start_time set to current_time
+    """
+    if fill_level_target_profile is None:
+        return None
+
+    profile_start = fill_level_target_profile.start_time
+    if isinstance(profile_start, datetime):
+        profile_start = (
+            profile_start.replace(tzinfo=timezone.utc)
+            if profile_start.tzinfo is None
+            else profile_start
+        )
+    else:
+        profile_start = profile_start.astimezone(timezone.utc)
+
+    current_time = (
+        current_time.replace(tzinfo=timezone.utc)
+        if current_time.tzinfo is None
+        else current_time
+    )
+
+    # If current time is not ahead of profile start, just update start_time
+    if current_time <= profile_start:
+        return fill_level_target_profile.model_copy(update={"start_time": current_time})
+
+    # Calculate elapsed time since profile start
+    elapsed_time_ms = int((current_time - profile_start).total_seconds() * 1000)
+
+    # Helper function to extract duration in milliseconds
+    def get_duration_ms(elem):
+        duration = elem.duration
+        if isinstance(duration, (int, float)):
+            return int(duration)
+        elif hasattr(duration, "root"):
+            return int(duration.root)
+        else:
+            return int(duration)
+
+    # Find which elements have passed and which we're currently in
+    remaining_elements = []
+    cumulative_duration_ms = 0
+
+    for element in fill_level_target_profile.elements:
+        element_duration_ms = get_duration_ms(element)
+        element_end_ms = cumulative_duration_ms + element_duration_ms
+
+        if element_end_ms <= elapsed_time_ms:
+            # This element has completely passed, skip it
+            cumulative_duration_ms = element_end_ms
+            continue
+        elif cumulative_duration_ms < elapsed_time_ms:
+            # We're in the middle of this element, truncate it
+            remaining_duration_ms = element_end_ms - elapsed_time_ms
+            if remaining_duration_ms > 0:
+                remaining_elements.append(
+                    FRBCFillLevelTargetProfileElement(
+                        duration=Duration(root=remaining_duration_ms),
+                        fill_level_range=element.fill_level_range,
+                    )
+                )
+            cumulative_duration_ms = element_end_ms
+        else:
+            # This element is in the future, keep it as-is
+            remaining_elements.append(element)
+            cumulative_duration_ms = element_end_ms
+
+    # Create adjusted profile with current_time as start_time
+    adjusted_profile = FRBCFillLevelTargetProfile(
+        message_id=str(uuid.uuid4()),
+        start_time=current_time,
+        elements=remaining_elements,
+    )
+
+    return adjusted_profile
+
+
 def create_itho_device_state(
     device_id: str,
     start_time: datetime,
@@ -206,9 +297,12 @@ def create_itho_device_state(
     # Create fill level target profile (only if requested)
     fill_level_target_profile = None
     if include_fill_level_target:
-        # FRBC.FillLevelTargetProfile - aligned with planning window start time
-        # CRITICAL: target_start_time must match planning window start_time
-        target_start_time = start_time
+        # FRBC.FillLevelTargetProfile - create with fixed reference time (start of day)
+        # This keeps fill_level_ranges at fixed positions in time regardless of when scheduling happens
+        # The profile will be adjusted for the actual scheduling time later
+        fixed_reference_time = start_time.replace(
+            hour=0, minute=0, second=0, microsecond=0
+        )
 
         # Get heating parameters from SystemDescription
         # From DHW_ON operation mode: fill_rate = 0.002031807896078361 per second
@@ -314,11 +408,25 @@ def create_itho_device_state(
         )
         print(f"Number of elements: {len(elements)}")
 
+        # Create profile with fixed reference time (start of day)
         fill_level_target_profile = FRBCFillLevelTargetProfile(
             message_id=str(uuid.uuid4()),
-            start_time=target_start_time,
+            start_time=fixed_reference_time,
             elements=elements,
         )
+
+        # Adjust profile for actual scheduling time
+        # This removes elements that have already passed and sets start_time to current scheduling time
+        fill_level_target_profile = adjust_fill_level_target_profile_for_current_time(
+            fill_level_target_profile,
+            start_time,
+        )
+
+        if fill_level_target_profile:
+            print("\nAdjusted fill level target profile:")
+            print(f"  Original reference time: {fixed_reference_time}")
+            print(f"  Adjusted start_time: {fill_level_target_profile.start_time}")
+            print(f"  Remaining elements: {len(fill_level_target_profile.elements)}")
     else:
         print(
             "\nFill level target profile: NOT CREATED (include_fill_level_target=False)"
