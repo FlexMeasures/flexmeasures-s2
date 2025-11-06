@@ -1,6 +1,7 @@
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 from datetime import datetime, timedelta, timezone
-import time
+
+# import time
 import pandas as pd
 import os
 import uuid
@@ -153,7 +154,7 @@ def plot_planning_results(
     plt.tight_layout()
     os.makedirs("plots", exist_ok=True)
     plt.savefig(f"plots/nocontrol_plot_D={D}_T={T}.png")
-    print(f"Plot saved to plots/nocontrol_plot_D={D}_T={T}.png")
+    # print(f"Plot saved to plots/nocontrol_plot_D={D}_T={T}.png")
 
 
 def get_target_profile_elements(number_of_elements: int):
@@ -169,9 +170,9 @@ def get_target_profile_elements(number_of_elements: int):
 
 def test_planning_service_impl_with_nocontrol_devices():
     """Test the PlanningServiceImpl with nocontrol devices."""
-    print("Testing PlanningServiceImpl with nocontrol devices")
-    print(f"Number of devices: {D}")
-    print(f"Number of timesteps: {T}")
+    # print("Testing PlanningServiceImpl with nocontrol devices")
+    # print(f"Number of devices: {D}")
+    # print(f"Number of timesteps: {T}")
 
     target_metadata = ProfileMetadata(
         profile_start=datetime(1970, 1, 1, tzinfo=timezone.utc),
@@ -225,11 +226,11 @@ def test_planning_service_impl_with_nocontrol_devices():
         multithreaded=False,
     )
 
-    print("Generating plan!")
+    # print("Generating plan!")
 
     service = PlanningServiceImpl(config)
 
-    start_time = time.time()
+    # start_time = time.time()
     cluster_plan = service.plan(
         state=cluster_state,
         target=cluster_target,
@@ -239,16 +240,16 @@ def test_planning_service_impl_with_nocontrol_devices():
         optimize_for_target=True,
         max_priority_class=1,
     )
-    end_time = time.time()
-    execution_time = end_time - start_time
+    # end_time = time.time()
+    # execution_time = end_time - start_time
 
-    print(f"Plan generated in {execution_time:.2f} seconds")
+    # print(f"Plan generated in {execution_time:.2f} seconds")
 
     assert cluster_plan is not None
-    print("Got cluster plan")
+    # print("Got cluster plan")
 
     if cluster_plan is None:
-        print("Cluster plan is None")
+        # print("Cluster plan is None")
         return
 
     device_plans = cluster_plan.get_plan_data().get_device_plans()
@@ -264,18 +265,19 @@ def test_planning_service_impl_with_nocontrol_devices():
     device_plans = [plan for plan in device_plans if plan is not None]
 
     assert len(device_plans) > 0
-    print(f"Got {len(device_plans)} device plans")
+    # print(f"Got {len(device_plans)} device plans")
 
     for device_plan in device_plans:
         if device_plan:
-            print(f"Device {device_plan.device_id}:")
-            print(
-                f"  Total energy: {sum(e for e in device_plan.energy_profile.elements if e is not None)} Joules"
-            )
-            print(f"  Instruction profile: {device_plan.instruction_profile}")
+            # print(f"Device {device_plan.device_id}:")
+            # print(
+            #     f"  Total energy: {sum(e for e in device_plan.energy_profile.elements if e is not None)} Joules"
+            # )
+            # print(f"  Instruction profile: {device_plan.instruction_profile}")
+            pass
 
     assert len(energy_profile.elements) == target_metadata.nr_of_timesteps
-    print("Test completed successfully!")
+    # print("Test completed successfully!")
 
 
 if __name__ == "__main__":

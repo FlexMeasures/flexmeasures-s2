@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
-import logging
+
+# import logging
 
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.common.proposal import Proposal
@@ -116,41 +117,42 @@ class S2FrbcDevicePlanner(DevicePlanner):
         if self.accepted_plan is None:
             raise ValueError("No accepted plan found")
 
-        print(f"\n{'='*80}")
-        print(f"DEVICE PLANNER: create_improved_planning for {self.device_name}")
-        print(
-            f"  Accepted plan energy: {sum(self.accepted_plan.energy.elements) if self.accepted_plan.energy else 0} J"
-        )
-        print(
-            f"  diff_to_global_target has Joule elements: {diff_to_global_target.nr_of_joule_target_elements()}"
-        )
-        print(
-            f"  diff_to_global_target nr_of_timesteps: {diff_to_global_target.metadata.nr_of_timesteps}"
-        )
+        # print(f"\n{'='*80}")
+        # print(f"DEVICE PLANNER: create_improved_planning for {self.device_name}")
+        # print(
+        #     f"  Accepted plan energy: {sum(self.accepted_plan.energy.elements) if self.accepted_plan.energy else 0} J"
+        # )
+        # print(
+        #     f"  diff_to_global_target has Joule elements: {diff_to_global_target.nr_of_joule_target_elements()}"
+        # )
+        # print(
+        #     f"  diff_to_global_target nr_of_timesteps: {diff_to_global_target.metadata.nr_of_timesteps}"
+        # )
 
         # Count tariff elements
-        tariff_count = sum(
-            1
-            for e in diff_to_global_target.elements
-            if isinstance(e, TargetProfile.TariffElement)
-        )
-        null_count = sum(
-            1
-            for e in diff_to_global_target.elements
-            if isinstance(e, TargetProfile.NullElement)
-        )
-        print(
-            f"  Target elements: {tariff_count} TariffElement, {null_count} NullElement, {len(diff_to_global_target.elements)} total"
-        )
+        # tariff_count = sum(
+        #     1
+        #     for e in diff_to_global_target.elements
+        #     if isinstance(e, TargetProfile.TariffElement)
+        # )
+        # null_count = sum(
+        #     1
+        #     for e in diff_to_global_target.elements
+        #     if isinstance(e, TargetProfile.NullElement)
+        # )
+        # print(
+        #     f"  Target elements: {tariff_count} TariffElement, {null_count} NullElement, {len(diff_to_global_target.elements)} total"
+        # )
 
         # Show sample tariff values
-        if tariff_count > 0:
-            sample_tariffs = [
-                e.get_tariff()
-                for e in diff_to_global_target.elements[:10]
-                if isinstance(e, TargetProfile.TariffElement)
-            ]
-            print(f"  Sample tariff values (first 10): {sample_tariffs}")
+        # if tariff_count > 0:
+        #     sample_tariffs = [
+        #         e.get_tariff()
+        #         for e in diff_to_global_target.elements[:10]
+        #         if isinstance(e, TargetProfile.TariffElement)
+        #     ]
+        #     print(f"  Sample tariff values (first 10): {sample_tariffs}")
+        pass
 
         # TODO: check if diff_to_global_target has tarrif elements
         # TODO: check for NULL elements in target
@@ -158,19 +160,20 @@ class S2FrbcDevicePlanner(DevicePlanner):
             target = diff_to_global_target.add(self.accepted_plan.energy)
         else:
             target = diff_to_global_target
-            print(
-                "diff_to_global_target has no Joule elements, using the target directly"
-            )
+            # print(
+            #     "diff_to_global_target has no Joule elements, using the target directly"
+            # )
+            pass
 
-        print("  Final target for find_best_plan:")
-        tariff_count_final = sum(
-            1 for e in target.elements if isinstance(e, TargetProfile.TariffElement)
-        )
-        null_count_final = sum(
-            1 for e in target.elements if isinstance(e, TargetProfile.NullElement)
-        )
-        print(f"    {tariff_count_final} TariffElement, {null_count_final} NullElement")
-        print(f"{'='*80}\n")
+        # print("  Final target for find_best_plan:")
+        # tariff_count_final = sum(
+        #     1 for e in target.elements if isinstance(e, TargetProfile.TariffElement)
+        # )
+        # null_count_final = sum(
+        #     1 for e in target.elements if isinstance(e, TargetProfile.NullElement)
+        # )
+        # print(f"    {tariff_count_final} TariffElement, {null_count_final} NullElement")
+        # print(f"{'='*80}\n")
 
         max_profile = diff_to_max.add(self.accepted_plan.energy)
         min_profile = diff_to_min.add(self.accepted_plan.energy)
@@ -181,15 +184,15 @@ class S2FrbcDevicePlanner(DevicePlanner):
             )
 
             # Log the new plan
-            new_energy = (
-                sum(self.latest_plan.energy.elements)
-                if self.latest_plan and self.latest_plan.energy
-                else 0
-            )
-            print(f"  New plan energy: {new_energy} J")
-            print(
-                f"  Energy difference: {new_energy - sum(self.accepted_plan.energy.elements)} J"
-            )
+            # new_energy = (
+            #     sum(self.latest_plan.energy.elements)
+            #     if self.latest_plan and self.latest_plan.energy
+            #     else 0
+            # )
+            # print(f"  New plan energy: {new_energy} J")
+            # print(
+            #     f"  Energy difference: {new_energy - sum(self.accepted_plan.energy.elements)} J"
+            # )
         else:
             self.latest_plan = S2FrbcPlan(
                 idle=True,
@@ -269,18 +272,18 @@ class S2FrbcDevicePlanner(DevicePlanner):
     def get_device_plan(self) -> Optional[DevicePlan]:
         if self.accepted_plan is None:
             return None
-        logging.debug(
-            dict(
-                device_id=self.device_id,
-                device_name=self.device_name,
-                connection_id=self.connection_id,
-                energy_profile=self.accepted_plan.energy,
-                fill_level_profile=self.accepted_plan.fill_level,
-                instruction_profile=self.convert_plan_to_instructions(
-                    self.profile_metadata, self.accepted_plan
-                ),
-            )
-        )
+        # logging.debug(
+        #     dict(
+        #         device_id=self.device_id,
+        #         device_name=self.device_name,
+        #         connection_id=self.connection_id,
+        #         energy_profile=self.accepted_plan.energy,
+        #         fill_level_profile=self.accepted_plan.fill_level,
+        #         instruction_profile=self.convert_plan_to_instructions(
+        #             self.profile_metadata, self.accepted_plan
+        #         ),
+        #     )
+        # )
         return DevicePlan(
             device_id=self.device_id,
             device_name=self.device_name,

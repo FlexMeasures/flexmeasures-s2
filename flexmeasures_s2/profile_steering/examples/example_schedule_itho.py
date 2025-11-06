@@ -235,23 +235,19 @@ def create_itho_device_state(
         print("=" * 80)
         print("FILL LEVEL TARGET CONFIGURATION")
         print("=" * 80)
-        print(f"Current fill level: {present_fill_level}°C")
+        print(f"Current fill level:{present_fill_level}°C")
         print(f"Peak target: [{peak_target_min}, {peak_target_max}]°C")
         print(f"Fill rate: {fill_rate_per_second} °C/second (when heating at 1100W)")
         print(f"Temperature rise needed: {temp_rise_needed:.2f}°C")
         print(
-            f"Heating time required: {heating_time_seconds/3600:.2f} hours ({heating_time_timesteps} timesteps)"
+            f"Heating time required: {heating_time_seconds / 3600:.2f} hours ({heating_time_timesteps} timesteps)"
         )
         print("")
         print("STRATEGY:")
         print("  - Peak periods require 51.5-55.0°C (constraint: fill_level >= 51.5°C)")
-        print(f"  - Current level ({present_fill_level}°C) is BELOW peak requirement")
         print("  - Optimizer sees constraint violation at peak times if not heated")
         print("  - Optimizer MUST heat to 51.5°C before/during peak periods")
         print("  - Optimizer will minimize cost by heating during CHEAP hours")
-        print(
-            f"  - Target start_time aligned with planning start_time: {target_start_time}"
-        )
         print("=" * 80)
 
         # Create fill level target profile elements
@@ -311,10 +307,10 @@ def create_itho_device_state(
         total_duration_ms = sum(get_duration_ms(elem) for elem in elements)
         total_duration_seconds = total_duration_ms / 1000.0
         print(
-            f"\nTarget profile duration: {total_duration_seconds/3600:.2f} hours ({total_duration_ms/1000:.0f} seconds)"
+            f"\nTarget profile duration: {total_duration_seconds / 3600:.2f} hours ({total_duration_ms / 1000:.0f} seconds)"
         )
         print(
-            f"Planning window duration: {planning_window_duration.total_seconds()/3600:.2f} hours ({planning_window_duration.total_seconds():.0f} seconds)"
+            f"Planning window duration: {planning_window_duration.total_seconds() / 3600:.2f} hours ({planning_window_duration.total_seconds():.0f} seconds)"
         )
         print(f"Number of elements: {len(elements)}")
 
@@ -385,14 +381,14 @@ def create_itho_device_state(
 
         print("\nUsage forecast created:")
         print(
-            f"  Total duration: {total_usage_duration_seconds/3600:.2f} hours ({total_usage_duration_ms/1000:.0f} seconds)"
+            f"  Total duration: {total_usage_duration_seconds / 3600:.2f} hours ({total_usage_duration_ms / 1000:.0f} seconds)"
         )
         print(f"  Number of elements: {len(usage_elements)}")
         print(
-            f"  Base usage rate: {base_usage_rate} °C/second ({base_usage_rate*3600:.4f} °C/hour)"
+            f"  Base usage rate: {base_usage_rate} °C/second ({base_usage_rate * 3600:.4f} °C/hour)"
         )
         print(
-            f"  Peak usage rate: {peak_usage_rate} °C/second ({peak_usage_rate*3600:.4f} °C/hour)"
+            f"  Peak usage rate: {peak_usage_rate} °C/second ({peak_usage_rate * 3600:.4f} °C/hour)"
         )
         print("  Usage during peaks will reduce fill level, forcing optimizer to heat")
 
@@ -421,9 +417,11 @@ def create_itho_device_state(
         usage_forecasts=[usage_forecast]
         if (include_usage_forecast and usage_forecast)
         else [],
-        fill_level_target_profiles=[fill_level_target_profile]
-        if (include_fill_level_target and fill_level_target_profile)
-        else [],
+        fill_level_target_profiles=(
+            [fill_level_target_profile]
+            if (include_fill_level_target and fill_level_target_profile)
+            else []
+        ),
         computational_parameters=S2FrbcDeviceState.ComputationalParameters(B, S),
         actuator_statuses=[actuator_status],
         storage_status=storage_status,
@@ -654,7 +652,7 @@ def plot_planning_results(
     os.makedirs("plots", exist_ok=True)
     filename = f"plots/itho_schedule{suffix}_D={D}_B={B}_S={S}_T={T}.png"
     plt.savefig(filename)
-    print(f"Plot saved to {filename}")
+    # print(f"Plot saved to {filename}")
 
     plt.show()
 
@@ -739,7 +737,7 @@ def save_instructions_to_file(
         device_state: Device state containing operation mode mappings (optional)
     """
     if not device_plans_list:
-        print(f"No device plans to save for {filename_suffix}")
+        # print(f"No device plans to save for {filename_suffix}")
         return
 
     # Create operation mode ID to name mapping
@@ -841,7 +839,7 @@ def save_instructions_to_file(
                     f.write("Detailed Instruction List:\n")
                     f.write("=" * 80 + "\n")
                     for i, instruction in enumerate(instructions):
-                        f.write(f"\nInstruction #{i+1}:\n")
+                        f.write(f"\nInstruction #{i + 1}:\n")
                         f.write(f"  Timestep: {i}\n")
                         f.write(
                             f"  Time: {start_time + timedelta(seconds=i * TIMESTEP_DURATION)}\n"
@@ -869,14 +867,14 @@ def save_instructions_to_file(
 
                         f.write("-" * 40 + "\n")
 
-    print(f"Instructions saved to: {filename}")
+    # print(f"Instructions saved to: {filename}")
 
 
 def test_itho_planning_with_energy_target():
     """Test the PlanningServiceImpl with ITHO DHW device using energy targets."""
-    print("=" * 80)
-    print("Test 1: ITHO DHW Heat Pump with Energy Target Profile")
-    print("=" * 80)
+    # print("=" * 80)
+    # print("Test 1: ITHO DHW Heat Pump with Energy Target Profile")
+    # print("=" * 80)
 
     # Start time is 15 minutes from now, aligned to 5-minute intervals
     now = datetime.now(timezone.utc)
@@ -885,7 +883,7 @@ def test_itho_planning_with_energy_target():
     start_time = now.replace(minute=minutes, second=0, microsecond=0) + timedelta(
         minutes=15
     )
-    print(f"Planning start time: {start_time}")
+    # print(f"Planning start time: {start_time}")
 
     # Create profile metadata
     target_metadata = ProfileMetadata(
@@ -934,7 +932,7 @@ def test_itho_planning_with_energy_target():
         multithreaded=False,
     )
 
-    print("Generating plan...")
+    # print("Generating plan...")
 
     # Create planning service implementation
     service = PlanningServiceImpl(config)
@@ -999,7 +997,7 @@ def test_itho_planning_with_energy_target():
                     if previous_mode and instruction.operation_mode != previous_mode:
                         mode_changes += 1
                     previous_mode = instruction.operation_mode
-            print(f"Number of operation mode changes: {mode_changes}")
+            # print(f"Number of operation mode changes: {mode_changes}")
 
     # Calculate total energy consumption
     total_energy_kwh = sum(energy_profile.elements) / 3_600_000
@@ -1019,7 +1017,7 @@ def test_itho_planning_with_energy_target():
             timedelta(seconds=TIMESTEP_DURATION),
             T,
         )
-        print("Fill level targets extracted from device state")
+        # print("Fill level targets extracted from device state")
 
     # Save instructions to file
     save_instructions_to_file(device_plans_list, "_energy", start_time, device_state)
@@ -1036,16 +1034,16 @@ def test_itho_planning_with_energy_target():
         suffix="_energy",
     )
 
-    print("ITHO energy target test completed successfully!")
+    # print("ITHO energy target test completed successfully!")
 
     return cluster_plan
 
 
 def test_itho_planning_with_constant_cost():
     """Test the PlanningServiceImpl with ITHO DHW device using constant cost."""
-    print("\n" + "=" * 80)
-    print("Test 2: ITHO DHW Heat Pump with Constant Cost (1 EUR/kWh)")
-    print("=" * 80)
+    # print("\n" + "=" * 80)
+    # print("Test 2: ITHO DHW Heat Pump with Constant Cost (1 EUR/kWh)")
+    # print("=" * 80)
 
     # Start time is 15 minutes from now, aligned to 5-minute intervals
     now = datetime.now(timezone.utc)
@@ -1054,7 +1052,7 @@ def test_itho_planning_with_constant_cost():
     start_time = now.replace(minute=minutes, second=0, microsecond=0) + timedelta(
         minutes=15
     )
-    print(f"Planning start time: {start_time}")
+    # print(f"Planning start time: {start_time}")
 
     # Create profile metadata
     target_metadata = ProfileMetadata(
@@ -1103,14 +1101,14 @@ def test_itho_planning_with_constant_cost():
         multithreaded=False,
     )
 
-    print("Generating constant-cost plan...")
+    # print("Generating constant-cost plan...")
 
     # Create planning service implementation
     service = PlanningServiceImpl(config)
 
     # Generate a plan
     plan_due_by_date = start_time + timedelta(seconds=10)
-    start_planning_time = time.time()
+    # start_planning_time = time.time()
 
     cluster_plan = service.plan(
         state=cluster_state,
@@ -1122,14 +1120,14 @@ def test_itho_planning_with_constant_cost():
         max_priority_class=1,
     )
 
-    end_planning_time = time.time()
-    execution_time = end_planning_time - start_planning_time
+    # end_planning_time = time.time()
+    # execution_time = end_planning_time - start_planning_time
 
-    print(f"Constant-cost plan generated in {execution_time:.2f} seconds")
+    # print(f"Constant-cost plan generated in {execution_time:.2f} seconds")
 
     # Assert and process results
     assert cluster_plan is not None, "Cluster plan is None"
-    print("Successfully generated constant-cost cluster plan")
+    # print("Successfully generated constant-cost cluster plan")
 
     # Get the plan data
     device_plans = cluster_plan.get_plan_data().get_device_plans()
@@ -1158,7 +1156,7 @@ def test_itho_planning_with_constant_cost():
 
         if device_plan.instruction_profile:
             instructions = device_plan.instruction_profile.elements
-            print(f"Device has {len(instructions)} instructions")
+            # print(f"Device has {len(instructions)} instructions")
 
             # Analyze operation mode changes
             mode_changes = 0
@@ -1168,18 +1166,18 @@ def test_itho_planning_with_constant_cost():
                     if previous_mode and instruction.operation_mode != previous_mode:
                         mode_changes += 1
                     previous_mode = instruction.operation_mode
-            print(f"Number of operation mode changes: {mode_changes}")
+            # print(f"Number of operation mode changes: {mode_changes}")
 
     # Calculate total energy consumption
-    total_energy_kwh = sum(energy_profile.elements) / 3_600_000
-    print(f"Total energy consumption: {total_energy_kwh:.2f} kWh")
+    # total_energy_kwh = sum(energy_profile.elements) / 3_600_000
+    # print(f"Total energy consumption: {total_energy_kwh:.2f} kWh")
 
     # Calculate the actual costs from the energy profile and tariffs
-    cost_elements = calculate_cost_from_energy_and_tariffs(
-        energy_profile.elements, constant_cost_elements
-    )
-    total_cost = sum(cost_elements)
-    print(f"Total cost: €{total_cost:.2f}")
+    # cost_elements = calculate_cost_from_energy_and_tariffs(
+    #     energy_profile.elements, constant_cost_elements
+    # )
+    # total_cost = sum(cost_elements)
+    # print(f"Total cost: €{total_cost:.2f}")
 
     # Extract fill level targets from device state
     fill_level_target_min = None
@@ -1195,7 +1193,7 @@ def test_itho_planning_with_constant_cost():
             timedelta(seconds=TIMESTEP_DURATION),
             T,
         )
-        print("Fill level targets extracted from device state")
+        # print("Fill level targets extracted from device state")
 
     # Save instructions to file
     save_instructions_to_file(
@@ -1215,16 +1213,16 @@ def test_itho_planning_with_constant_cost():
         tariff_elements=constant_cost_elements,
     )
 
-    print("ITHO constant cost test completed successfully!")
+    # print("ITHO constant cost test completed successfully!")
 
     return cluster_plan
 
 
 def test_itho_planning_with_cost_target():
     """Test the PlanningServiceImpl with ITHO DHW device using variable cost targets."""
-    print("\n" + "=" * 80)
-    print("Test 3: ITHO DHW Heat Pump with Variable Cost Target Profile")
-    print("=" * 80)
+    # print("\n" + "=" * 80)
+    # print("Test 3: ITHO DHW Heat Pump with Variable Cost Target Profile")
+    # print("=" * 80)
 
     # Start time is 15 minutes from now, aligned to 5-minute intervals
     now = datetime.now(timezone.utc)
@@ -1233,7 +1231,7 @@ def test_itho_planning_with_cost_target():
     start_time = now.replace(minute=minutes, second=0, microsecond=0) + timedelta(
         minutes=15
     )
-    print(f"Planning start time: {start_time}")
+    # print(f"Planning start time: {start_time}")
 
     # Create profile metadata
     target_metadata = ProfileMetadata(
@@ -1282,7 +1280,7 @@ def test_itho_planning_with_cost_target():
         multithreaded=False,
     )
 
-    print("Generating cost-optimized plan...")
+    # print("Generating cost-optimized plan...")
 
     # Create planning service implementation
     service = PlanningServiceImpl(config)
@@ -1337,7 +1335,7 @@ def test_itho_planning_with_cost_target():
 
         if device_plan.instruction_profile:
             instructions = device_plan.instruction_profile.elements
-            print(f"Device has {len(instructions)} instructions")
+            # print(f"Device has {len(instructions)} instructions")
 
             # Analyze operation mode changes
             mode_changes = 0
@@ -1347,7 +1345,7 @@ def test_itho_planning_with_cost_target():
                     if previous_mode and instruction.operation_mode != previous_mode:
                         mode_changes += 1
                     previous_mode = instruction.operation_mode
-            print(f"Number of operation mode changes: {mode_changes}")
+            # print(f"Number of operation mode changes: {mode_changes}")
 
     # Calculate total energy consumption
     total_energy_kwh = sum(energy_profile.elements) / 3_600_000
@@ -1374,7 +1372,7 @@ def test_itho_planning_with_cost_target():
             timedelta(seconds=TIMESTEP_DURATION),
             T,
         )
-        print("Fill level targets extracted from device state")
+        # print("Fill level targets extracted from device state")
 
     # Save instructions to file
     save_instructions_to_file(device_plans_list, "_cost", start_time, device_state)
@@ -1392,18 +1390,18 @@ def test_itho_planning_with_cost_target():
         tariff_elements=cost_target_elements,
     )
 
-    print("ITHO cost target test completed successfully!")
+    # print("ITHO cost target test completed successfully!")
 
     return cluster_plan
 
 
 def test_itho_planning_with_usage_forecast_only():
     """Test the PlanningServiceImpl with ITHO DHW device using ONLY usage forecast (no fill level target)."""
-    print("\n" + "=" * 80)
-    print(
-        "Test 4: ITHO DHW Heat Pump with Usage Forecast ONLY (no FillLevelTargetProfile)"
-    )
-    print("=" * 80)
+    # print("\n" + "=" * 80)
+    # print(
+    #     "Test 4: ITHO DHW Heat Pump with Usage Forecast ONLY (no FillLevelTargetProfile)"
+    # )
+    # print("=" * 80)
 
     # Start time is 15 minutes from now, aligned to 5-minute intervals
     now = datetime.now(timezone.utc)
@@ -1412,7 +1410,7 @@ def test_itho_planning_with_usage_forecast_only():
     start_time = now.replace(minute=minutes, second=0, microsecond=0) + timedelta(
         minutes=15
     )
-    print(f"Planning start time: {start_time}")
+    # print(f"Planning start time: {start_time}")
 
     # Create profile metadata
     target_metadata = ProfileMetadata(
@@ -1466,14 +1464,14 @@ def test_itho_planning_with_usage_forecast_only():
         multithreaded=False,
     )
 
-    print("Generating plan with usage forecast only (no fill level target)...")
+    # print("Generating plan with usage forecast only (no fill level target)...")
 
     # Create planning service implementation
     service = PlanningServiceImpl(config)
 
     # Generate a plan
     plan_due_by_date = start_time + timedelta(seconds=10)
-    start_planning_time = time.time()
+    # start_planning_time = time.time()
 
     cluster_plan = service.plan(
         state=cluster_state,
@@ -1485,14 +1483,14 @@ def test_itho_planning_with_usage_forecast_only():
         max_priority_class=1,
     )
 
-    end_planning_time = time.time()
-    execution_time = end_planning_time - start_planning_time
+    # end_planning_time = time.time()
+    # execution_time = end_planning_time - start_planning_time
 
-    print(f"Plan generated in {execution_time:.2f} seconds")
+    # print(f"Plan generated in {execution_time:.2f} seconds")
 
     # Assert and process results
     assert cluster_plan is not None, "Cluster plan is None"
-    print("Successfully generated cluster plan with usage forecast only")
+    # print("Successfully generated cluster plan with usage forecast only")
 
     # Get the plan data
     device_plans = cluster_plan.get_plan_data().get_device_plans()
@@ -1521,7 +1519,7 @@ def test_itho_planning_with_usage_forecast_only():
 
         if device_plan.instruction_profile:
             instructions = device_plan.instruction_profile.elements
-            print(f"Device has {len(instructions)} instructions")
+            # print(f"Device has {len(instructions)} instructions")
 
             # Analyze operation mode changes
             mode_changes = 0
@@ -1531,23 +1529,23 @@ def test_itho_planning_with_usage_forecast_only():
                     if previous_mode and instruction.operation_mode != previous_mode:
                         mode_changes += 1
                     previous_mode = instruction.operation_mode
-            print(f"Number of operation mode changes: {mode_changes}")
+            # print(f"Number of operation mode changes: {mode_changes}")
 
     # Calculate total energy consumption
-    total_energy_kwh = sum(energy_profile.elements) / 3_600_000
-    print(f"Total energy consumption: {total_energy_kwh:.2f} kWh")
+    # total_energy_kwh = sum(energy_profile.elements) / 3_600_000
+    # print(f"Total energy consumption: {total_energy_kwh:.2f} kWh")
 
     # Calculate the actual costs from the energy profile and tariffs
-    cost_elements = calculate_cost_from_energy_and_tariffs(
-        energy_profile.elements, cost_target_elements
-    )
-    total_cost = sum(cost_elements)
-    print(f"Total cost: ${total_cost:.2f}")
+    # cost_elements = calculate_cost_from_energy_and_tariffs(
+    #     energy_profile.elements, cost_target_elements
+    # )
+    # total_cost = sum(cost_elements)
+    # print(f"Total cost: ${total_cost:.2f}")
 
     # No fill level targets to extract (they were not included)
     fill_level_target_min = None
     fill_level_target_max = None
-    print("No fill level targets (test uses usage forecast only)")
+    # print("No fill level targets (test uses usage forecast only)")
 
     # Save instructions to file
     save_instructions_to_file(
@@ -1567,18 +1565,18 @@ def test_itho_planning_with_usage_forecast_only():
         tariff_elements=cost_target_elements,
     )
 
-    print("ITHO usage forecast only test completed successfully!")
+    # print("ITHO usage forecast only test completed successfully!")
 
     return cluster_plan
 
 
 def test_itho_planning_with_fill_level_target_only():
     """Test the PlanningServiceImpl with ITHO DHW device using ONLY fill level target (no usage forecast)."""
-    print("\n" + "=" * 80)
-    print(
-        "Test 5: ITHO DHW Heat Pump with FillLevelTargetProfile ONLY (no UsageForecast)"
-    )
-    print("=" * 80)
+    # print("\n" + "=" * 80)
+    # print(
+    #     "Test 5: ITHO DHW Heat Pump with FillLevelTargetProfile ONLY (no UsageForecast)"
+    # )
+    # print("=" * 80)
 
     # Start time is 15 minutes from now, aligned to 5-minute intervals
     now = datetime.now(timezone.utc)
@@ -1587,7 +1585,7 @@ def test_itho_planning_with_fill_level_target_only():
     start_time = now.replace(minute=minutes, second=0, microsecond=0) + timedelta(
         minutes=15
     )
-    print(f"Planning start time: {start_time}")
+    # print(f"Planning start time: {start_time}")
 
     # Create profile metadata
     target_metadata = ProfileMetadata(
@@ -1641,14 +1639,14 @@ def test_itho_planning_with_fill_level_target_only():
         multithreaded=False,
     )
 
-    print("Generating plan with fill level target only (no usage forecast)...")
+    # print("Generating plan with fill level target only (no usage forecast)...")
 
     # Create planning service implementation
     service = PlanningServiceImpl(config)
 
     # Generate a plan
     plan_due_by_date = start_time + timedelta(seconds=10)
-    start_planning_time = time.time()
+    # start_planning_time = time.time()
 
     cluster_plan = service.plan(
         state=cluster_state,
@@ -1660,14 +1658,14 @@ def test_itho_planning_with_fill_level_target_only():
         max_priority_class=1,
     )
 
-    end_planning_time = time.time()
-    execution_time = end_planning_time - start_planning_time
+    # end_planning_time = time.time()
+    # execution_time = end_planning_time - start_planning_time
 
-    print(f"Plan generated in {execution_time:.2f} seconds")
+    # print(f"Plan generated in {execution_time:.2f} seconds")
 
     # Assert and process results
     assert cluster_plan is not None, "Cluster plan is None"
-    print("Successfully generated cluster plan with fill level target only")
+    # print("Successfully generated cluster plan with fill level target only")
 
     # Get the plan data
     device_plans = cluster_plan.get_plan_data().get_device_plans()
@@ -1696,7 +1694,7 @@ def test_itho_planning_with_fill_level_target_only():
 
         if device_plan.instruction_profile:
             instructions = device_plan.instruction_profile.elements
-            print(f"Device has {len(instructions)} instructions")
+            # print(f"Device has {len(instructions)} instructions")
 
             # Analyze operation mode changes
             mode_changes = 0
@@ -1706,7 +1704,7 @@ def test_itho_planning_with_fill_level_target_only():
                     if previous_mode and instruction.operation_mode != previous_mode:
                         mode_changes += 1
                     previous_mode = instruction.operation_mode
-            print(f"Number of operation mode changes: {mode_changes}")
+            # print(f"Number of operation mode changes: {mode_changes}")
 
     # Calculate total energy consumption
     total_energy_kwh = sum(energy_profile.elements) / 3_600_000
@@ -1733,7 +1731,7 @@ def test_itho_planning_with_fill_level_target_only():
             timedelta(seconds=TIMESTEP_DURATION),
             T,
         )
-        print("Fill level targets extracted from device state")
+        # print("Fill level targets extracted from device state")
     else:
         print("No fill level targets found in device state")
 
@@ -1755,7 +1753,7 @@ def test_itho_planning_with_fill_level_target_only():
         tariff_elements=cost_target_elements,
     )
 
-    print("ITHO fill level target only test completed successfully!")
+    # print("ITHO fill level target only test completed successfully!")
 
     return cluster_plan
 
@@ -1771,10 +1769,10 @@ if __name__ == "__main__":
     # Optionally, set specific loggers to different levels
     # logging.getLogger('matplotlib').setLevel(logging.WARNING)
 
-    print("=" * 80)
-    print("ITHO DHW Heat Pump Planning Examples with DEBUG Logging")
-    print("=" * 80)
-    print()
+    # print("=" * 80)
+    # print("ITHO DHW Heat Pump Planning Examples with DEBUG Logging")
+    # print("=" * 80)
+    # print()
 
     # Test 1: Energy targeting
     # test_itho_planning_with_energy_target()

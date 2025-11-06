@@ -1,8 +1,9 @@
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 from datetime import datetime, timedelta, timezone
 import uuid
-import logging
-import time
+
+# import logging
+# import time
 import pandas as pd
 import os
 from s2python.frbc.frbc_actuator_description import FRBCActuatorDescription
@@ -210,7 +211,7 @@ def create_recharge_system_description(
         ],
     )
     id_on_operation_mode = str(uuid.uuid4())
-    logging.debug(f"id_on_operation_mode: {id_on_operation_mode}")
+    # logging.debug(f"id_on_operation_mode: {id_on_operation_mode}")
     ids.append((id_on_operation_mode, "charge_on_operation_mode"))
     on_operation_mode = FRBCOperationMode(
         id=id_on_operation_mode,
@@ -230,7 +231,7 @@ def create_recharge_system_description(
         ],
     )
     id_off_operation_mode = str(uuid.uuid4())
-    logging.debug(f"id_off_operation_mode: {id_off_operation_mode}")
+    # logging.debug(f"id_off_operation_mode: {id_off_operation_mode}")
     ids.append((id_off_operation_mode, "charge_off_operation_mode"))
     off_operation_mode = FRBCOperationMode(
         id=id_off_operation_mode,
@@ -240,7 +241,7 @@ def create_recharge_system_description(
     )
 
     id_on_to_off_timer = str(uuid.uuid4())
-    logging.debug(f"id_on_to_off_timer: {id_on_to_off_timer}")
+    # logging.debug(f"id_on_to_off_timer: {id_on_to_off_timer}")
     ids.append((id_on_to_off_timer, "charge_on_to_off_timer"))
     on_to_off_timer = Timer(
         id=id_on_to_off_timer,
@@ -248,7 +249,7 @@ def create_recharge_system_description(
         duration=Duration(root=30),
     )
     id_off_to_on_timer = str(uuid.uuid4())
-    logging.debug(f"id_off_to_on_timer: {id_off_to_on_timer}")
+    # logging.debug(f"id_off_to_on_timer: {id_off_to_on_timer}")
     ids.append((id_off_to_on_timer, "charge_off_to_on_timer"))
     off_to_on_timer = Timer(
         id=id_off_to_on_timer,
@@ -256,7 +257,7 @@ def create_recharge_system_description(
         duration=Duration(root=30),
     )
     transition_id_from_on_to_off = str(uuid.uuid4())
-    logging.debug(f"transition_id_from_on_to_off: {transition_id_from_on_to_off}")
+    # logging.debug(f"transition_id_from_on_to_off: {transition_id_from_on_to_off}")
     ids.append(
         (transition_id_from_on_to_off, "transition_from_charge_on_to_charge_off")
     )
@@ -270,7 +271,7 @@ def create_recharge_system_description(
         abnormal_condition_only=False,
     )
     transition_id_from_off_to_on = str(uuid.uuid4())
-    logging.debug(f"transition_id_from_off_to_on: {transition_id_from_off_to_on}")
+    # logging.debug(f"transition_id_from_off_to_on: {transition_id_from_off_to_on}")
     ids.append(
         (transition_id_from_off_to_on, "transition_from_charge_off_to_charge_on")
     )
@@ -284,7 +285,7 @@ def create_recharge_system_description(
         abnormal_condition_only=False,
     )
     charge_actuator_id = str(uuid.uuid4())
-    logging.debug(f"charge_actuator_id: {charge_actuator_id}")
+    # logging.debug(f"charge_actuator_id: {charge_actuator_id}")
     ids.append((charge_actuator_id, "charge_actuator"))
     charge_actuator_status = FRBCActuatorStatus(
         message_id=charge_actuator_id,  # type: ignore[arg-type]
@@ -302,7 +303,7 @@ def create_recharge_system_description(
         supported_commodities=[Commodity.ELECTRICITY],
     )
     storage_status_id = str(uuid.uuid4())
-    logging.debug(f"storage_status_id: {storage_status_id}")
+    # logging.debug(f"storage_status_id: {storage_status_id}")
     ids.append((storage_status_id, "storage_status"))
     storage_status = FRBCStorageStatus(
         message_id=storage_status_id,  # type: ignore[arg-type]
@@ -318,7 +319,7 @@ def create_recharge_system_description(
         fill_level_range=NumberRange(start_of_range=0, end_of_range=100),
     )
     system_description_id = str(uuid.uuid4())
-    logging.debug(f"system_description_id: {system_description_id}")
+    # logging.debug(f"system_description_id: {system_description_id}")
     ids.append((system_description_id, "system_description"))
     frbc_system_description = FRBCSystemDescription(
         message_id=system_description_id,  # type: ignore[arg-type]
@@ -332,7 +333,7 @@ def create_recharge_system_description(
 
 def create_recharge_leakage_behaviour(start_of_recharge):
     leakage_id = str(uuid.uuid4())
-    logging.debug(f"leakage_id: {leakage_id}")
+    # logging.debug(f"leakage_id: {leakage_id}")
     ids.append((leakage_id, "leakage"))
     return FRBCLeakageBehaviour(
         message_id=leakage_id,
@@ -351,7 +352,7 @@ def create_recharge_usage_forecast(start_of_recharge, recharge_duration):
         duration=int(recharge_duration.total_seconds()), usage_rate_expected=0
     )
     usage_id = str(uuid.uuid4())
-    logging.debug(f"usage_id: {usage_id}")
+    # logging.debug(f"usage_id: {usage_id}")
     ids.append((usage_id, "usage"))
     return FRBCUsageForecast(
         message_id=usage_id, start_time=start_of_recharge, elements=[no_usage]
@@ -377,7 +378,7 @@ def create_recharge_fill_level_target_profile(
         ),
     )
     fill_level_id = str(uuid.uuid4())
-    logging.debug(f"fill_level_id: {fill_level_id}")
+    # logging.debug(f"fill_level_id: {fill_level_id}")
     ids.append((fill_level_id, "fill_level"))
     return FRBCFillLevelTargetProfile(
         message_id=fill_level_id,
@@ -400,7 +401,7 @@ def create_driving_system_description(start_of_drive, soc_percentage_before_driv
         ],
     )
     id_off_operation_mode = str(uuid.uuid4())
-    logging.debug(f"operation_mode_driving: {id_off_operation_mode}")
+    # logging.debug(f"operation_mode_driving: {id_off_operation_mode}")
     ids.append((id_off_operation_mode, "operation_mode_driving"))
     off_operation_mode = FRBCOperationMode(
         id=id_off_operation_mode,
@@ -409,7 +410,7 @@ def create_driving_system_description(start_of_drive, soc_percentage_before_driv
         abnormal_condition_only=False,
     )
     off_actuator_id = str(uuid.uuid4())
-    logging.debug(f"actuator_driving: {off_actuator_id}")
+    # logging.debug(f"actuator_driving: {off_actuator_id}")
     ids.append((off_actuator_id, "actuator_driving"))
     off_actuator_status = FRBCActuatorStatus(
         message_id=str(uuid.uuid4()),
@@ -686,7 +687,7 @@ def calculate_cost_from_energy_and_tariffs(energy_elements, tariff_elements):
 
 def test_planning_service_impl_with_ev_device():
     """Test the PlanningServiceImpl with an EV device."""
-    print("Test the PlanningServiceImpl with an EV device.")
+    # print("Test the PlanningServiceImpl with an EV device.")
     # Create 10 device states
     numberOfDevices = D
 
@@ -746,7 +747,7 @@ def test_planning_service_impl_with_ev_device():
         multithreaded=False,
     )
 
-    print("Generating plan!")
+    # print("Generating plan!")
 
     # Create planning service implementation
     service = PlanningServiceImpl(config)
@@ -754,7 +755,7 @@ def test_planning_service_impl_with_ev_device():
     # Set due by date for planning
     plan_due_by_date = target_metadata.profile_start + timedelta(seconds=10)
     # Act - Generate a plan
-    start_time = time.time()
+    # start_time = time.time()
     cluster_plan = service.plan(
         state=cluster_state,
         target=cluster_target,
@@ -764,17 +765,17 @@ def test_planning_service_impl_with_ev_device():
         optimize_for_target=True,
         max_priority_class=1,
     )
-    end_time = time.time()
-    execution_time = end_time - start_time
+    # end_time = time.time()
+    # execution_time = end_time - start_time
 
     # Log information
-    print(f"Plan generated in {execution_time: .2f} seconds")
+    # print(f"Plan generated in {execution_time: .2f} seconds")
 
     # Assert
     assert cluster_plan is not None
-    print("Got cluster plan")
+    # print("Got cluster plan")
     if cluster_plan is None:
-        print("Cluster plan is None")
+        # print("Cluster plan is None")
         return
     # Get the plan for our device
     device_plans = cluster_plan.get_plan_data().get_device_plans()
@@ -795,13 +796,13 @@ def test_planning_service_impl_with_ev_device():
     if D == 3 or D == 10 or D == 5:
         with open(f"energy_profile-D={D}_B={B}_S={S}_T={T}.json", "r") as f:
             assert energy_profile.elements == json.load(f)
-            print("Energy profile matches expected values")
+            # print("Energy profile matches expected values")
     # Get only the non-None plans
     device_plans = [plan for plan in device_plans if plan is not None]
 
     # Assert that we got a plan for our device
     assert len(device_plans) > 0
-    print("Got device plan")
+    # print("Got device plan")
 
     # Print instructions and analyze operation mode changes
     all_instructions = []
@@ -809,11 +810,11 @@ def test_planning_service_impl_with_ev_device():
         if device_plan and device_plan.instruction_profile:
             instructions = device_plan.instruction_profile.elements
             all_instructions.extend(instructions)
-            print(
-                f"Device {device_plan.device_id} has {len(instructions)} instructions"
-            )
+            # print(
+            #     f"Device {device_plan.device_id} has {len(instructions)} instructions"
+            # )
 
-    print(f"Total number of instructions: {len(all_instructions)}")
+    # print(f"Total number of instructions: {len(all_instructions)}")
 
     # Find instructions with different operation modes than previous instruction
     mode_changes = []
@@ -837,7 +838,7 @@ def test_planning_service_impl_with_ev_device():
                 )
             previous_mode = current_mode
 
-    print(f"Found {len(mode_changes)} operation mode changes:")
+    # print(f"Found {len(mode_changes)} operation mode changes:")
     for change in mode_changes:
         print(
             f"  Instruction {change['index']}: {change['previous_mode']} -> {change['current_mode']}"
@@ -849,11 +850,12 @@ def test_planning_service_impl_with_ev_device():
 
     # Basic assertion - the energy profile should have the expected number of elements
     assert len(energy_profile.elements) == target_metadata.nr_of_timesteps
+    # pass
 
 
 def test_planning_service_impl_with_cost_target():
     """Test the PlanningServiceImpl with cost targeting."""
-    print("Test the PlanningServiceImpl with cost targeting.")
+    # print("Test the PlanningServiceImpl with cost targeting.")
 
     # Create profile metadata
     target_metadata = ProfileMetadata(
@@ -911,13 +913,13 @@ def test_planning_service_impl_with_cost_target():
         multithreaded=False,
     )
 
-    print("Generating cost-optimized plan!")
+    # print("Generating cost-optimized plan!")
 
     # Create planning service implementation
     service = PlanningServiceImpl(config)
 
     # Act - Generate a plan
-    start_time = time.time()
+    # start_time = time.time()
     cluster_plan = service.plan(
         state=cluster_state,
         target=cluster_target,
@@ -927,18 +929,18 @@ def test_planning_service_impl_with_cost_target():
         optimize_for_target=True,
         max_priority_class=1,
     )
-    end_time = time.time()
-    execution_time = end_time - start_time
+    # end_time = time.time()
+    # execution_time = end_time - start_time
 
     # Log information
-    print(f"Cost-optimized plan generated in {execution_time: .2f} seconds")
+    # print(f"Cost-optimized plan generated in {execution_time: .2f} seconds")
 
     # Assert
     assert cluster_plan is not None
-    print("Got cost-optimized cluster plan")
+    # print("Got cost-optimized cluster plan")
 
     if cluster_plan is None:
-        print("Cluster plan is None")
+        # print("Cluster plan is None")
         return
 
     # Get the plan for our device
@@ -949,10 +951,10 @@ def test_planning_service_impl_with_cost_target():
         energy_profile.elements, cost_target_elements
     )
 
-    print(
-        f"Total energy consumption: {sum(energy_profile.elements) / 3_600_000:.2f} kWh"  #
-    )
-    print(f"Total cost: ${sum(cost_elements):.2f}")
+    # print(
+    #     f"Total energy consumption: {sum(energy_profile.elements) / 3_600_000:.2f} kWh"  #
+    # )
+    # print(f"Total cost: ${sum(cost_elements):.2f}")
 
     # Plot the cost-optimized planning results with dual axes
     plot_planning_results(
@@ -967,7 +969,7 @@ def test_planning_service_impl_with_cost_target():
     # Basic assertion - the energy profile should have the expected number of elements
     assert len(energy_profile.elements) == target_metadata.nr_of_timesteps
 
-    print("Cost targeting test completed successfully!")
+    # print("Cost targeting test completed successfully!")
 
 
 # Main function
@@ -975,7 +977,7 @@ if __name__ == "__main__":
     # Test energy targeting (original functionality)
     test_planning_service_impl_with_ev_device()
 
-    print("\n" + "=" * 60 + "\n")
+    # print("\n" + "=" * 60 + "\n")
 
     # Test cost targeting (new functionality)
     test_planning_service_impl_with_cost_target()

@@ -90,9 +90,11 @@ class DdbcPlanningWindow:
                     hasattr(first_elem, "__class__")
                     and "Null" in first_elem.__class__.__name__
                 ):
-                    logger.info("DDBC planning WITH target (optimization mode)")
+                    # logger.info("DDBC planning WITH target (optimization mode)")
+                    pass
                 else:
-                    logger.info("DDBC planning with NULL target (initial planning)")
+                    # logger.info("DDBC planning with NULL target (initial planning)")
+                    pass
         except Exception:
             pass  # Silently ignore logging errors
 
