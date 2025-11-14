@@ -27,8 +27,8 @@ def _get_device_proposal(
             diff_to_min_value,
             plan_due_by_date,
         )
-    except Exception as e:
-        print(f"Error getting proposal from device {device.device_id} in worker: {e}")
+    except Exception:
+        # print(f"Error getting proposal from device {device.device_id} in worker: {e}")
         return None
 
 
@@ -39,10 +39,10 @@ def _get_initial_device_plan(
     try:
         plan = device.create_initial_planning(plan_due_by_date)
         return (device.device_id, plan)
-    except Exception as e:
-        print(
-            f"Error getting initial plan from device {device.device_id} in worker: {e}"
-        )
+    except Exception:
+        # print(
+        #     f"Error getting initial plan from device {device.device_id} in worker: {e}"
+        # )
         return (device.device_id, None)
 
 
@@ -133,15 +133,15 @@ class CongestionPointPlanner:
 
         # Check if the current planning is within the congestion target range
         if self.congestion_target.is_within_range(current_planning):
-            print(
-                "Current planning is within the congestion target range. Returning it."
-            )
+            # print(
+            #     "Current planning is within the congestion target range. Returning it."
+            # )
             return current_planning
 
         # If the current planning is not within the congestion target range, optimize it
-        print(
-            "Current planning is not within the congestion target range. Optimizing it."
-        )
+        # print(
+        #     "Current planning is not within the congestion target range. Optimizing it."
+        # )
 
         # print(f"Congestion target: {self.congestion_target}")
         # This is an old implementation that does not use the root planner
@@ -154,7 +154,8 @@ class CongestionPointPlanner:
 
         # Iterate over priority classes
         for priority_class in range(min_priority_class, max_priority_class + 1):
-            print(f"Optimizing priority class: {priority_class}")
+            # print(f"Optimizing priority class: {priority_class}")
+            pass
             while True:
                 best_proposal = None
                 diff_to_max = self.congestion_target.difference_with_max_value(
@@ -178,19 +179,19 @@ class CongestionPointPlanner:
                                 raise ValueError(
                                     f"No proposal found for device {device.device_id}"
                                 )
-                            print(
-                                f"congestion point improvement for '{device.device_id}': {proposal.get_congestion_improvement_value()}"
-                            )
+                            # print(
+                            #     f"congestion point improvement for '{device.device_id}': {proposal.get_congestion_improvement_value()}"
+                            # )
                             if (
                                 best_proposal is None
                                 or proposal.get_congestion_improvement_value()
                                 > best_proposal.get_congestion_improvement_value()
                             ):
                                 best_proposal = proposal
-                        except Exception as e:
-                            print(
-                                f"Error getting proposal from device {device.device_id}: {e}"
-                            )
+                        except Exception:
+                            # print(
+                            #     f"Error getting proposal from device {device.device_id}: {e}"
+                            # )
                             continue
 
                 if (
@@ -206,9 +207,9 @@ class CongestionPointPlanner:
                 best_proposal.origin.accept_proposal(best_proposal)
                 i += 1
 
-                print(
-                    f"Initial planning '{self.congestion_point_id}': best controller '{best_proposal.origin.device_id}' with congestion improvement of {best_proposal.get_congestion_improvement_value()}. Iteration {i}."
-                )
+                # print(
+                #     f"Initial planning '{self.congestion_point_id}': best controller '{best_proposal.origin.device_id}' with congestion improvement of {best_proposal.get_congestion_improvement_value()}. Iteration {i}."
+                # )
 
                 if i >= self.MAX_ITERATIONS:
                     break
@@ -283,26 +284,28 @@ class CongestionPointPlanner:
 
         for proposal in proposals:
             if proposal.get_congestion_improvement_value() < 0:
-                print(
-                    f"{proposal.origin.device_name}, congestion improvement: {proposal.get_congestion_improvement_value()}"
-                )
+                # print(
+                #     f"{proposal.origin.device_name}, congestion improvement: {proposal.get_congestion_improvement_value()}"
+                # )
+                pass
 
             if best_proposal is None or proposal.is_preferred_to(best_proposal):
                 best_proposal = proposal
 
         if best_proposal is None:
-            print(
-                f"CP '{self.congestion_point_id}': No proposal available at current priority level ({priority_class})"
-            )
+            # print(
+            #     f"CP '{self.congestion_point_id}': No proposal available at current priority level ({priority_class})"
+            # )
+            pass
         else:
             if best_proposal.get_congestion_improvement_value() == float("-inf"):
                 raise ValueError(
                     "Invalid proposal with negative infinity improvement value"
                 )
 
-            print(
-                f"CP '{self.congestion_point_id}': Selected best controller '{best_proposal.origin.device_name}' with improvement of {best_proposal.get_global_improvement_value()}."
-            )
+            # print(
+            #     f"CP '{self.congestion_point_id}': Selected best controller '{best_proposal.origin.device_name}' with improvement of {best_proposal.get_global_improvement_value()}."
+            # )
 
         return best_proposal
 

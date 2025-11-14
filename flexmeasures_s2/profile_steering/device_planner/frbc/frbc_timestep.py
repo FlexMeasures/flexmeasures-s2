@@ -102,30 +102,32 @@ class FrbcTimestep:
             if stored_state is None:
                 self._states_by_bucket[bucket] = state
                 state.set_selection_reason(SelectionReason.NO_ALTERNATIVE)
-                logger.debug(
-                    f"    New state in bucket {bucket}: fill_level={state.fill_level:.2f}, energy={state.timestep_energy:.0f}"
-                )
+                # logger.debug(
+                #     f"    New state in bucket {bucket}: fill_level={state.fill_level:.2f}, energy={state.timestep_energy:.0f}"
+                # )
             else:
                 selection_result = state.is_preferable_than(stored_state)
                 if selection_result.result:
-                    logger.debug(
-                        f"    Bucket {bucket}: Replacing state (fill_level={stored_state.fill_level:.2f}) with better state (fill_level={state.fill_level:.2f})"
-                    )
-                    logger.debug(
-                        f"      Reason: {selection_result.reason.value if hasattr(selection_result.reason, 'value') else selection_result.reason}"
-                    )
+                    # logger.debug(
+                    #     f"    Bucket {bucket}: Replacing state (fill_level={stored_state.fill_level:.2f}) with better state (fill_level={state.fill_level:.2f})"
+                    # )
+                    # logger.debug(
+                    #     f"      Reason: {selection_result.reason.value if hasattr(selection_result.reason, 'value') else selection_result.reason}"
+                    # )
                     self._states_by_bucket[bucket] = state
                 else:
-                    logger.debug(
-                        f"    Bucket {bucket}: Keeping existing state (fill_level={stored_state.fill_level:.2f}) over new state (fill_level={state.fill_level:.2f})"
-                    )
+                    # logger.debug(
+                    #     f"    Bucket {bucket}: Keeping existing state (fill_level={stored_state.fill_level:.2f}) over new state (fill_level={state.fill_level:.2f})"
+                    # )
+                    pass
                 self._states_by_bucket[bucket].set_selection_reason(
                     selection_result.reason
                 )
         else:
-            logger.debug(
-                f"    State outside fill level range: fill_level={state.fill_level:.2f} (emergency state)"
-            )
+            # logger.debug(
+            #     f"    State outside fill level range: fill_level={state.fill_level:.2f} (emergency state)"
+            # )
+            pass
             if (
                 self.emergency_state is None
                 or state.get_fill_level_distance()

@@ -62,9 +62,10 @@ class Proposal:
             elif isinstance(target_element, TargetProfile.NullElement):
                 null_count += 1
         if tariff_count == 0 and null_count > 0:
-            print(
-                f"  WARNING: get_cost called with {null_count} NullElements, {tariff_count} TariffElements - cost will be 0!"
-            )
+            # print(
+            #     f"  WARNING: get_cost called with {null_count} NullElements, {tariff_count} TariffElements - cost will be 0!"
+            # )
+            pass
         return cost
 
     def get_congestion_improvement_value(self) -> float:

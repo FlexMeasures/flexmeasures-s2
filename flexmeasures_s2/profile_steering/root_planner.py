@@ -98,16 +98,16 @@ class RootPlanner:
                     )
                 else:
                     difference_profile = self.target
-                    print(
-                        "difference_profile has no Joule elements, using the target directly"
-                    )
+                    # print(
+                    #     "difference_profile has no Joule elements, using the target directly"
+                    # )
 
                 best_proposal = None
 
                 # Get proposals from each congestion point controller
                 proposals = []
                 for cpc in self.cp_controllers:
-                    print("Improving------------------------->")
+                    # print("Improving------------------------->")
                     try:
                         proposal = cpc.create_improved_planning(
                             difference_profile,
@@ -120,8 +120,8 @@ class RootPlanner:
                                 best_proposal
                             ):
                                 best_proposal = proposal
-                    except Exception as e:
-                        print(f"Error getting proposal from controller: {e}")
+                    except Exception:
+                        # print(f"Error getting proposal from controller: {e}")
                         continue
 
                 if best_proposal is None:
@@ -129,23 +129,20 @@ class RootPlanner:
                     break
 
                 # Update root controller's own planning
-                accepted_proposals = 0
                 if self.always_accept_all_proposals:
                     # If we're NOT optimizing for a Joule target or congestion target, we can
                     # accept all proposals for efficiency
-                    accepted_proposals = len(proposals)
                     for proposal in proposals:
                         self._accept_proposal(proposal)
                 else:
                     # If we're optimizing for a Joule target or congestion target we only accept
                     # one proposal
-                    accepted_proposals = 1
                     self._accept_proposal(best_proposal)
 
                 i += 1
-                print(
-                    f"Root controller: selected best controller '{best_proposal.origin.device_name}' with global energy impr {best_proposal.get_global_improvement_value()}, cost impr {best_proposal.get_cost_improvement_value()}, CP impr {best_proposal.get_congestion_improvement_value()}. Accepted {accepted_proposals} proposal(s). Iteration {i}."
-                )
+                # print(
+                #     f"Root controller: selected best controller '{best_proposal.origin.device_name}' with global energy impr {best_proposal.get_global_improvement_value()}, cost impr {best_proposal.get_cost_improvement_value()}, CP impr {best_proposal.get_congestion_improvement_value()}. Accepted {accepted_proposals} proposal(s). Iteration {i}."
+                # )
 
                 # Check stopping criteria: if improvement values are below thresholds or max iterations reached.
                 if self.always_accept_all_proposals:
@@ -163,13 +160,14 @@ class RootPlanner:
                     ) or i >= self.MAX_ITERATIONS:
                         break
 
-            print(
-                f"Optimizing priority class {priority_class} was done after {i} iterations."
-            )
+            # print(
+            #     f"Optimizing priority class {priority_class} was done after {i} iterations."
+            # )
             if i >= self.MAX_ITERATIONS:
-                print(
-                    f"Warning: Optimization stopped due to iteration limit. Priority class: {priority_class}, Iterations: {i}"
-                )
+                # print(
+                #     f"Warning: Optimization stopped due to iteration limit. Priority class: {priority_class}, Iterations: {i}"
+                # )
+                pass
 
     def _accept_proposal(self, proposal):
         """Accept a proposal and update the planning accordingly."""

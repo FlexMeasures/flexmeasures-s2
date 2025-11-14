@@ -1,5 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict
+import uuid
 
 from flask import current_app as app
 import pandas as pd
@@ -19,12 +20,207 @@ from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state i
 )
 from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
-from s2python.frbc import FRBCInstruction
+from s2python.frbc import (
+    FRBCInstruction,
+    FRBCFillLevelTargetProfile,
+    FRBCFillLevelTargetProfileElement,
+    FRBCUsageForecast,
+    FRBCUsageForecastElement,
+)
+from s2python.common import Duration
 
 from flexmeasures_s2.scheduler.schedulers import (
     PlanningServiceConfig,
     PlanningServiceImpl,
 )
+
+
+def adjust_fill_level_target_profile_for_current_time(
+    fill_level_target_profile: FRBCFillLevelTargetProfile,
+    current_time: datetime,
+) -> FRBCFillLevelTargetProfile:
+    """
+    Adjust fill level target profile when current time is ahead of profile start_time.
+
+    Removes elements that have already passed and adjusts the start_time to current_time.
+    This keeps fill_level_ranges at fixed positions in time regardless of when scheduling happens.
+
+    Args:
+        fill_level_target_profile: The original fill level target profile
+        current_time: The current scheduling time (when planning actually happens)
+
+    Returns:
+        Adjusted fill level target profile with start_time set to current_time
+    """
+    if fill_level_target_profile is None:
+        return None
+
+    profile_start = fill_level_target_profile.start_time
+    if isinstance(profile_start, datetime):
+        profile_start = (
+            profile_start.replace(tzinfo=timezone.utc)
+            if profile_start.tzinfo is None
+            else profile_start
+        )
+    else:
+        profile_start = profile_start.astimezone(timezone.utc)
+
+    current_time = (
+        current_time.replace(tzinfo=timezone.utc)
+        if current_time.tzinfo is None
+        else current_time
+    )
+
+    # If current time is not ahead of profile start, just update start_time
+    if current_time <= profile_start:
+        return fill_level_target_profile.model_copy(update={"start_time": current_time})
+
+    # Calculate elapsed time since profile start
+    elapsed_time_ms = int((current_time - profile_start).total_seconds() * 1000)
+
+    # Helper function to extract duration in milliseconds
+    def get_duration_ms(elem):
+        duration = elem.duration
+        if isinstance(duration, (int, float)):
+            return int(duration)
+        elif hasattr(duration, "root"):
+            return int(duration.root)
+        else:
+            return int(duration)
+
+    # Find which elements have passed and which we're currently in
+    remaining_elements = []
+    cumulative_duration_ms = 0
+
+    for element in fill_level_target_profile.elements:
+        element_duration_ms = get_duration_ms(element)
+        element_end_ms = cumulative_duration_ms + element_duration_ms
+
+        if element_end_ms <= elapsed_time_ms:
+            # This element has completely passed, skip it
+            cumulative_duration_ms = element_end_ms
+            continue
+        elif cumulative_duration_ms < elapsed_time_ms:
+            # We're in the middle of this element, truncate it
+            remaining_duration_ms = element_end_ms - elapsed_time_ms
+            if remaining_duration_ms > 0:
+                remaining_elements.append(
+                    FRBCFillLevelTargetProfileElement(
+                        duration=Duration(root=remaining_duration_ms),
+                        fill_level_range=element.fill_level_range,
+                    )
+                )
+            cumulative_duration_ms = element_end_ms
+        else:
+            # This element is in the future, keep it as-is
+            remaining_elements.append(element)
+            cumulative_duration_ms = element_end_ms
+
+    # Create adjusted profile with current_time as start_time
+    adjusted_profile = FRBCFillLevelTargetProfile(
+        message_id=str(uuid.uuid4()),
+        start_time=current_time,
+        elements=remaining_elements,
+    )
+
+    return adjusted_profile
+
+
+def adjust_usage_forecast_for_current_time(
+    usage_forecast: FRBCUsageForecast,
+    current_time: datetime,
+) -> FRBCUsageForecast:
+    """
+    Adjust usage forecast when current time is ahead of forecast start_time.
+
+    Removes elements that have already passed and adjusts the start_time to current_time.
+    This keeps usage_rate values at fixed positions in time regardless of when scheduling happens.
+
+    Args:
+        usage_forecast: The original usage forecast
+        current_time: The current scheduling time (when planning actually happens)
+
+    Returns:
+        Adjusted usage forecast with start_time set to current_time
+    """
+    if usage_forecast is None:
+        return None
+
+    forecast_start = usage_forecast.start_time
+    if isinstance(forecast_start, datetime):
+        forecast_start = (
+            forecast_start.replace(tzinfo=timezone.utc)
+            if forecast_start.tzinfo is None
+            else forecast_start
+        )
+    else:
+        forecast_start = forecast_start.astimezone(timezone.utc)
+
+    current_time = (
+        current_time.replace(tzinfo=timezone.utc)
+        if current_time.tzinfo is None
+        else current_time
+    )
+
+    # If current time is not ahead of forecast start, just update start_time
+    if current_time <= forecast_start:
+        return usage_forecast.model_copy(update={"start_time": current_time})
+
+    # Calculate elapsed time since forecast start
+    elapsed_time_ms = int((current_time - forecast_start).total_seconds() * 1000)
+
+    # Helper function to extract duration in milliseconds
+    def get_duration_ms(elem):
+        duration = elem.duration
+        if isinstance(duration, (int, float)):
+            return int(duration)
+        elif hasattr(duration, "root"):
+            return int(duration.root)
+        else:
+            return int(duration)
+
+    # Find which elements have passed and which we're currently in
+    remaining_elements = []
+    cumulative_duration_ms = 0
+
+    for element in usage_forecast.elements:
+        element_duration_ms = get_duration_ms(element)
+        element_end_ms = cumulative_duration_ms + element_duration_ms
+
+        if element_end_ms <= elapsed_time_ms:
+            # This element has completely passed, skip it
+            cumulative_duration_ms = element_end_ms
+            continue
+        elif cumulative_duration_ms < elapsed_time_ms:
+            # We're in the middle of this element, truncate it
+            remaining_duration_ms = element_end_ms - elapsed_time_ms
+            if remaining_duration_ms > 0:
+                remaining_elements.append(
+                    FRBCUsageForecastElement(
+                        duration=Duration(root=remaining_duration_ms),
+                        usage_rate_expected=element.usage_rate_expected,
+                        usage_rate_upper_limit=element.usage_rate_upper_limit,
+                        usage_rate_upper_95PPR=element.usage_rate_upper_95PPR,
+                        usage_rate_upper_68PPR=element.usage_rate_upper_68PPR,
+                        usage_rate_lower_68PPR=element.usage_rate_lower_68PPR,
+                        usage_rate_lower_95PPR=element.usage_rate_lower_95PPR,
+                        usage_rate_lower_limit=element.usage_rate_lower_limit,
+                    )
+                )
+            cumulative_duration_ms = element_end_ms
+        else:
+            # This element is in the future, keep it as-is
+            remaining_elements.append(element)
+            cumulative_duration_ms = element_end_ms
+
+    # Create adjusted forecast with current_time as start_time
+    adjusted_forecast = FRBCUsageForecast(
+        message_id=str(uuid.uuid4()),
+        start_time=current_time,
+        elements=remaining_elements,
+    )
+
+    return adjusted_forecast
 
 
 class S2FlaskScheduler(Scheduler):
@@ -420,30 +616,57 @@ class S2FlaskScheduler(Scheduler):
                     else None
                 )
 
-                # Align fill level target profile start_time with scheduler start time
-                if (
-                    fill_level_target_profile
-                    and fill_level_target_profile.start_time != self.start
-                ):
-                    app.logger.debug(
-                        f"Aligning fill level target profile start_time: "
-                        f"{fill_level_target_profile.start_time} → {self.start}"
+                # Adjust fill level target profile for scheduler start time
+                # This removes elements that have already passed and adjusts start_time
+                if fill_level_target_profile:
+                    original_start = fill_level_target_profile.start_time
+                    n_original = (
+                        len(fill_level_target_profile.elements)
+                        if fill_level_target_profile.elements
+                        else 0
                     )
-                    # Create a copy with updated start_time
-                    fill_level_target_profile = fill_level_target_profile.model_copy(
-                        update={"start_time": self.start}
+                    adjusted_profile = (
+                        adjust_fill_level_target_profile_for_current_time(
+                            fill_level_target_profile, self.start
+                        )
                     )
+                    if adjusted_profile:
+                        fill_level_target_profile = adjusted_profile
+                        if original_start != self.start:
+                            n_adjusted = (
+                                len(adjusted_profile.elements)
+                                if adjusted_profile.elements
+                                else 0
+                            )
+                            app.logger.debug(
+                                f"Adjusted fill level target profile: "
+                                f"{original_start} → {self.start}, "
+                                f"elements: {n_original} → {n_adjusted}"
+                            )
 
-                # Align usage forecast start_time with scheduler start time
-                if usage_forecast and usage_forecast.start_time != self.start:
-                    app.logger.debug(
-                        f"Aligning usage forecast start_time: "
-                        f"{usage_forecast.start_time} → {self.start}"
+                # Adjust usage forecast for scheduler start time
+                # This removes elements that have already passed and adjusts start_time
+                if usage_forecast:
+                    original_start = usage_forecast.start_time
+                    n_original = (
+                        len(usage_forecast.elements) if usage_forecast.elements else 0
                     )
-                    # Create a copy with updated start_time
-                    usage_forecast = usage_forecast.model_copy(
-                        update={"start_time": self.start}
+                    adjusted_forecast = adjust_usage_forecast_for_current_time(
+                        usage_forecast, self.start
                     )
+                    if adjusted_forecast:
+                        usage_forecast = adjusted_forecast
+                        if original_start != self.start:
+                            n_adjusted = (
+                                len(adjusted_forecast.elements)
+                                if adjusted_forecast.elements
+                                else 0
+                            )
+                            app.logger.debug(
+                                f"Adjusted usage forecast: "
+                                f"{original_start} → {self.start}, "
+                                f"elements: {n_original} → {n_adjusted}"
+                            )
 
                 # Create device state using the received FRBC data
                 device_state = S2FrbcDeviceState(
@@ -536,37 +759,61 @@ class S2FlaskScheduler(Scheduler):
                     usage_forecast = frbc_data.get("usage_forecast")
                     leakage_behaviour = frbc_data.get("leakage_behaviour")
 
-                    # Align fill level target profile start_time with scheduler start time
-                    if (
-                        fill_level_target_profile
-                        and hasattr(fill_level_target_profile, "start_time")
-                        and fill_level_target_profile.start_time != self.start
+                    # Adjust fill level target profile for scheduler start time
+                    # This removes elements that have already passed and adjusts start_time
+                    if fill_level_target_profile and hasattr(
+                        fill_level_target_profile, "start_time"
                     ):
-                        app.logger.debug(
-                            f"Aligning fill level target profile start_time: "
-                            f"{fill_level_target_profile.start_time} → {self.start}"
+                        original_start = fill_level_target_profile.start_time
+                        n_original = (
+                            len(fill_level_target_profile.elements)
+                            if fill_level_target_profile.elements
+                            else 0
                         )
-                        # Create a copy with updated start_time
-                        fill_level_target_profile = (
-                            fill_level_target_profile.model_copy(
-                                update={"start_time": self.start}
+                        adjusted_profile = (
+                            adjust_fill_level_target_profile_for_current_time(
+                                fill_level_target_profile, self.start
                             )
                         )
+                        if adjusted_profile:
+                            fill_level_target_profile = adjusted_profile
+                            if original_start != self.start:
+                                n_adjusted = (
+                                    len(adjusted_profile.elements)
+                                    if adjusted_profile.elements
+                                    else 0
+                                )
+                                app.logger.debug(
+                                    f"Adjusted fill level target profile: "
+                                    f"{original_start} → {self.start}, "
+                                    f"elements: {n_original} → {n_adjusted}"
+                                )
 
-                    # Align usage forecast start_time with scheduler start time
-                    if (
-                        usage_forecast
-                        and hasattr(usage_forecast, "start_time")
-                        and usage_forecast.start_time != self.start
-                    ):
-                        app.logger.debug(
-                            f"Aligning usage forecast start_time: "
-                            f"{usage_forecast.start_time} → {self.start}"
+                    # Adjust usage forecast for scheduler start time
+                    # This removes elements that have already passed and adjusts start_time
+                    if usage_forecast and hasattr(usage_forecast, "start_time"):
+                        original_start = usage_forecast.start_time
+                        n_original = (
+                            len(usage_forecast.elements)
+                            if usage_forecast.elements
+                            else 0
                         )
-                        # Create a copy with updated start_time
-                        usage_forecast = usage_forecast.model_copy(
-                            update={"start_time": self.start}
+                        adjusted_forecast = adjust_usage_forecast_for_current_time(
+                            usage_forecast, self.start
                         )
+                        if adjusted_forecast:
+                            usage_forecast = adjusted_forecast
+                            if original_start != self.start:
+                                n_adjusted = (
+                                    len(adjusted_forecast.elements)
+                                    if adjusted_forecast.elements
+                                    else 0
+                                )
+                                app.logger.debug(
+                                    f"Adjusted usage forecast: "
+                                    f"{original_start} → {self.start}, "
+                                    f"elements: {n_original} → {n_adjusted}"
+                                )
 
                     # Create device state using the received FRBC data
                     device_state = S2FrbcDeviceState(

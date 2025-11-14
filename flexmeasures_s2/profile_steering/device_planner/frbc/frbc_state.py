@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Dict, Optional, Any, Tuple
 import logging
 
-from flask import current_app as app
+# from flask import current_app as app
 from s2python.frbc import (
     FRBCSystemDescription,
 )
@@ -408,10 +408,12 @@ class FrbcState:
                         actuator_id
                     ].operation_mode_id
                 except KeyError:
-                    app.logger.debug(
-                        f"previous_state.actuator_configurations = {previous_state.actuator_configurations}"
-                    )
-                    raise KeyError(f"UUID {actuator_id} not in actuator configurations")
+                    # app.logger.debug(
+                    #     f"previous_state.actuator_configurations = {previous_state.actuator_configurations}"
+                    # )
+                    raise KeyError(
+                        f"UUID {actuator_id} not in actuator configurations"
+                    ) from None
 
                 new_operation_mode_id = actuator_configuration.operation_mode_id
                 if previous_operation_mode_id != new_operation_mode_id:
