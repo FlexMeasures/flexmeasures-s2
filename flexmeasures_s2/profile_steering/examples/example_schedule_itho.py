@@ -273,6 +273,7 @@ def create_itho_device_state(
         # Element 9: 10800000 ms (3 hours) - peak [51.5, 55.0]
         # Element 10: 14400000 ms (4 hours) - maintenance [10.0, 55.0]
 
+        # Total duration:
         # Define the pattern exactly as in itho.yaml
         fill_level_target_elements = [
             (23400000, fill_level_min, fill_level_max),  # Maintenance
