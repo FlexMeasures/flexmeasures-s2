@@ -43,6 +43,11 @@ def _get_initial_device_plan(
         print(
             f"Error getting initial plan from device {device.device_id} in worker: {e}"
         )
+        print(f"Exception type: {type(e).__name__}")
+        import traceback
+
+        print("Full traceback:")
+        traceback.print_exc()
         return (device.device_id, None)
 
 

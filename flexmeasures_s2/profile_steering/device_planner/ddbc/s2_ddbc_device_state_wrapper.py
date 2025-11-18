@@ -22,7 +22,7 @@ class S2DdbcDeviceStateWrapper:
     """
 
     EPSILON = 1e-4
-    STRATIFICATION_LAYERS = 50
+    STRATIFICATION_LAYERS = 30  # Number of stratification layers (matching FRBC)
 
     def __init__(self, device_state: S2DdbcDeviceState):
         self.device_state = device_state
@@ -88,12 +88,13 @@ class S2DdbcDeviceStateWrapper:
         actuator_operation_mode_map: Dict[str, List[str]] = {}
 
         for actuator in target_timestep.get_system_description().actuators:
+            # Convert both actuator ID and operation mode IDs to strings
             operation_mode_ids = [
-                om.id
+                str(om.id)
                 for om in actuator.operation_modes
                 if not om.abnormal_condition_only
             ]
-            actuator_operation_mode_map[actuator.id] = operation_mode_ids
+            actuator_operation_mode_map[str(actuator.id)] = operation_mode_ids
 
         self.actuator_operation_mode_map_per_timestep[
             target_timestep.get_start_date()
@@ -104,15 +105,27 @@ class S2DdbcDeviceStateWrapper:
         self, target_timestep: "DdbcTimestep", actuator_id: str, operation_mode_id: str
     ) -> DdbcOperationModeWrapper:
         """Get an operation mode wrapper."""
+
+        # Handle UUID objects with root attribute - extract the actual UUID value
+        if hasattr(operation_mode_id, "root"):
+            # Extract the root attribute and convert to string
+            operation_mode_id = str(operation_mode_id.root)
+        elif not isinstance(operation_mode_id, str):
+            operation_mode_id = str(operation_mode_id)
+        # If it's already a string, use it as is
+
         om_key = f"{actuator_id}-{operation_mode_id}"
 
         if om_key in self.operation_modes:
             return self.operation_modes[om_key]
 
         found_actuator_description = None
-        for actuator_description in target_timestep.get_system_description().actuators:
+        system_actuators = target_timestep.get_system_description().actuators
+
+        for actuator_description in system_actuators:
+            actuator_desc_id_str = str(actuator_description.id)
             if (
-                str(actuator_description.id) == actuator_id
+                actuator_desc_id_str == actuator_id
                 or actuator_description.id == actuator_id
             ):
                 found_actuator_description = actuator_description
@@ -121,29 +134,54 @@ class S2DdbcDeviceStateWrapper:
         if found_actuator_description is None:
             raise ValueError(f"Actuator {actuator_id} not found")
 
-        for operation_mode in found_actuator_description.operation_modes:
-            operation_mode_id_obj = (
-                operation_mode.Id
-                if hasattr(operation_mode, "Id")
-                else operation_mode.id
-            )
-            if hasattr(operation_mode_id_obj, "root"):
+        found_om_ids = []
+        for idx, operation_mode in enumerate(
+            found_actuator_description.operation_modes
+        ):
+            # Try to get the operation mode ID from multiple sources
+            operation_mode_id_obj = None
+            if hasattr(operation_mode, "Id"):
+                operation_mode_id_obj = operation_mode.Id
+            elif hasattr(operation_mode, "id"):
+                operation_mode_id_obj = operation_mode.id
+            else:
+                operation_mode_id_obj = None
+
+            # Convert to string for comparison
+            if operation_mode_id_obj is not None and hasattr(
+                operation_mode_id_obj, "root"
+            ):
                 operation_mode_id_str = str(operation_mode_id_obj.root)
+            elif operation_mode_id_obj is not None and hasattr(
+                operation_mode_id_obj, "hex"
+            ):
+                operation_mode_id_str = str(operation_mode_id_obj)
             else:
                 operation_mode_id_str = str(operation_mode_id_obj)
-            if operation_mode_id_str == str(operation_mode_id):
+
+            found_om_ids.append(operation_mode_id_str)
+
+            if operation_mode_id_str == operation_mode_id:
                 found_operation_mode = DdbcOperationModeWrapper(operation_mode)
                 self.operation_modes[om_key] = found_operation_mode
                 return found_operation_mode
 
         raise ValueError(
-            f"Operation mode {operation_mode_id} not found for actuator {actuator_id}"
+            f"Operation mode '{operation_mode_id}' (type: {type(operation_mode_id)}) not found for actuator {actuator_id}. "
+            f"Available operation modes: {found_om_ids}. "
+            f"Comparison details: searching='{operation_mode_id}' vs found={found_om_ids}"
         )
 
     def operation_mode_uses_factor(
         self, target_timestep: "DdbcTimestep", actuator_id: str, operation_mode_id: str
     ) -> bool:
         """Check if an operation mode uses a factor."""
+        # Handle UUID objects with root attribute
+        if hasattr(operation_mode_id, "root"):
+            operation_mode_id = str(operation_mode_id.root)
+        else:
+            operation_mode_id = str(operation_mode_id)
+
         key = f"{actuator_id}-{operation_mode_id}"
         result_from_map = self.operation_mode_uses_factor_map.get(key)
 
@@ -201,18 +239,22 @@ class S2DdbcDeviceStateWrapper:
             )
 
         finished = False
-        while not finished:
+        strat_iter_count = 0
+        # Safety limit to prevent infinite loops in stratification
+        MAX_STRATIFICATION_ITERATIONS = 1000
+
+        while not finished and strat_iter_count < MAX_STRATIFICATION_ITERATIONS:
             found_multiple = False
             for i in range(len(operation_mode_configurations)):
                 c = operation_mode_configurations[i]
                 if self._contains_multiple_oms_with_factor(c, target_timestep):
                     operation_mode_configurations.pop(i)
-                    operation_mode_configurations.extend(
-                        self._apply_stratification_layers(c, target_timestep)
-                    )
+                    new_configs = self._apply_stratification_layers(c, target_timestep)
+                    operation_mode_configurations.extend(new_configs)
                     found_multiple = True
                     break
             finished = not found_multiple
+            strat_iter_count += 1
 
         self.all_actions[timestep_date] = operation_mode_configurations
         return operation_mode_configurations
@@ -242,13 +284,19 @@ class S2DdbcDeviceStateWrapper:
         configs: List[Dict[str, S2DdbcActuatorConfiguration]] = []
         om = self.get_operation_mode(target_timestep, actuator_id, operation_mode_id)
 
-        for i in range(self.STRATIFICATION_LAYERS + 1):
+        # If stratification is disabled, just use factor 0.0
+        if self.STRATIFICATION_LAYERS == 0:
             config_actuator_map = dict(copy)
-            factor_for_actuator = i * (1.0 / self.STRATIFICATION_LAYERS)
-            config_actuator_map[actuator_id] = om.convert_to_actuator_config(
-                factor_for_actuator
-            )
+            config_actuator_map[actuator_id] = om.convert_to_actuator_config(0.0)
             configs.append(config_actuator_map)
+        else:
+            for i in range(self.STRATIFICATION_LAYERS + 1):
+                config_actuator_map = dict(copy)
+                factor_for_actuator = i * (1.0 / self.STRATIFICATION_LAYERS)
+                config_actuator_map[actuator_id] = om.convert_to_actuator_config(
+                    factor_for_actuator
+                )
+                configs.append(config_actuator_map)
 
         return configs
 

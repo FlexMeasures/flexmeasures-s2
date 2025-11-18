@@ -17,14 +17,13 @@ from flexmeasures_s2.profile_steering.device_planner.ddbc.avg_demand_forecast_ut
     AvgDemandForecastUtil,
     AvgDemandForecastProfile,
 )
+from flexmeasures_s2.profile_steering.device_planner.ddbc.s2_ddbc_insights_profile import (
+    S2DdbcInsightsProfile,
+)
+from flexmeasures_s2.profile_steering.device_planner.ddbc.s2_ddbc_plan import S2DdbcPlan
 
 if TYPE_CHECKING:
-    from flexmeasures_s2.profile_steering.device_planner.ddbc.s2_ddbc_plan import (
-        S2DdbcPlan,
-    )
-    from flexmeasures_s2.profile_steering.device_planner.ddbc.s2_ddbc_insights_profile import (
-        S2DdbcInsightsProfile,
-    )
+    pass
 
 T = TypeVar("T")
 

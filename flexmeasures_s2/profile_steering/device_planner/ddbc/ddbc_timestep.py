@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 class DdbcTimestep:
     """Represents a single timestep in DDBC planning."""
 
-    DISTANCE_EPSILON = 1e-4
+    DISTANCE_EPSILON = 500.0  # 500 W tolerance (5% of 10kW typical system)
 
     def __init__(
         self,
@@ -45,14 +45,17 @@ class DdbcTimestep:
 
     def add_state(self, state: "DdbcState"):
         """Add a state to this timestep and track the best state."""
-        if state.supply_demand_distance() < self.DISTANCE_EPSILON:
-            if self.best_state is None or state.is_preferable_than(self.best_state):
+        distance = state.supply_demand_distance()
+
+        if distance < self.DISTANCE_EPSILON:
+            if self.best_state is None:
+                self.best_state = state
+            elif state.is_preferable_than(self.best_state):
                 self.best_state = state
         else:
             if (
                 self.emergency_state is None
-                or state.supply_demand_distance()
-                < self.emergency_state.supply_demand_distance()
+                or distance < self.emergency_state.supply_demand_distance()
             ):
                 self.emergency_state = state
 

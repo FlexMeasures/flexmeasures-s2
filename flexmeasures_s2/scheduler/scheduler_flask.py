@@ -17,6 +17,9 @@ from flexmeasures_s2.profile_steering.cluster_target import ClusterTarget
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import (
     S2FrbcDeviceState,
 )
+from flexmeasures_s2.profile_steering.device_planner.ddbc.s2_ddbc_device_state import (
+    S2DdbcDeviceState,
+)
 from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 from s2python.frbc import FRBCInstruction
@@ -46,6 +49,7 @@ class S2FlaskScheduler(Scheduler):
         self.planning_service = None
         self.config_deserialized = False
         self.frbc_device_data = None  # Store FRBC device data from WebSocket
+        self.ddbc_device_data = None  # Store DDBC device data from WebSocket
 
     def compute(self, *args, **kwargs):
         """
@@ -73,11 +77,19 @@ class S2FlaskScheduler(Scheduler):
 
             app.logger.info("🧮 S2FlaskScheduler started")
 
-            if not hasattr(self, "frbc_device_data") or self.frbc_device_data is None:
-                app.logger.error("❌ No FRBC device data available")
+            # Check if we have either FRBC or DDBC device data
+            has_frbc = (
+                hasattr(self, "frbc_device_data") and self.frbc_device_data is not None
+            )
+            has_ddbc = (
+                hasattr(self, "ddbc_device_data") and self.ddbc_device_data is not None
+            )
+
+            if not has_frbc and not has_ddbc:
+                app.logger.error("❌ No device data available (neither FRBC nor DDBC)")
                 return []
 
-            # Create device states from FRBC data
+            # Create device states from available data
             device_states, cluster_target = self._create_cluster_state_and_target()
 
             if not device_states:
@@ -206,8 +218,20 @@ class S2FlaskScheduler(Scheduler):
         return self.planning_service
 
     def _create_cluster_state_and_target(self):
-        """Create cluster state and target from FRBC device data."""
-        device_states = self.create_device_states_from_frbc_data()
+        """Create cluster state and target from FRBC or DDBC device data."""
+        device_states = {}
+
+        # Try to create device states from FRBC data
+        if hasattr(self, "frbc_device_data") and self.frbc_device_data is not None:
+            frbc_states = self.create_device_states_from_frbc_data()
+            device_states.update(frbc_states)
+            app.logger.debug(f"Created {len(frbc_states)} FRBC device state(s)")
+
+        # Try to create device states from DDBC data
+        if hasattr(self, "ddbc_device_data") and self.ddbc_device_data is not None:
+            ddbc_states = self.create_device_states_from_ddbc_data()
+            device_states.update(ddbc_states)
+            app.logger.debug(f"Created {len(ddbc_states)} DDBC device state(s)")
 
         if not device_states:
             return device_states, None
@@ -496,6 +520,109 @@ class S2FlaskScheduler(Scheduler):
         else:
             app.logger.error(
                 f"❌ Unexpected FRBC data type: {type(self.frbc_device_data)}"
+            )
+
+        return device_states
+
+    def create_device_states_from_ddbc_data(self) -> Dict[str, Any]:
+        """
+        Create device states from received DDBC data.
+
+        Returns:
+            Dict[str, Any]: Dictionary of device states created from DDBC data
+        """
+        if not hasattr(self, "ddbc_device_data") or self.ddbc_device_data is None:
+            app.logger.warning("⚠️ No DDBC device data")
+            return {}
+
+        device_states = {}
+
+        # Handle single DDBCDeviceData object
+        if hasattr(self.ddbc_device_data, "resource_id"):
+            ddbc_data = self.ddbc_device_data
+            device_id = ddbc_data.resource_id or "ddbc_device_1"
+
+            try:
+                app.logger.debug(f"🔧 Creating DDBC device state for {device_id[:8]}...")
+
+                # Extract information from received DDBC data object
+                system_desc = ddbc_data.system_description
+                demand_forecasts = (
+                    ddbc_data.demand_forecasts
+                    if hasattr(ddbc_data, "demand_forecasts")
+                    else []
+                )
+                actuator_statuses = (
+                    ddbc_data.actuator_statuses
+                    if hasattr(ddbc_data, "actuator_statuses")
+                    else {}
+                )
+
+                # Create device state using the received DDBC data
+                device_state = S2DdbcDeviceState(
+                    device_id=device_id,
+                    device_name=f"DDBC Device {device_id}",
+                    connection_id=f"{device_id}_connection",
+                    priority_class=0,
+                    timestamp=self.start,
+                    energy_in_current_timestep=0.0,
+                    is_online=True,
+                    power_forecast=None,
+                    system_descriptions=[system_desc] if system_desc else [],
+                    demand_forecasts=demand_forecasts,
+                    actuator_statuses=actuator_statuses,
+                )
+
+                device_states[device_id] = device_state
+                app.logger.debug(f"✅ DDBC device state ready: {device_id[:8]}...")
+
+            except Exception as e:
+                app.logger.error(
+                    f"❌ DDBC device state creation failed for {device_id[:8]}...: {e}"
+                )
+                import traceback
+
+                app.logger.debug(traceback.format_exc())
+
+        # Handle dictionary of device data (backward compatibility)
+        elif isinstance(self.ddbc_device_data, dict):
+            for device_id, ddbc_data in self.ddbc_device_data.items():
+                try:
+                    app.logger.debug(
+                        f"🔧 Creating DDBC device state for {device_id[:8]}..."
+                    )
+
+                    # Extract information from received DDBC data
+                    system_desc = ddbc_data.get("system_description")
+                    demand_forecasts = ddbc_data.get("demand_forecasts", [])
+                    actuator_statuses = ddbc_data.get("actuator_statuses", {})
+
+                    # Create device state using the received DDBC data
+                    device_state = S2DdbcDeviceState(
+                        device_id=device_id,
+                        device_name=f"DDBC Device {device_id}",
+                        connection_id=f"{device_id}_connection",
+                        priority_class=0,
+                        timestamp=self.start,
+                        energy_in_current_timestep=0.0,
+                        is_online=True,
+                        power_forecast=None,
+                        system_descriptions=[system_desc] if system_desc else [],
+                        demand_forecasts=demand_forecasts,
+                        actuator_statuses=actuator_statuses,
+                    )
+
+                    device_states[device_id] = device_state
+                    app.logger.debug(f"✅ DDBC device state ready: {device_id[:8]}...")
+
+                except Exception as e:
+                    app.logger.error(
+                        f"❌ DDBC device state creation failed for {device_id[:8]}...: {e}"
+                    )
+                    continue
+        else:
+            app.logger.error(
+                f"❌ Unexpected DDBC data type: {type(self.ddbc_device_data)}"
             )
 
         return device_states

@@ -65,7 +65,11 @@ class DdbcOperationModeWrapper:
         self.uses_factor = uses_factor
 
     def get_id(self) -> str:
-        return str(self.id)
+        # Handle UUID objects with root attribute
+        if hasattr(self.id, "root"):
+            return str(self.id.root)
+        else:
+            return str(self.id)
 
     def get_diagnostic_label(self) -> Optional[str]:
         return self.diagnostic_label

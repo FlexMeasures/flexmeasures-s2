@@ -62,8 +62,15 @@ class DdbcState:
             if actuator_status is None:
                 continue
 
+            # Convert active_operation_mode_id to string to handle UUID objects
+            active_om_id = actuator_status.active_operation_mode_id
+            if hasattr(active_om_id, "root"):
+                active_om_id_str = str(active_om_id.root)
+            else:
+                active_om_id_str = str(active_om_id)
+
             om = self.device_state_wrapper.get_operation_mode(
-                self.timestep, actuator_id_str, actuator_status.active_operation_mode_id
+                self.timestep, actuator_id_str, active_om_id_str
             )
 
             factor = float(actuator_status.operation_mode_factor)

@@ -25,7 +25,7 @@ from flexmeasures_s2.profile_steering.device_planner.device_planner_abstract imp
 class S2DdbcDevicePlanner(DevicePlanner):
     """Device planner for Demand-Driven Based Control (DDBC) devices."""
 
-    STRATIFICATION_LAYERS = 50
+    STRATIFICATION_LAYERS = 30  # Number of stratification layers (matching FRBC)
 
     def __init__(
         self,
