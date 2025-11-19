@@ -181,3 +181,5 @@ flexmeasures.log
 #MacOS
 .DS_Store
 flexmeasures_s2/profile_steering/examples/example_schedule_itho_flask.py
+flexmeasures_s2/profile_steering/examples/run_itho_with_debug.sh
+flexmeasures_s2/profile_steering/examples/instructions/
