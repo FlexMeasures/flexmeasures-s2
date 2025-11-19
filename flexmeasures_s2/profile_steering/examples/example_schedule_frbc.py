@@ -49,7 +49,7 @@ D = 3  # number of devices  -> todo: multiprocessing on create_improved_planning
 B = 200  # number of buckets  -> todo: vectorize computation of next state from current state
 S = 30  # number of stratification layers
 PLANNING_WINDOW = pd.Timedelta("PT24H")
-PLANNING_RESOLUTION = pd.Timedelta("PT15M")
+PLANNING_RESOLUTION = pd.Timedelta("PT5M")
 
 T = PLANNING_WINDOW // PLANNING_RESOLUTION  # number of time steps
 TIMESTEP_DURATION = PLANNING_RESOLUTION / pd.Timedelta(
@@ -991,4 +991,4 @@ if __name__ == "__main__":
     print("\n" + "=" * 60 + "\n")
 
     # Test cost targeting (new functionality)
-    # test_planning_service_impl_with_cost_target()
+    test_planning_service_impl_with_cost_target()
