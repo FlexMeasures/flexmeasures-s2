@@ -1,7 +1,7 @@
 ================================================================================
 ITHO DHW Heat Pump Instructions Flask Usage Only
 ================================================================================
-Planning start time: 2025-11-19 09:40:00+00:00
+Planning start time: 2025-11-19 09:55:00+00:00
 Planning window: 1 days 00:00:00
 Resolution: 0 days 00:05:00
 Total timesteps: 288
@@ -13,12 +13,22 @@ Number of instructions: 288
 
 Instruction Timeline:
 --------------------------------------------------------------------------------
+  Mode: DHW_ON
+  Start: 2025-11-19 09:55:00+00:00 (timestep 0)
+  Duration: 17 timesteps (85.0 minutes)
+  Operation mode factor: 0.0
+----------------------------------------
   Mode: DHW_OFF
-  Start: 2025-11-19 09:40:00+00:00 (timestep 0)
-  Duration: 288 timesteps (1440.0 minutes)
+  Start: 2025-11-19 11:20:00+00:00 (timestep 17)
+  Duration: 188 timesteps (940.0 minutes)
+  Operation mode factor: 0.0
+----------------------------------------
+  Mode: DHW_ON
+  Start: 2025-11-20 03:00:00+00:00 (timestep 205)
+  Duration: 83 timesteps (415.0 minutes)
 ----------------------------------------
 
-Total operation mode changes: 0
+Total operation mode changes: 2
 ================================================================================
 
 Detailed Instruction List:
@@ -26,142 +36,142 @@ Detailed Instruction List:
 
 Instruction #1:
   Timestep: 0
-  Time: 2025-11-19 09:40:00+00:00
-  Operation mode: dd34a0b2-98d5-4897-a86d-d53ad6739cb8
-  Factor: 0.0
-  Execution time: 2025-11-19 09:25:00+00:00
-
-Instruction #2:
-  Timestep: 1
-  Time: 2025-11-19 09:45:00+00:00
-  Operation mode: dd34a0b2-98d5-4897-a86d-d53ad6739cb8
-  Factor: 0.0
-  Execution time: 2025-11-19 09:30:00+00:00
-
-Instruction #3:
-  Timestep: 2
-  Time: 2025-11-19 09:50:00+00:00
-  Operation mode: dd34a0b2-98d5-4897-a86d-d53ad6739cb8
-  Factor: 0.0
-  Execution time: 2025-11-19 09:35:00+00:00
-
-Instruction #4:
-  Timestep: 3
   Time: 2025-11-19 09:55:00+00:00
-  Operation mode: dd34a0b2-98d5-4897-a86d-d53ad6739cb8
+  Operation mode: 7bfbf58c-7bd5-4bdc-b419-f0f9bdf3e560
   Factor: 0.0
   Execution time: 2025-11-19 09:40:00+00:00
 
-Instruction #5:
-  Timestep: 4
+Instruction #2:
+  Timestep: 1
   Time: 2025-11-19 10:00:00+00:00
-  Operation mode: dd34a0b2-98d5-4897-a86d-d53ad6739cb8
+  Operation mode: 7bfbf58c-7bd5-4bdc-b419-f0f9bdf3e560
   Factor: 0.0
   Execution time: 2025-11-19 09:45:00+00:00
 
-Instruction #6:
-  Timestep: 5
+Instruction #3:
+  Timestep: 2
   Time: 2025-11-19 10:05:00+00:00
-  Operation mode: dd34a0b2-98d5-4897-a86d-d53ad6739cb8
+  Operation mode: 7bfbf58c-7bd5-4bdc-b419-f0f9bdf3e560
   Factor: 0.0
   Execution time: 2025-11-19 09:50:00+00:00
 
-Instruction #7:
-  Timestep: 6
+Instruction #4:
+  Timestep: 3
   Time: 2025-11-19 10:10:00+00:00
-  Operation mode: dd34a0b2-98d5-4897-a86d-d53ad6739cb8
+  Operation mode: 7bfbf58c-7bd5-4bdc-b419-f0f9bdf3e560
   Factor: 0.0
   Execution time: 2025-11-19 09:55:00+00:00
 
-Instruction #8:
-  Timestep: 7
+Instruction #5:
+  Timestep: 4
   Time: 2025-11-19 10:15:00+00:00
-  Operation mode: dd34a0b2-98d5-4897-a86d-d53ad6739cb8
+  Operation mode: 7bfbf58c-7bd5-4bdc-b419-f0f9bdf3e560
   Factor: 0.0
   Execution time: 2025-11-19 10:00:00+00:00
 
-Instruction #9:
-  Timestep: 8
+Instruction #6:
+  Timestep: 5
   Time: 2025-11-19 10:20:00+00:00
-  Operation mode: dd34a0b2-98d5-4897-a86d-d53ad6739cb8
+  Operation mode: 7bfbf58c-7bd5-4bdc-b419-f0f9bdf3e560
   Factor: 0.0
   Execution time: 2025-11-19 10:05:00+00:00
 
-Instruction #10:
-  Timestep: 9
+Instruction #7:
+  Timestep: 6
   Time: 2025-11-19 10:25:00+00:00
-  Operation mode: dd34a0b2-98d5-4897-a86d-d53ad6739cb8
+  Operation mode: 7bfbf58c-7bd5-4bdc-b419-f0f9bdf3e560
   Factor: 0.0
   Execution time: 2025-11-19 10:10:00+00:00
 
-Instruction #11:
-  Timestep: 10
+Instruction #8:
+  Timestep: 7
   Time: 2025-11-19 10:30:00+00:00
-  Operation mode: dd34a0b2-98d5-4897-a86d-d53ad6739cb8
+  Operation mode: 7bfbf58c-7bd5-4bdc-b419-f0f9bdf3e560
   Factor: 0.0
   Execution time: 2025-11-19 10:15:00+00:00
 
-Instruction #12:
-  Timestep: 11
+Instruction #9:
+  Timestep: 8
   Time: 2025-11-19 10:35:00+00:00
-  Operation mode: dd34a0b2-98d5-4897-a86d-d53ad6739cb8
+  Operation mode: 7bfbf58c-7bd5-4bdc-b419-f0f9bdf3e560
   Factor: 0.0
   Execution time: 2025-11-19 10:20:00+00:00
 
-Instruction #13:
-  Timestep: 12
+Instruction #10:
+  Timestep: 9
   Time: 2025-11-19 10:40:00+00:00
-  Operation mode: dd34a0b2-98d5-4897-a86d-d53ad6739cb8
+  Operation mode: 7bfbf58c-7bd5-4bdc-b419-f0f9bdf3e560
   Factor: 0.0
   Execution time: 2025-11-19 10:25:00+00:00
 
-Instruction #14:
-  Timestep: 13
+Instruction #11:
+  Timestep: 10
   Time: 2025-11-19 10:45:00+00:00
-  Operation mode: dd34a0b2-98d5-4897-a86d-d53ad6739cb8
+  Operation mode: 7bfbf58c-7bd5-4bdc-b419-f0f9bdf3e560
   Factor: 0.0
   Execution time: 2025-11-19 10:30:00+00:00
 
-Instruction #15:
-  Timestep: 14
+Instruction #12:
+  Timestep: 11
   Time: 2025-11-19 10:50:00+00:00
-  Operation mode: dd34a0b2-98d5-4897-a86d-d53ad6739cb8
+  Operation mode: 7bfbf58c-7bd5-4bdc-b419-f0f9bdf3e560
   Factor: 0.0
   Execution time: 2025-11-19 10:35:00+00:00
 
-Instruction #16:
-  Timestep: 15
+Instruction #13:
+  Timestep: 12
   Time: 2025-11-19 10:55:00+00:00
-  Operation mode: dd34a0b2-98d5-4897-a86d-d53ad6739cb8
+  Operation mode: 7bfbf58c-7bd5-4bdc-b419-f0f9bdf3e560
   Factor: 0.0
   Execution time: 2025-11-19 10:40:00+00:00
 
-Instruction #17:
-  Timestep: 16
+Instruction #14:
+  Timestep: 13
   Time: 2025-11-19 11:00:00+00:00
-  Operation mode: dd34a0b2-98d5-4897-a86d-d53ad6739cb8
+  Operation mode: 7bfbf58c-7bd5-4bdc-b419-f0f9bdf3e560
   Factor: 0.0
   Execution time: 2025-11-19 10:45:00+00:00
 
-Instruction #18:
-  Timestep: 17
+Instruction #15:
+  Timestep: 14
   Time: 2025-11-19 11:05:00+00:00
-  Operation mode: dd34a0b2-98d5-4897-a86d-d53ad6739cb8
+  Operation mode: 7bfbf58c-7bd5-4bdc-b419-f0f9bdf3e560
   Factor: 0.0
   Execution time: 2025-11-19 10:50:00+00:00
 
-Instruction #19:
-  Timestep: 18
+Instruction #16:
+  Timestep: 15
   Time: 2025-11-19 11:10:00+00:00
-  Operation mode: dd34a0b2-98d5-4897-a86d-d53ad6739cb8
+  Operation mode: 7bfbf58c-7bd5-4bdc-b419-f0f9bdf3e560
   Factor: 0.0
   Execution time: 2025-11-19 10:55:00+00:00
 
-Instruction #20:
-  Timestep: 19
+Instruction #17:
+  Timestep: 16
   Time: 2025-11-19 11:15:00+00:00
-  Operation mode: dd34a0b2-98d5-4897-a86d-d53ad6739cb8
+  Operation mode: 7bfbf58c-7bd5-4bdc-b419-f0f9bdf3e560
   Factor: 0.0
   Execution time: 2025-11-19 11:00:00+00:00
+
+Instruction #18:
+  Timestep: 17
+  Time: 2025-11-19 11:20:00+00:00
+  Operation mode: f397493b-be70-49ee-8d28-08e07c6395aa
+  Factor: 0.0
+  Execution time: 2025-11-19 11:05:00+00:00
+
+Instruction #19:
+  Timestep: 18
+  Time: 2025-11-19 11:25:00+00:00
+  Operation mode: f397493b-be70-49ee-8d28-08e07c6395aa
+  Factor: 0.0
+  Execution time: 2025-11-19 11:10:00+00:00
+
+Instruction #20:
+  Timestep: 19
+  Time: 2025-11-19 11:30:00+00:00
+  Operation mode: f397493b-be70-49ee-8d28-08e07c6395aa
+  Factor: 0.0
+  Execution time: 2025-11-19 11:15:00+00:00
 
 ... and 268 more instructions
