@@ -25,8 +25,6 @@ from flexmeasures_s2.profile_steering.device_planner.device_planner_abstract imp
 )
 from s2python.frbc import FRBCInstruction
 
-# make sure this is a DevicePlanner
-
 
 class S2FrbcDevicePlanner(DevicePlanner):
     def __init__(

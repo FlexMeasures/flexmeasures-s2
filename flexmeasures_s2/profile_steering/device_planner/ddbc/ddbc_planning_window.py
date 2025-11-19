@@ -1,7 +1,5 @@
 from datetime import datetime
-from typing import List, Dict
-import logging
-
+from typing import List, Optional, Callable, TypeVar, Any, Dict, TYPE_CHECKING, cast
 from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
@@ -14,19 +12,24 @@ from flexmeasures_s2.profile_steering.device_planner.ddbc.s2_ddbc_device_state_w
 from flexmeasures_s2.profile_steering.device_planner.ddbc.ddbc_timestep import (
     DdbcTimestep,
 )
-from flexmeasures_s2.profile_steering.device_planner.ddbc.s2_ddbc_plan import (
-    S2DdbcPlan,
-    S2DdbcActuatorConfiguration,
+from flexmeasures_s2.profile_steering.device_planner.ddbc.ddbc_state import DdbcState
+from flexmeasures_s2.profile_steering.device_planner.ddbc.avg_demand_forecast_util import (
+    AvgDemandForecastUtil,
+    AvgDemandForecastProfile,
 )
+from flexmeasures_s2.profile_steering.device_planner.ddbc.s2_ddbc_insights_profile import (
+    S2DdbcInsightsProfile,
+)
+from flexmeasures_s2.profile_steering.device_planner.ddbc.s2_ddbc_plan import S2DdbcPlan
 
-logger = logging.getLogger(__name__)
+if TYPE_CHECKING:
+    pass
+
+T = TypeVar("T")
 
 
 class DdbcPlanningWindow:
-    """
-    Planning window for DDBC devices.
-    Creates a simple plan that meets demand forecasts using available operation modes.
-    """
+    """Planning window for DDBC device planning."""
 
     def __init__(
         self,
@@ -34,252 +37,186 @@ class DdbcPlanningWindow:
         profile_metadata: ProfileMetadata,
         plan_due_by_date: datetime,
     ):
-        self.device_state_wrapper = S2DdbcDeviceStateWrapper(device_state)
-        self.device_state = device_state
+        self.device_state = S2DdbcDeviceStateWrapper(device_state)
         self.profile_metadata = profile_metadata
         self.plan_due_by_date = plan_due_by_date
-        self.timestep_duration_seconds = (
+        self.timestep_duration_seconds = int(
             profile_metadata.timestep_duration.total_seconds()
         )
-        self.timesteps: List[DdbcTimestep] = []
 
+        self.timesteps: List[DdbcTimestep] = []
         self._generate_timesteps()
 
     def _generate_timesteps(self):
-        """Generate timesteps with system descriptions and demand forecasts."""
+        """Generate timesteps for the planning window."""
         timestep_start = self.profile_metadata.profile_start
 
-        # Get the latest system description and demand forecast
-        system_descriptions = self.device_state.get_system_descriptions()
-        demand_forecasts = self.device_state.get_demand_forecasts()
-
-        # Use the first available system description and demand forecast
-        system_description = system_descriptions[0] if system_descriptions else None
-        demand_forecast = demand_forecasts[0] if demand_forecasts else None
-
         for i in range(self.profile_metadata.nr_of_timesteps):
-            timestep = DdbcTimestep(
-                start_date=timestep_start,
-                timestep_duration_seconds=self.timestep_duration_seconds,
-                system_description=system_description,
-                demand_forecast=demand_forecast,
-            )
-            self.timesteps.append(timestep)
+            timestep_end = timestep_start + self.profile_metadata.timestep_duration
 
-            timestep_start = timestep_start + self.profile_metadata.timestep_duration
+            if i == 0 and timestep_start < self.plan_due_by_date < timestep_end:
+                timestep_start = self.plan_due_by_date
+
+            current_system_description = self.get_latest_before(
+                timestep_start,
+                self.device_state.get_system_descriptions(),
+                lambda sd: sd.valid_from,
+            )
+
+            current_avg_demand_forecast_obj = self.get_latest_before(
+                timestep_start,
+                self.device_state.get_demand_forecasts(),
+                lambda df: df.start_time,
+            )
+
+            current_demand_profile: Optional[AvgDemandForecastProfile] = None
+            if current_avg_demand_forecast_obj is not None:
+                current_demand_profile = (
+                    AvgDemandForecastUtil.from_avg_demand_rate_forecast(
+                        current_avg_demand_forecast_obj
+                    )
+                )
+
+            avg_demand_rate_forecast = self.get_avg_demand_forecast_for_timestep(
+                current_demand_profile, timestep_start, timestep_end
+            )
+
+            self.timesteps.append(
+                DdbcTimestep(
+                    timestep_start,
+                    timestep_end,
+                    current_system_description,
+                    avg_demand_rate_forecast,
+                )
+            )
+
+            timestep_start = timestep_end
+
+    @staticmethod
+    def get_latest_before(
+        before: datetime, select_from: List[T], get_datetime: Callable[[T], datetime]
+    ) -> Optional[T]:
+        """Get the latest item from a list that occurs before a given datetime."""
+        latest_before: Optional[T] = None
+        latest_before_datetime: Optional[datetime] = None
+
+        if select_from is not None:
+            for current in select_from:
+                if current is not None:
+                    current_datetime = get_datetime(current)
+
+                    if current_datetime <= before:
+                        if latest_before is None or (
+                            latest_before_datetime is not None
+                            and current_datetime > latest_before_datetime
+                        ):
+                            latest_before = current
+                            latest_before_datetime = current_datetime
+
+        return latest_before
+
+    @staticmethod
+    def get_avg_demand_forecast_for_timestep(
+        avg_demand_forecast: Optional[AvgDemandForecastProfile],
+        timestep_start: datetime,
+        timestep_end: datetime,
+    ) -> Optional[float]:
+        """Get the average demand forecast for a timestep."""
+        if avg_demand_forecast is None:
+            return None
+
+        return AvgDemandForecastUtil.get_avg_demand_forecast_for_timestep(
+            avg_demand_forecast, timestep_start, timestep_end
+        )
 
     def find_best_plan(
         self,
         target_profile: TargetProfile,
         diff_to_min_profile: JouleProfile,
         diff_to_max_profile: JouleProfile,
-    ) -> S2DdbcPlan:
-        """
-        Find the best plan for DDBC device.
-        Balances between meeting demand forecasts and optimizing for target profiles.
-        """
-        energy_elements: List[float] = []
-        actuator_configs_per_timestep: List[Dict[str, S2DdbcActuatorConfiguration]] = []
-
-        # Debug: log what kind of target we received
-        try:
-            if target_profile.elements and len(target_profile.elements) > 0:
-                first_elem = target_profile.elements[0]
-                # Check if it's a real target or null
-                if first_elem is not None and not (
-                    hasattr(first_elem, "__class__")
-                    and "Null" in first_elem.__class__.__name__
-                ):
-                    # logger.info("DDBC planning WITH target (optimization mode)")
-                    pass
-                else:
-                    # logger.info("DDBC planning with NULL target (initial planning)")
-                    pass
-        except Exception:
-            pass  # Silently ignore logging errors
-
-        for i, timestep in enumerate(self.timesteps):
-            if timestep.system_description is None:
-                # No system description available, add zero energy
-                energy_elements.append(0.0)
-                actuator_configs_per_timestep.append({})
-                continue
-
-            # Get the expected demand rate for this timestep
-            expected_demand_rate = timestep.get_expected_demand_rate()
-
-            # Get target energy for this timestep (if available)
-            target_element = (
-                target_profile.elements[i] if i < len(target_profile.elements) else None
-            )
-            min_element = (
-                diff_to_min_profile.elements[i]
-                if i < len(diff_to_min_profile.elements)
-                else None
-            )
-            max_element = (
-                diff_to_max_profile.elements[i]
-                if i < len(diff_to_max_profile.elements)
-                else None
-            )
-
-            # Handle target value (could be None, a NullElement, or a real value)
-            target_energy_value = None
+    ) -> "S2DdbcPlan":
+        """Find the best plan for the device."""
+        for i in range(len(self.timesteps)):
+            ts = self.timesteps[i]
+            ts.clear()
+            target_element = target_profile.elements[i]
             if target_element is not None:
-                # Check if it's a NullElement (skip it)
-                if (
-                    hasattr(target_element, "__class__")
-                    and "Null" in target_element.__class__.__name__
-                ):
-                    target_energy_value = None  # Treat NullElement as no target
-                elif hasattr(target_element, "value"):
-                    target_energy_value = target_element.value
-                else:
-                    # It's a plain number
-                    target_energy_value = target_element
-
-            # Get available actuators and operation modes
-            actuators = self.device_state_wrapper.get_actuators(timestep)
-
-            if not actuators:
-                # No actuators, add zero energy
-                energy_elements.append(0.0)
-                actuator_configs_per_timestep.append({})
-                continue
-
-            # Simple strategy: use first actuator
-            actuator_id = actuators[0]
-            operation_modes = (
-                self.device_state_wrapper.get_normal_operation_modes_for_actuator(
-                    timestep, actuator_id
-                )
-            )
-
-            if not operation_modes:
-                energy_elements.append(0.0)
-                actuator_configs_per_timestep.append({})
-                continue
-
-            # Use the first operation mode
-            operation_mode_id = operation_modes[0]
-            om_wrapper = self.device_state_wrapper.get_operation_mode(
-                timestep, actuator_id, operation_mode_id
-            )
-
-            if om_wrapper is None:
-                energy_elements.append(0.0)
-                actuator_configs_per_timestep.append({})
-                continue
-
-            # Calculate optimal factor based on context
-            # For initial planning (null target): meet demand
-            # For improved planning (with target): optimize towards target while respecting demand
-
-            best_factor = 0.0
-
-            if expected_demand_rate > 0 and om_wrapper.max_supply > 0:
-                # Calculate factor needed to meet demand
-                demand_factor = min(1.0, expected_demand_rate / om_wrapper.max_supply)
-
-                # If we have a real target (not null), optimize towards it
-                if target_energy_value is not None:
-                    try:
-                        # Handle JouleElement or plain number
-                        if hasattr(target_energy_value, "value"):
-                            target_energy = float(target_energy_value.value)
-                        else:
-                            target_energy = float(target_energy_value)
-
-                        # Calculate what factor would give us the target energy
-                        if om_wrapper.electrical_power_range:
-                            max_power = om_wrapper.electrical_power_range.end_of_range
-                            if max_power > 0:
-                                # Target factor based on desired electrical energy
-                                target_power = (
-                                    target_energy / self.timestep_duration_seconds
-                                )
-                                target_factor = target_power / max_power
-                                target_factor = max(0.0, min(1.0, target_factor))
-
-                                # Key insight: DDBC must meet thermal demand (cannot go below demand_factor)
-                                # But can use MORE electrical energy if target is higher
-                                # This allows shifting from gas to electric when electricity is cheaper
-
-                                # If target wants less energy than demand requires, meet demand (can't go lower)
-                                # If target wants more energy, move towards target
-                                if target_factor < demand_factor:
-                                    best_factor = demand_factor  # Must meet demand
-                                else:
-                                    # Blend: prioritize demand but allow going higher for target
-                                    # 60% demand minimum, up to 100% based on target
-                                    best_factor = max(demand_factor, target_factor)
-                            else:
-                                best_factor = demand_factor
-                        else:
-                            best_factor = demand_factor
-                    except (AttributeError, TypeError, ValueError):
-                        # If target parsing fails, just use demand factor
-                        best_factor = demand_factor
-                else:
-                    # No target (initial planning), just meet demand
-                    best_factor = demand_factor
-
-                # Respect congestion constraints
-                test_energy = (
-                    om_wrapper.get_electrical_power(best_factor)
-                    * self.timestep_duration_seconds
+                ts.set_targets(
+                    target_element,
+                    diff_to_min_profile.elements[i],
+                    diff_to_max_profile.elements[i],
                 )
 
-                if min_element is not None and min_element < 0:
-                    # We have a minimum constraint (can't go below this)
-                    min_energy = -min_element  # Convert diff to absolute
-                    if test_energy < min_energy:
-                        # Need to increase factor
-                        if om_wrapper.electrical_power_range:
-                            max_power = om_wrapper.electrical_power_range.end_of_range
-                            if max_power > 0:
-                                best_factor = min(
-                                    1.0,
-                                    (min_energy / self.timestep_duration_seconds)
-                                    / max_power,
-                                )
+        first_timestep_index = -1
+        for i in range(len(self.timesteps)):
+            if self.timesteps[i].get_system_description() is not None:
+                first_timestep_index = i
+                break
 
-                if max_element is not None and max_element < 0:
-                    # We have a maximum constraint (can't go above this)
-                    max_energy = -max_element  # Convert diff to absolute
-                    if test_energy > max_energy:
-                        # Need to decrease factor
-                        if om_wrapper.electrical_power_range:
-                            max_power = om_wrapper.electrical_power_range.end_of_range
-                            if max_power > 0:
-                                best_factor = min(
-                                    1.0,
-                                    (max_energy / self.timestep_duration_seconds)
-                                    / max_power,
-                                )
+        if first_timestep_index == -1:
+            first_timestep_index = self.profile_metadata.nr_of_timesteps
+        else:
+            first_timestep = self.timesteps[first_timestep_index]
 
-            # Calculate final energy consumption
-            electrical_power = om_wrapper.get_electrical_power(best_factor)
-            timestep_energy = electrical_power * self.timestep_duration_seconds
+            state_zero = DdbcState(self.device_state, first_timestep)
+            state_zero.generate_next_timestep_states(first_timestep)
 
-            energy_elements.append(timestep_energy)
+            for i in range(first_timestep_index, len(self.timesteps) - 1):
+                current_timestep = self.timesteps[i]
+                next_timestep = self.timesteps[i + 1]
 
-            # Store actuator configuration
-            actuator_config = S2DdbcActuatorConfiguration(
-                operation_mode_id=operation_mode_id,
-                factor=best_factor,
-            )
-            actuator_configs_per_timestep.append({actuator_id: actuator_config})
+                best_state = current_timestep.get_best_state()
+                if best_state is not None:
+                    best_state.generate_next_timestep_states(next_timestep)
 
-        # Create energy profile
+        return self._convert_to_plan(first_timestep_index)
+
+    def _convert_to_plan(self, first_timestep_index_with_state: int) -> "S2DdbcPlan":
+        """Convert the planning window to a plan."""
+        energy: List[int] = []
+        actuators: List[Dict[str, Any]] = []
+        insight_elements: List[Any] = []
+
+        for i in range(self.profile_metadata.nr_of_timesteps):
+            if i >= first_timestep_index_with_state:
+                timestep = self.timesteps[i]
+                state = timestep.get_best_state()
+
+                if state is not None:
+                    energy.append(int(state.get_timestep_energy()))
+                    actuators.append(state.get_actuator_configurations())
+                    insight_elements.append(
+                        S2DdbcInsightsProfile.Element(
+                            timestep.get_avg_demand_rate_forecast(),
+                            state.get_supply_rate(),
+                            state.get_actuator_configurations(),
+                        )
+                    )
+                else:
+                    energy.append(0)
+                    actuators.append({})
+                    insight_elements.append(None)
+            else:
+                energy.append(0)
+                actuators.append({})
+                insight_elements.append(None)
+
+        energy[0] = energy[0] + int(self.device_state.get_energy_in_current_timestep())
+
         energy_profile = JouleProfile(
-            metadata=self.profile_metadata,
-            elements=energy_elements,  # type: ignore[arg-type]
+            self.profile_metadata.profile_start,
+            self.profile_metadata.timestep_duration,
+            cast(List[Optional[int]], energy),
         )
 
-        # Create and return plan
         return S2DdbcPlan(
-            idle=all(e == 0.0 for e in energy_elements),
+            idle=False,
             energy=energy_profile,
-            operation_mode_id=actuator_configs_per_timestep,
+            operation_mode_id=actuators,
+            s2_ddbc_insights_profile=S2DdbcInsightsProfile(
+                self.profile_metadata, insight_elements
+            ),
         )
+
+    def get_timestep_duration_seconds(self) -> int:
+        return self.timestep_duration_seconds

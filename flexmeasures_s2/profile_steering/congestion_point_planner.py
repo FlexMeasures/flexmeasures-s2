@@ -39,10 +39,15 @@ def _get_initial_device_plan(
     try:
         plan = device.create_initial_planning(plan_due_by_date)
         return (device.device_id, plan)
-    except Exception:
-        # print(
-        #     f"Error getting initial plan from device {device.device_id} in worker: {e}"
-        # )
+    except Exception as e:
+        print(
+            f"Error getting initial plan from device {device.device_id} in worker: {e}"
+        )
+        print(f"Exception type: {type(e).__name__}")
+        import traceback
+
+        print("Full traceback:")
+        traceback.print_exc()
         return (device.device_id, None)
 
 

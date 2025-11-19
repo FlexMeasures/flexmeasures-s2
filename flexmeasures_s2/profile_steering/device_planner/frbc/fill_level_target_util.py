@@ -30,19 +30,21 @@ class FillLevelTargetUtil:
         elements = []
         start = fill_level_target_profile.start_time.astimezone(timezone.utc)
         for element in fill_level_target_profile.elements:
-            # Handle both Duration objects and int/float values
+            # Extract duration value - handle both int and Duration object
             duration = element.duration
             if isinstance(duration, (int, float)):
-                duration_seconds = duration  # Already in seconds
+                duration_ms = int(duration)
             elif hasattr(duration, "root"):
-                duration_seconds = (
-                    duration.root / 1000.0
-                )  # Convert milliseconds to seconds
+                duration_ms = int(duration.root)
+            elif hasattr(duration, "__root__"):
+                duration_ms = int(duration.__root__)
             else:
-                # Fallback: try to use as-is
-                duration_seconds = float(duration)
+                try:
+                    duration_ms = int(duration)
+                except (TypeError, ValueError):
+                    duration_ms = int(str(duration))
 
-            end = start + timedelta(seconds=duration_seconds)
+            end = start + timedelta(milliseconds=duration_ms)
             elements.append(
                 FillLevelTargetElement(
                     start,

@@ -1,75 +1,148 @@
-from s2python.ddbc import DDBCOperationMode
-from s2python.common import CommodityQuantity
-from flexmeasures_s2.profile_steering.device_planner.ddbc.s2_ddbc_plan import (
-    S2DdbcActuatorConfiguration,
+from typing import List, Any, Dict, Optional
+from flexmeasures_s2.profile_steering.common.power_range_wrapper import (
+    PowerRangeWrapper,
 )
+from flexmeasures_s2.profile_steering.device_planner.ddbc.number_range_wrapper import (
+    NumberRangeWrapper,
+)
+from s2python.common import CommodityQuantity
 
 
 class DdbcOperationModeWrapper:
-    """Wrapper for DDBC operation modes with utility methods."""
+    """Wrapper for DDBC operation mode to provide utility methods."""
 
-    def __init__(self, operation_mode: DDBCOperationMode):
-        self.operation_mode = operation_mode
-        self.id = str(operation_mode.id)
-        self.diagnostic_label = operation_mode.diagnostic_label
+    EPSILON = 1e-4
 
-        # Extract supply range
-        if operation_mode.supply_range and len(operation_mode.supply_range) > 0:
-            supply_range = operation_mode.supply_range[0]
-            self.min_supply = supply_range.start_of_range
-            self.max_supply = supply_range.end_of_range
+    def __init__(self, ddbc_operation_mode: Any):
+        """Initialize from a DDBC operation mode."""
+        self.id = (
+            ddbc_operation_mode.Id
+            if hasattr(ddbc_operation_mode, "Id")
+            else ddbc_operation_mode.id
+        )
+        self.diagnostic_label = getattr(ddbc_operation_mode, "diagnostic_label", None)
+        self.abnormal_condition_only = getattr(
+            ddbc_operation_mode, "abnormal_condition_only", False
+        )
+
+        self.power_ranges: List[PowerRangeWrapper] = []
+        for unwrapped_power_range in ddbc_operation_mode.power_ranges:
+            self.power_ranges.append(PowerRangeWrapper(unwrapped_power_range))
+
+        if isinstance(ddbc_operation_mode.supply_range, list):
+            self.supply_range = NumberRangeWrapper(ddbc_operation_mode.supply_range[0])
         else:
-            self.min_supply = 0.0
-            self.max_supply = 0.0
+            self.supply_range = NumberRangeWrapper(ddbc_operation_mode.supply_range)
 
-        # Extract power ranges
-        self.electrical_power_range = None
-        self.gas_power_range = None
+        self.running_costs: Optional[NumberRangeWrapper]
+        if (
+            hasattr(ddbc_operation_mode, "running_costs")
+            and ddbc_operation_mode.running_costs is not None
+        ):
+            self.running_costs = NumberRangeWrapper(ddbc_operation_mode.running_costs)
+        else:
+            self.running_costs = None
 
-        for power_range in operation_mode.power_ranges:
-            if power_range.commodity_quantity in [
-                CommodityQuantity.ELECTRIC_POWER_L1,
-                CommodityQuantity.ELECTRIC_POWER_L2,
-                CommodityQuantity.ELECTRIC_POWER_L3,
-                CommodityQuantity.ELECTRIC_POWER_3_PHASE_SYMMETRIC,
-            ]:
-                self.electrical_power_range = power_range
-            elif (
-                power_range.commodity_quantity
+        # Determine if this operation mode uses a factor
+        uses_factor = False
+
+        if (
+            abs(
+                self.supply_range.get_start_of_range()
+                - self.supply_range.get_end_of_range()
+            )
+            > self.EPSILON
+        ):
+            uses_factor = True
+
+        for power_range in self.power_ranges:
+            if (
+                abs(power_range.get_start_of_range() - power_range.get_end_of_range())
+                > self.EPSILON
+            ):
+                uses_factor = True
+
+        self.uses_factor = uses_factor
+
+    def get_id(self) -> str:
+        # Handle UUID objects with root attribute
+        if hasattr(self.id, "root"):
+            return str(self.id.root)
+        else:
+            return str(self.id)
+
+    def get_diagnostic_label(self) -> Optional[str]:
+        return self.diagnostic_label
+
+    def get_power_ranges(self) -> List[PowerRangeWrapper]:
+        return self.power_ranges
+
+    def get_supply_range(self) -> NumberRangeWrapper:
+        return self.supply_range
+
+    def get_running_costs(self) -> Optional[NumberRangeWrapper]:
+        return self.running_costs
+
+    def uses_factor_method(self) -> bool:
+        return self.uses_factor
+
+    def get_operation_mode_electrical_power(self, factor: float) -> float:
+        """Calculate electrical power consumption for a given factor."""
+        power_watt = 0.0
+
+        electric_commodities = [
+            CommodityQuantity.ELECTRIC_POWER_L1,
+            CommodityQuantity.ELECTRIC_POWER_L2,
+            CommodityQuantity.ELECTRIC_POWER_L3,
+            CommodityQuantity.ELECTRIC_POWER_3_PHASE_SYMMETRIC,
+        ]
+
+        for power_range in self.get_power_ranges():
+            if power_range.get_commodity_quantity() in electric_commodities:
+                start = power_range.get_start_of_range()
+                end = power_range.get_end_of_range()
+                power_watt += (end - start) * factor + start
+
+        return power_watt
+
+    def get_operation_mode_gas_consumption(self, factor: float) -> float:
+        """Calculate natural gas consumption (liters per second) for a given factor."""
+        liters_gas_per_second = 0.0
+
+        for power_range in self.get_power_ranges():
+            if (
+                power_range.get_commodity_quantity()
                 == CommodityQuantity.NATURAL_GAS_FLOW_RATE
             ):
-                self.gas_power_range = power_range
+                start = power_range.get_start_of_range()
+                end = power_range.get_end_of_range()
+                liters_gas_per_second += (end - start) * factor + start
 
-    def get_supply_rate(self, factor: float) -> float:
-        """Get the supply rate for a given operation mode factor."""
-        return self.min_supply + (self.max_supply - self.min_supply) * factor
+        return liters_gas_per_second
 
-    def get_electrical_power(self, factor: float) -> float:
-        """Get electrical power consumption for a given factor."""
-        if self.electrical_power_range is None:
-            return 0.0
-        return (
-            self.electrical_power_range.start_of_range
-            + (
-                self.electrical_power_range.end_of_range
-                - self.electrical_power_range.start_of_range
-            )
-            * factor
+    def get_operation_mode_supply_rate(self, factor: float) -> float:
+        """Calculate supply rate for a given factor."""
+        start = self.get_supply_range().get_start_of_range()
+        end = self.get_supply_range().get_end_of_range()
+        return (end - start) * factor + start
+
+    def convert_to_actuator_config(self, factor: float):
+        """Convert to S2DdbcActuatorConfiguration."""
+        from flexmeasures_s2.profile_steering.device_planner.ddbc.s2_ddbc_actuator_configuration import (
+            S2DdbcActuatorConfiguration,
         )
 
-    def get_gas_power(self, factor: float) -> float:
-        """Get gas consumption for a given factor."""
-        if self.gas_power_range is None:
-            return 0.0
-        return (
-            self.gas_power_range.start_of_range
-            + (self.gas_power_range.end_of_range - self.gas_power_range.start_of_range)
-            * factor
-        )
+        power_per_commodity_quantity: Dict[str, float] = {}
 
-    def convert_to_actuator_config(self, factor: float) -> S2DdbcActuatorConfiguration:
-        """Convert to actuator configuration with the given factor."""
+        for power_range in self.power_ranges:
+            commodity_quantity_value = power_range.get_commodity_quantity().value
+            power_per_commodity_quantity[
+                commodity_quantity_value
+            ] = power_range.get_power(factor)
+
         return S2DdbcActuatorConfiguration(
-            operation_mode_id=self.id,
+            operation_mode_id=self.get_id(),
             factor=factor,
+            supply_rate=self.get_operation_mode_supply_rate(factor),
+            power_per_commodity_quantity=power_per_commodity_quantity,
         )
