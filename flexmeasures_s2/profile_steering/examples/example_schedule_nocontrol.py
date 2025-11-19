@@ -18,6 +18,10 @@ from flexmeasures_s2.scheduler.schedulers import (
     ClusterState,
     ClusterTarget,
 )
+from flexmeasures_s2.scheduler.scheduler_flask import S2FlaskScheduler
+from flask import Flask
+from unittest.mock import Mock, create_autospec
+from flexmeasures import Sensor
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 
@@ -170,9 +174,9 @@ def get_target_profile_elements(number_of_elements: int):
 
 def test_planning_service_impl_with_nocontrol_devices():
     """Test the PlanningServiceImpl with nocontrol devices."""
-    # print("Testing PlanningServiceImpl with nocontrol devices")
-    # print(f"Number of devices: {D}")
-    # print(f"Number of timesteps: {T}")
+    print("Testing PlanningServiceImpl with nocontrol devices")
+    print(f"Number of devices: {D}")
+    print(f"Number of timesteps: {T}")
 
     target_metadata = ProfileMetadata(
         profile_start=datetime(1970, 1, 1, tzinfo=timezone.utc),
@@ -226,30 +230,24 @@ def test_planning_service_impl_with_nocontrol_devices():
         multithreaded=False,
     )
 
-    # print("Generating plan!")
+    print("Generating plan with PlanningServiceImpl!")
 
     service = PlanningServiceImpl(config)
 
-    # start_time = time.time()
     cluster_plan = service.plan(
         state=cluster_state,
         target=cluster_target,
         planning_window=TIMESTEP_DURATION * T,
-        reason="Testing NoControl planning",
+        reason="Testing NoControl planning with PlanningServiceImpl",
         plan_due_by_date=plan_due_by_date,
         optimize_for_target=True,
         max_priority_class=1,
     )
-    # end_time = time.time()
-    # execution_time = end_time - start_time
-
-    # print(f"Plan generated in {execution_time:.2f} seconds")
 
     assert cluster_plan is not None
-    # print("Got cluster plan")
+    print("Got cluster plan from PlanningServiceImpl")
 
     if cluster_plan is None:
-        # print("Cluster plan is None")
         return
 
     device_plans = cluster_plan.get_plan_data().get_device_plans()
@@ -265,20 +263,122 @@ def test_planning_service_impl_with_nocontrol_devices():
     device_plans = [plan for plan in device_plans if plan is not None]
 
     assert len(device_plans) > 0
-    # print(f"Got {len(device_plans)} device plans")
+    print(f"Got {len(device_plans)} device plans from PlanningServiceImpl")
 
     for device_plan in device_plans:
         if device_plan:
-            # print(f"Device {device_plan.device_id}:")
-            # print(
-            #     f"  Total energy: {sum(e for e in device_plan.energy_profile.elements if e is not None)} Joules"
-            # )
-            # print(f"  Instruction profile: {device_plan.instruction_profile}")
-            pass
+            total_energy = sum(
+                e for e in device_plan.energy_profile.elements if e is not None
+            )
+            print(
+                f"Device {device_plan.device_id}: Total energy: {total_energy} Joules"
+            )
 
     assert len(energy_profile.elements) == target_metadata.nr_of_timesteps
-    # print("Test completed successfully!")
+    print("PlanningServiceImpl test completed successfully!")
+
+
+def test_flask_scheduler_with_nocontrol_devices():
+    """Test the S2FlaskScheduler with nocontrol devices."""
+    print("\nTesting S2FlaskScheduler with nocontrol devices")
+    print(f"Number of devices: {D}")
+    print(f"Number of timesteps: {T}")
+
+    # Create a minimal Flask app for testing
+    app = Flask(__name__)
+    app.config["FLEXMEASURES_S2_TARGET_MODE"] = "energy"
+    app.config["TESTING"] = True
+
+    target_metadata = ProfileMetadata(
+        profile_start=datetime(1970, 1, 1, tzinfo=timezone.utc),
+        timestep_duration=timedelta(seconds=TIMESTEP_DURATION),
+        nr_of_timesteps=T,
+    )
+
+    # Create device states
+    device_states = [
+        create_nocontrol_device_state(
+            f"nocontrol_device_{i + 1}",
+            target_metadata.profile_start,
+            T,
+            TIMESTEP_DURATION,
+        )
+        for i in range(D)
+    ]
+
+    device_states_dict = {
+        device_state.device_id: device_state for device_state in device_states
+    }
+
+    with app.app_context():
+        # Create a mock sensor that passes isinstance checks
+        # Must be created inside app context because Sensor is a SQLAlchemy model
+        mock_sensor = create_autospec(Sensor, instance=True)
+        mock_sensor.id = 1
+
+        # Create scheduler
+        scheduler = S2FlaskScheduler(
+            asset_or_sensor=mock_sensor,
+            start=target_metadata.profile_start,
+            end=target_metadata.profile_start
+            + timedelta(seconds=TIMESTEP_DURATION * T),
+            resolution=timedelta(seconds=TIMESTEP_DURATION),
+            belief_time=target_metadata.profile_start,
+            flex_model={},
+            flex_context={"target-profile": {}},
+        )
+
+        # Override the create_device_states_from_frbc_data method to return nocontrol devices
+        def create_nocontrol_device_states():
+            return device_states_dict
+
+        scheduler.create_device_states_from_frbc_data = create_nocontrol_device_states
+
+        # Set frbc_device_data to a mock object to avoid early return
+        scheduler.frbc_device_data = Mock()
+
+        # Override _get_target_elements to use our target profile
+        target_profile_elements = get_target_profile_elements(T)
+
+        def get_target_elements(num_elements: int):
+            return target_profile_elements[:num_elements]
+
+        scheduler._get_target_elements = get_target_elements
+
+        print("Generating plan with S2FlaskScheduler!")
+
+        # Compute the schedule
+        results = scheduler.compute()
+
+        assert results is not None
+        print(f"Got {len(results)} results from S2FlaskScheduler")
+
+        # Extract energy profiles from results
+        energy_data_list = [r for r in results if isinstance(r, dict) and "data" in r]
+
+        assert len(energy_data_list) > 0
+        print(f"Got {len(energy_data_list)} energy profiles from S2FlaskScheduler")
+
+        # Verify the energy profile
+        if energy_data_list:
+            energy_series = energy_data_list[0]["data"]
+            assert len(energy_series) == T
+            print(f"Energy profile has {len(energy_series)} timesteps (expected {T})")
+
+        print("S2FlaskScheduler test completed successfully!")
 
 
 if __name__ == "__main__":
+    print("=" * 80)
+    print("Running PlanningServiceImpl test")
+    print("=" * 80)
     test_planning_service_impl_with_nocontrol_devices()
+
+    print("\n" + "=" * 80)
+    print("Running S2FlaskScheduler test")
+    print("=" * 80)
+    test_flask_scheduler_with_nocontrol_devices()
+
+    print("\n" + "=" * 80)
+    print("All tests completed!")
+    print("=" * 80)
