@@ -1,0 +1,177 @@
+================================================================================
+ITHO DHW Heat Pump Instructions Flask Filltarget Only
+================================================================================
+Planning start time: 2025-11-19 09:55:00+00:00
+Planning window: 1 days 00:00:00
+Resolution: 0 days 00:05:00
+Total timesteps: 288
+================================================================================
+
+Device: itho_dhw_device_flask_001
+Number of instructions: 288
+--------------------------------------------------------------------------------
+
+Instruction Timeline:
+--------------------------------------------------------------------------------
+  Mode: DHW_ON
+  Start: 2025-11-19 09:55:00+00:00 (timestep 0)
+  Duration: 85 timesteps (425.0 minutes)
+  Operation mode factor: 0.0
+----------------------------------------
+  Mode: DHW_OFF
+  Start: 2025-11-19 17:00:00+00:00 (timestep 85)
+  Duration: 198 timesteps (990.0 minutes)
+  Operation mode factor: 0.0
+----------------------------------------
+  Mode: DHW_ON
+  Start: 2025-11-20 09:30:00+00:00 (timestep 283)
+  Duration: 5 timesteps (25.0 minutes)
+----------------------------------------
+
+Total operation mode changes: 2
+================================================================================
+
+Detailed Instruction List:
+================================================================================
+
+Instruction #1:
+  Timestep: 0
+  Time: 2025-11-19 09:55:00+00:00
+  Operation mode: e7eeb83d-5155-4f05-acec-7b6db49b854c
+  Factor: 0.0
+  Execution time: 2025-11-19 09:40:00+00:00
+
+Instruction #2:
+  Timestep: 1
+  Time: 2025-11-19 10:00:00+00:00
+  Operation mode: e7eeb83d-5155-4f05-acec-7b6db49b854c
+  Factor: 0.0
+  Execution time: 2025-11-19 09:45:00+00:00
+
+Instruction #3:
+  Timestep: 2
+  Time: 2025-11-19 10:05:00+00:00
+  Operation mode: e7eeb83d-5155-4f05-acec-7b6db49b854c
+  Factor: 0.0
+  Execution time: 2025-11-19 09:50:00+00:00
+
+Instruction #4:
+  Timestep: 3
+  Time: 2025-11-19 10:10:00+00:00
+  Operation mode: e7eeb83d-5155-4f05-acec-7b6db49b854c
+  Factor: 0.0
+  Execution time: 2025-11-19 09:55:00+00:00
+
+Instruction #5:
+  Timestep: 4
+  Time: 2025-11-19 10:15:00+00:00
+  Operation mode: e7eeb83d-5155-4f05-acec-7b6db49b854c
+  Factor: 0.0
+  Execution time: 2025-11-19 10:00:00+00:00
+
+Instruction #6:
+  Timestep: 5
+  Time: 2025-11-19 10:20:00+00:00
+  Operation mode: e7eeb83d-5155-4f05-acec-7b6db49b854c
+  Factor: 0.0
+  Execution time: 2025-11-19 10:05:00+00:00
+
+Instruction #7:
+  Timestep: 6
+  Time: 2025-11-19 10:25:00+00:00
+  Operation mode: e7eeb83d-5155-4f05-acec-7b6db49b854c
+  Factor: 0.0
+  Execution time: 2025-11-19 10:10:00+00:00
+
+Instruction #8:
+  Timestep: 7
+  Time: 2025-11-19 10:30:00+00:00
+  Operation mode: e7eeb83d-5155-4f05-acec-7b6db49b854c
+  Factor: 0.0
+  Execution time: 2025-11-19 10:15:00+00:00
+
+Instruction #9:
+  Timestep: 8
+  Time: 2025-11-19 10:35:00+00:00
+  Operation mode: e7eeb83d-5155-4f05-acec-7b6db49b854c
+  Factor: 0.0
+  Execution time: 2025-11-19 10:20:00+00:00
+
+Instruction #10:
+  Timestep: 9
+  Time: 2025-11-19 10:40:00+00:00
+  Operation mode: e7eeb83d-5155-4f05-acec-7b6db49b854c
+  Factor: 0.0
+  Execution time: 2025-11-19 10:25:00+00:00
+
+Instruction #11:
+  Timestep: 10
+  Time: 2025-11-19 10:45:00+00:00
+  Operation mode: e7eeb83d-5155-4f05-acec-7b6db49b854c
+  Factor: 0.0
+  Execution time: 2025-11-19 10:30:00+00:00
+
+Instruction #12:
+  Timestep: 11
+  Time: 2025-11-19 10:50:00+00:00
+  Operation mode: e7eeb83d-5155-4f05-acec-7b6db49b854c
+  Factor: 0.0
+  Execution time: 2025-11-19 10:35:00+00:00
+
+Instruction #13:
+  Timestep: 12
+  Time: 2025-11-19 10:55:00+00:00
+  Operation mode: e7eeb83d-5155-4f05-acec-7b6db49b854c
+  Factor: 0.0
+  Execution time: 2025-11-19 10:40:00+00:00
+
+Instruction #14:
+  Timestep: 13
+  Time: 2025-11-19 11:00:00+00:00
+  Operation mode: e7eeb83d-5155-4f05-acec-7b6db49b854c
+  Factor: 0.0
+  Execution time: 2025-11-19 10:45:00+00:00
+
+Instruction #15:
+  Timestep: 14
+  Time: 2025-11-19 11:05:00+00:00
+  Operation mode: e7eeb83d-5155-4f05-acec-7b6db49b854c
+  Factor: 0.0
+  Execution time: 2025-11-19 10:50:00+00:00
+
+Instruction #16:
+  Timestep: 15
+  Time: 2025-11-19 11:10:00+00:00
+  Operation mode: e7eeb83d-5155-4f05-acec-7b6db49b854c
+  Factor: 0.0
+  Execution time: 2025-11-19 10:55:00+00:00
+
+Instruction #17:
+  Timestep: 16
+  Time: 2025-11-19 11:15:00+00:00
+  Operation mode: e7eeb83d-5155-4f05-acec-7b6db49b854c
+  Factor: 0.0
+  Execution time: 2025-11-19 11:00:00+00:00
+
+Instruction #18:
+  Timestep: 17
+  Time: 2025-11-19 11:20:00+00:00
+  Operation mode: e7eeb83d-5155-4f05-acec-7b6db49b854c
+  Factor: 0.0
+  Execution time: 2025-11-19 11:05:00+00:00
+
+Instruction #19:
+  Timestep: 18
+  Time: 2025-11-19 11:25:00+00:00
+  Operation mode: e7eeb83d-5155-4f05-acec-7b6db49b854c
+  Factor: 0.0
+  Execution time: 2025-11-19 11:10:00+00:00
+
+Instruction #20:
+  Timestep: 19
+  Time: 2025-11-19 11:30:00+00:00
+  Operation mode: e7eeb83d-5155-4f05-acec-7b6db49b854c
+  Factor: 0.0
+  Execution time: 2025-11-19 11:15:00+00:00
+
+... and 268 more instructions

@@ -1,5 +1,6 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from typing import Any, Dict
+import uuid
 
 from flask import current_app as app
 import pandas as pd
@@ -17,14 +18,212 @@ from flexmeasures_s2.profile_steering.cluster_target import ClusterTarget
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import (
     S2FrbcDeviceState,
 )
+from flexmeasures_s2.profile_steering.device_planner.ddbc.s2_ddbc_device_state import (
+    S2DdbcDeviceState,
+)
 from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
-from s2python.frbc import FRBCInstruction
+from s2python.frbc import (
+    FRBCInstruction,
+    FRBCFillLevelTargetProfile,
+    FRBCFillLevelTargetProfileElement,
+    FRBCUsageForecast,
+    FRBCUsageForecastElement,
+)
+from s2python.common import Duration
 
 from flexmeasures_s2.scheduler.schedulers import (
     PlanningServiceConfig,
     PlanningServiceImpl,
 )
+
+
+def adjust_fill_level_target_profile_for_current_time(
+    fill_level_target_profile: FRBCFillLevelTargetProfile,
+    current_time: datetime,
+) -> FRBCFillLevelTargetProfile:
+    """
+    Adjust fill level target profile when current time is ahead of profile start_time.
+
+    Removes elements that have already passed and adjusts the start_time to current_time.
+    This keeps fill_level_ranges at fixed positions in time regardless of when scheduling happens.
+
+    Args:
+        fill_level_target_profile: The original fill level target profile
+        current_time: The current scheduling time (when planning actually happens)
+
+    Returns:
+        Adjusted fill level target profile with start_time set to current_time
+    """
+    if fill_level_target_profile is None:
+        return None
+
+    profile_start = fill_level_target_profile.start_time
+    if isinstance(profile_start, datetime):
+        profile_start = (
+            profile_start.replace(tzinfo=timezone.utc)
+            if profile_start.tzinfo is None
+            else profile_start
+        )
+    else:
+        profile_start = profile_start.astimezone(timezone.utc)
+
+    current_time = (
+        current_time.replace(tzinfo=timezone.utc)
+        if current_time.tzinfo is None
+        else current_time
+    )
+
+    # If current time is not ahead of profile start, just update start_time
+    if current_time <= profile_start:
+        return fill_level_target_profile.model_copy(update={"start_time": current_time})
+
+    # Calculate elapsed time since profile start
+    elapsed_time_ms = int((current_time - profile_start).total_seconds() * 1000)
+
+    # Helper function to extract duration in milliseconds
+    def get_duration_ms(elem):
+        duration = elem.duration
+        if isinstance(duration, (int, float)):
+            return int(duration)
+        elif hasattr(duration, "root"):
+            return int(duration.root)
+        else:
+            return int(duration)
+
+    # Find which elements have passed and which we're currently in
+    remaining_elements = []
+    cumulative_duration_ms = 0
+
+    for element in fill_level_target_profile.elements:
+        element_duration_ms = get_duration_ms(element)
+        element_end_ms = cumulative_duration_ms + element_duration_ms
+
+        if element_end_ms <= elapsed_time_ms:
+            # This element has completely passed, skip it
+            cumulative_duration_ms = element_end_ms
+            continue
+        elif cumulative_duration_ms < elapsed_time_ms:
+            # We're in the middle of this element, truncate it
+            remaining_duration_ms = element_end_ms - elapsed_time_ms
+            if remaining_duration_ms > 0:
+                remaining_elements.append(
+                    FRBCFillLevelTargetProfileElement(
+                        duration=Duration(root=remaining_duration_ms),
+                        fill_level_range=element.fill_level_range,
+                    )
+                )
+            cumulative_duration_ms = element_end_ms
+        else:
+            # This element is in the future, keep it as-is
+            remaining_elements.append(element)
+            cumulative_duration_ms = element_end_ms
+
+    # Create adjusted profile with current_time as start_time
+    adjusted_profile = FRBCFillLevelTargetProfile(
+        message_id=str(uuid.uuid4()),
+        start_time=current_time,
+        elements=remaining_elements,
+    )
+
+    return adjusted_profile
+
+
+def adjust_usage_forecast_for_current_time(
+    usage_forecast: FRBCUsageForecast,
+    current_time: datetime,
+) -> FRBCUsageForecast:
+    """
+    Adjust usage forecast when current time is ahead of forecast start_time.
+
+    Removes elements that have already passed and adjusts the start_time to current_time.
+    This keeps usage_rate values at fixed positions in time regardless of when scheduling happens.
+
+    Args:
+        usage_forecast: The original usage forecast
+        current_time: The current scheduling time (when planning actually happens)
+
+    Returns:
+        Adjusted usage forecast with start_time set to current_time
+    """
+    if usage_forecast is None:
+        return None
+
+    forecast_start = usage_forecast.start_time
+    if isinstance(forecast_start, datetime):
+        forecast_start = (
+            forecast_start.replace(tzinfo=timezone.utc)
+            if forecast_start.tzinfo is None
+            else forecast_start
+        )
+    else:
+        forecast_start = forecast_start.astimezone(timezone.utc)
+
+    current_time = (
+        current_time.replace(tzinfo=timezone.utc)
+        if current_time.tzinfo is None
+        else current_time
+    )
+
+    # If current time is not ahead of forecast start, just update start_time
+    if current_time <= forecast_start:
+        return usage_forecast.model_copy(update={"start_time": current_time})
+
+    # Calculate elapsed time since forecast start
+    elapsed_time_ms = int((current_time - forecast_start).total_seconds() * 1000)
+
+    # Helper function to extract duration in milliseconds
+    def get_duration_ms(elem):
+        duration = elem.duration
+        if isinstance(duration, (int, float)):
+            return int(duration)
+        elif hasattr(duration, "root"):
+            return int(duration.root)
+        else:
+            return int(duration)
+
+    # Find which elements have passed and which we're currently in
+    remaining_elements = []
+    cumulative_duration_ms = 0
+
+    for element in usage_forecast.elements:
+        element_duration_ms = get_duration_ms(element)
+        element_end_ms = cumulative_duration_ms + element_duration_ms
+
+        if element_end_ms <= elapsed_time_ms:
+            # This element has completely passed, skip it
+            cumulative_duration_ms = element_end_ms
+            continue
+        elif cumulative_duration_ms < elapsed_time_ms:
+            # We're in the middle of this element, truncate it
+            remaining_duration_ms = element_end_ms - elapsed_time_ms
+            if remaining_duration_ms > 0:
+                remaining_elements.append(
+                    FRBCUsageForecastElement(
+                        duration=Duration(root=remaining_duration_ms),
+                        usage_rate_expected=element.usage_rate_expected,
+                        usage_rate_upper_limit=element.usage_rate_upper_limit,
+                        usage_rate_upper_95PPR=element.usage_rate_upper_95PPR,
+                        usage_rate_upper_68PPR=element.usage_rate_upper_68PPR,
+                        usage_rate_lower_68PPR=element.usage_rate_lower_68PPR,
+                        usage_rate_lower_95PPR=element.usage_rate_lower_95PPR,
+                        usage_rate_lower_limit=element.usage_rate_lower_limit,
+                    )
+                )
+            cumulative_duration_ms = element_end_ms
+        else:
+            # This element is in the future, keep it as-is
+            remaining_elements.append(element)
+            cumulative_duration_ms = element_end_ms
+
+    # Create adjusted forecast with current_time as start_time
+    adjusted_forecast = FRBCUsageForecast(
+        message_id=str(uuid.uuid4()),
+        start_time=current_time,
+        elements=remaining_elements,
+    )
+
+    return adjusted_forecast
 
 
 class S2FlaskScheduler(Scheduler):
@@ -46,6 +245,7 @@ class S2FlaskScheduler(Scheduler):
         self.planning_service = None
         self.config_deserialized = False
         self.frbc_device_data = None  # Store FRBC device data from WebSocket
+        self.ddbc_device_data = None  # Store DDBC device data from WebSocket
 
     def compute(self, *args, **kwargs):
         """
@@ -58,26 +258,22 @@ class S2FlaskScheduler(Scheduler):
             self.deserialize_config()
 
         try:
-            # Update start/end times if not already set or if they're outdated
-            # Always align to resolution boundary to avoid validation errors
-            now = datetime.now(timezone.utc)
-
-            # Align to resolution boundary
-            resolution_seconds = int(self.resolution.total_seconds())
-            total_seconds = int(now.timestamp())
-            aligned_seconds = (total_seconds // resolution_seconds) * resolution_seconds
-            start_aligned = datetime.fromtimestamp(aligned_seconds, tz=timezone.utc)
-
-            self.start = start_aligned
-            self.end = start_aligned + timedelta(hours=24)
 
             app.logger.info("🧮 S2FlaskScheduler started")
 
-            if not hasattr(self, "frbc_device_data") or self.frbc_device_data is None:
-                app.logger.error("❌ No FRBC device data available")
+            # Check if we have either FRBC or DDBC device data
+            has_frbc = (
+                hasattr(self, "frbc_device_data") and self.frbc_device_data is not None
+            )
+            has_ddbc = (
+                hasattr(self, "ddbc_device_data") and self.ddbc_device_data is not None
+            )
+
+            if not has_frbc and not has_ddbc:
+                app.logger.error("❌ No device data available (neither FRBC nor DDBC)")
                 return []
 
-            # Create device states from FRBC data
+            # Create device states from available data
             device_states, cluster_target = self._create_cluster_state_and_target()
 
             if not device_states:
@@ -221,8 +417,20 @@ class S2FlaskScheduler(Scheduler):
         return self.planning_service
 
     def _create_cluster_state_and_target(self):
-        """Create cluster state and target from FRBC device data."""
-        device_states = self.create_device_states_from_frbc_data()
+        """Create cluster state and target from FRBC or DDBC device data."""
+        device_states = {}
+
+        # Try to create device states from FRBC data
+        if hasattr(self, "frbc_device_data") and self.frbc_device_data is not None:
+            frbc_states = self.create_device_states_from_frbc_data()
+            device_states.update(frbc_states)
+            app.logger.debug(f"Created {len(frbc_states)} FRBC device state(s)")
+
+        # Try to create device states from DDBC data
+        if hasattr(self, "ddbc_device_data") and self.ddbc_device_data is not None:
+            ddbc_states = self.create_device_states_from_ddbc_data()
+            device_states.update(ddbc_states)
+            app.logger.debug(f"Created {len(ddbc_states)} DDBC device state(s)")
 
         if not device_states:
             return device_states, None
@@ -343,7 +551,6 @@ class S2FlaskScheduler(Scheduler):
 
             try:
                 # Convert device plan to instructions
-                # Skip if there's no instruction profile (e.g., for nocontrol devices)
                 if device_plan.instruction_profile is None:
                     continue
 
@@ -420,7 +627,73 @@ class S2FlaskScheduler(Scheduler):
                     if hasattr(frbc_data, "actuator_statuses")
                     else []
                 )
-                fill_level_target_profile = frbc_data.fill_level_target_profile
+                fill_level_target_profile = (
+                    frbc_data.fill_level_target_profile
+                    if hasattr(frbc_data, "fill_level_target_profile")
+                    else None
+                )
+                usage_forecast = (
+                    frbc_data.usage_forecast
+                    if hasattr(frbc_data, "usage_forecast")
+                    else None
+                )
+                leakage_behaviour = (
+                    frbc_data.leakage_behaviour
+                    if hasattr(frbc_data, "leakage_behaviour")
+                    else None
+                )
+
+                # Adjust fill level target profile for scheduler start time
+                # This removes elements that have already passed and adjusts start_time
+                if fill_level_target_profile:
+                    original_start = fill_level_target_profile.start_time
+                    n_original = (
+                        len(fill_level_target_profile.elements)
+                        if fill_level_target_profile.elements
+                        else 0
+                    )
+                    adjusted_profile = (
+                        adjust_fill_level_target_profile_for_current_time(
+                            fill_level_target_profile, self.start
+                        )
+                    )
+                    if adjusted_profile:
+                        fill_level_target_profile = adjusted_profile
+                        if original_start != self.start:
+                            n_adjusted = (
+                                len(adjusted_profile.elements)
+                                if adjusted_profile.elements
+                                else 0
+                            )
+                            app.logger.debug(
+                                f"Adjusted fill level target profile: "
+                                f"{original_start} → {self.start}, "
+                                f"elements: {n_original} → {n_adjusted}"
+                            )
+
+                # Adjust usage forecast for scheduler start time
+                # This removes elements that have already passed and adjusts start_time
+                if usage_forecast:
+                    original_start = usage_forecast.start_time
+                    n_original = (
+                        len(usage_forecast.elements) if usage_forecast.elements else 0
+                    )
+                    adjusted_forecast = adjust_usage_forecast_for_current_time(
+                        usage_forecast, self.start
+                    )
+                    if adjusted_forecast:
+                        usage_forecast = adjusted_forecast
+                        if original_start != self.start:
+                            n_adjusted = (
+                                len(adjusted_forecast.elements)
+                                if adjusted_forecast.elements
+                                else 0
+                            )
+                            app.logger.debug(
+                                f"Adjusted usage forecast: "
+                                f"{original_start} → {self.start}, "
+                                f"elements: {n_original} → {n_adjusted}"
+                            )
 
                 # Create device state using the received FRBC data
                 device_state = S2FrbcDeviceState(
@@ -435,8 +708,8 @@ class S2FlaskScheduler(Scheduler):
                     is_online=True,
                     power_forecast=None,
                     system_descriptions=[system_desc] if system_desc else [],
-                    leakage_behaviours=[],
-                    usage_forecasts=[],
+                    leakage_behaviours=[leakage_behaviour] if leakage_behaviour else [],
+                    usage_forecasts=[usage_forecast] if usage_forecast else [],
                     fill_level_target_profiles=[fill_level_target_profile]
                     if fill_level_target_profile
                     else [],
@@ -444,12 +717,44 @@ class S2FlaskScheduler(Scheduler):
                         100, 20
                     ),
                     actuator_statuses=actuator_statuses,
-                    storage_status=[storage_status] if storage_status else [],
+                    storage_status=storage_status,  # Single object, not a list
                 )
                 app.logger.debug(f"Storage status used for scheduler: {storage_status}")
-                app.logger.debug(
-                    f"Present fill level used for scheduler: {storage_status.present_fill_level}"
-                )
+                if storage_status:
+                    app.logger.debug(
+                        f"Present fill level used for scheduler: {storage_status.present_fill_level}"
+                    )
+
+                # Log which profiles are being used
+                if fill_level_target_profile:
+                    n_elements = (
+                        len(fill_level_target_profile.elements)
+                        if fill_level_target_profile.elements
+                        else 0
+                    )
+                    app.logger.debug(
+                        f"Fill level target profile: {n_elements} element(s)"
+                    )
+                else:
+                    app.logger.debug("Fill level target profile: NOT PROVIDED")
+
+                if usage_forecast:
+                    n_elements = (
+                        len(usage_forecast.elements) if usage_forecast.elements else 0
+                    )
+                    app.logger.debug(f"Usage forecast: {n_elements} element(s)")
+                else:
+                    app.logger.debug("Usage forecast: NOT PROVIDED")
+
+                if leakage_behaviour:
+                    n_elements = (
+                        len(leakage_behaviour.elements)
+                        if leakage_behaviour.elements
+                        else 0
+                    )
+                    app.logger.debug(f"Leakage behaviour: {n_elements} element(s)")
+                else:
+                    app.logger.debug("Leakage behaviour: NOT PROVIDED")
 
                 device_states[device_id] = device_state
                 app.logger.debug(f"✅ Device state ready: {device_id[:8]}...")
@@ -478,6 +783,64 @@ class S2FlaskScheduler(Scheduler):
                     fill_level_target_profile = frbc_data.get(
                         "fill_level_target_profile"
                     )
+                    usage_forecast = frbc_data.get("usage_forecast")
+                    leakage_behaviour = frbc_data.get("leakage_behaviour")
+
+                    # Adjust fill level target profile for scheduler start time
+                    # This removes elements that have already passed and adjusts start_time
+                    if fill_level_target_profile and hasattr(
+                        fill_level_target_profile, "start_time"
+                    ):
+                        original_start = fill_level_target_profile.start_time
+                        n_original = (
+                            len(fill_level_target_profile.elements)
+                            if fill_level_target_profile.elements
+                            else 0
+                        )
+                        adjusted_profile = (
+                            adjust_fill_level_target_profile_for_current_time(
+                                fill_level_target_profile, self.start
+                            )
+                        )
+                        if adjusted_profile:
+                            fill_level_target_profile = adjusted_profile
+                            if original_start != self.start:
+                                n_adjusted = (
+                                    len(adjusted_profile.elements)
+                                    if adjusted_profile.elements
+                                    else 0
+                                )
+                                app.logger.debug(
+                                    f"Adjusted fill level target profile: "
+                                    f"{original_start} → {self.start}, "
+                                    f"elements: {n_original} → {n_adjusted}"
+                                )
+
+                    # Adjust usage forecast for scheduler start time
+                    # This removes elements that have already passed and adjusts start_time
+                    if usage_forecast and hasattr(usage_forecast, "start_time"):
+                        original_start = usage_forecast.start_time
+                        n_original = (
+                            len(usage_forecast.elements)
+                            if usage_forecast.elements
+                            else 0
+                        )
+                        adjusted_forecast = adjust_usage_forecast_for_current_time(
+                            usage_forecast, self.start
+                        )
+                        if adjusted_forecast:
+                            usage_forecast = adjusted_forecast
+                            if original_start != self.start:
+                                n_adjusted = (
+                                    len(adjusted_forecast.elements)
+                                    if adjusted_forecast.elements
+                                    else 0
+                                )
+                                app.logger.debug(
+                                    f"Adjusted usage forecast: "
+                                    f"{original_start} → {self.start}, "
+                                    f"elements: {n_original} → {n_adjusted}"
+                                )
 
                     # Create device state using the received FRBC data
                     device_state = S2FrbcDeviceState(
@@ -493,8 +856,10 @@ class S2FlaskScheduler(Scheduler):
                         is_online=True,
                         power_forecast=None,
                         system_descriptions=[system_desc] if system_desc else [],
-                        leakage_behaviours=[],
-                        usage_forecasts=[],
+                        leakage_behaviours=[leakage_behaviour]
+                        if leakage_behaviour
+                        else [],
+                        usage_forecasts=[usage_forecast] if usage_forecast else [],
                         fill_level_target_profiles=[fill_level_target_profile]
                         if fill_level_target_profile
                         else [],
@@ -502,7 +867,7 @@ class S2FlaskScheduler(Scheduler):
                             100, 20
                         ),
                         actuator_statuses=actuator_statuses,
-                        storage_status=[storage_status] if storage_status else [],
+                        storage_status=storage_status,  # Single object, not a list
                     )
 
                     device_states[device_id] = device_state
@@ -516,6 +881,111 @@ class S2FlaskScheduler(Scheduler):
         else:
             app.logger.error(
                 f"❌ Unexpected FRBC data type: {type(self.frbc_device_data)}"
+            )
+
+        return device_states
+
+    def create_device_states_from_ddbc_data(self) -> Dict[str, Any]:
+        """
+        Create device states from received DDBC data.
+
+        Returns:
+            Dict[str, Any]: Dictionary of device states created from DDBC data
+        """
+        if not hasattr(self, "ddbc_device_data") or self.ddbc_device_data is None:
+            app.logger.warning("⚠️ No DDBC device data")
+            return {}
+
+        device_states = {}
+
+        # Handle single DDBCDeviceData object
+        if hasattr(self.ddbc_device_data, "resource_id"):
+            ddbc_data = self.ddbc_device_data
+            device_id = ddbc_data.resource_id or "ddbc_device_1"
+
+            try:
+                app.logger.debug(f"🔧 Creating DDBC device state for {device_id[:8]}...")
+
+                # Extract information from received DDBC data object
+                system_desc = ddbc_data.system_description
+                demand_forecasts = (
+                    ddbc_data.demand_forecasts
+                    if hasattr(ddbc_data, "demand_forecasts")
+                    else []
+                )
+                actuator_statuses = (
+                    ddbc_data.actuator_statuses
+                    if hasattr(ddbc_data, "actuator_statuses")
+                    else {}
+                )
+
+                # Create device state using the received DDBC data
+                device_state = S2DdbcDeviceState(
+                    device_id=device_id,
+                    device_name=f"DDBC Device {device_id}",
+                    connection_id=f"{device_id}_connection",
+                    priority_class=0,
+                    timestamp=self.start,
+                    energy_in_current_timestep=0.0,
+                    is_online=True,
+                    power_forecast=None,
+                    system_descriptions=[system_desc] if system_desc else [],
+                    demand_forecasts=demand_forecasts,
+                    actuator_statuses=actuator_statuses,
+                    gas_price_per_m3=2.0,  # €2 per m3 of gas
+                )
+
+                device_states[device_id] = device_state
+                app.logger.debug(f"✅ DDBC device state ready: {device_id[:8]}...")
+
+            except Exception as e:
+                app.logger.error(
+                    f"❌ DDBC device state creation failed for {device_id[:8]}...: {e}"
+                )
+                import traceback
+
+                app.logger.debug(traceback.format_exc())
+
+        # Handle dictionary of device data (backward compatibility)
+        elif isinstance(self.ddbc_device_data, dict):
+            for device_id, ddbc_data in self.ddbc_device_data.items():
+                try:
+                    app.logger.debug(
+                        f"🔧 Creating DDBC device state for {device_id[:8]}..."
+                    )
+
+                    # Extract information from received DDBC data
+                    system_desc = ddbc_data.get("system_description")
+                    demand_forecasts = ddbc_data.get("demand_forecasts", [])
+                    actuator_statuses = ddbc_data.get("actuator_statuses", {})
+
+                    # Create device state using the received DDBC data
+                    device_state = S2DdbcDeviceState(
+                        device_id=device_id,
+                        device_name=f"DDBC Device {device_id}",
+                        connection_id=f"{device_id}_connection",
+                        priority_class=0,
+                        timestamp=self.start,
+                        energy_in_current_timestep=0.0,
+                        is_online=True,
+                        power_forecast=None,
+                        system_descriptions=[system_desc] if system_desc else [],
+                        demand_forecasts=demand_forecasts,
+                        actuator_statuses=actuator_statuses,
+                        gas_price_per_m3=2.0,  # €2 per m3 of gas
+                    )
+
+                    device_states[device_id] = device_state
+                    app.logger.debug(f"✅ DDBC device state ready: {device_id[:8]}...")
+
+                except Exception as e:
+                    app.logger.error(
+                        f"❌ DDBC device state creation failed for {device_id[:8]}...: {e}"
+                    )
+                    continue
+        else:
+            app.logger.error(
+                f"❌ Unexpected DDBC data type: {type(self.ddbc_device_data)}"
             )
 
         return device_states

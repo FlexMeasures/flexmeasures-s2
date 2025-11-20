@@ -1,0 +1,3218 @@
+================================================================================
+ITHO DHW Heat Pump Instructions Cost
+================================================================================
+Planning start time: 2025-11-05 14:10:00+00:00
+Planning window: 1 days 00:00:00
+Resolution: 0 days 00:05:00
+Total timesteps: 288
+================================================================================
+
+Device: itho_dhw_device_003
+Number of instructions: 288
+--------------------------------------------------------------------------------
+
+Instruction Timeline:
+--------------------------------------------------------------------------------
+  Mode: DHW_ON
+  Start: 2025-11-05 14:10:00+00:00 (timestep 0)
+  Duration: 7 timesteps (35.0 minutes)
+  Operation mode factor: 0.0
+----------------------------------------
+  Mode: DHW_OFF
+  Start: 2025-11-05 14:45:00+00:00 (timestep 7)
+  Duration: 19 timesteps (95.0 minutes)
+  Operation mode factor: 0.0
+----------------------------------------
+  Mode: DHW_ON
+  Start: 2025-11-05 16:20:00+00:00 (timestep 26)
+  Duration: 53 timesteps (265.0 minutes)
+  Operation mode factor: 0.0
+----------------------------------------
+  Mode: DHW_OFF
+  Start: 2025-11-05 20:45:00+00:00 (timestep 79)
+  Duration: 124 timesteps (620.0 minutes)
+  Operation mode factor: 0.0
+----------------------------------------
+  Mode: DHW_ON
+  Start: 2025-11-06 07:05:00+00:00 (timestep 203)
+  Duration: 6 timesteps (30.0 minutes)
+  Operation mode factor: 0.0
+----------------------------------------
+  Mode: DHW_OFF
+  Start: 2025-11-06 07:35:00+00:00 (timestep 209)
+  Duration: 79 timesteps (395.0 minutes)
+----------------------------------------
+
+Total operation mode changes: 5
+================================================================================
+
+Detailed Instruction List:
+================================================================================
+
+Instruction #1:
+  Timestep: 0
+  Time: 2025-11-05 14:10:00+00:00
+  ID: a607df3d-4615-45e7-8e8d-fd32762b910a
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 14:10:00+00:00
+----------------------------------------
+
+Instruction #2:
+  Timestep: 1
+  Time: 2025-11-05 14:15:00+00:00
+  ID: 8d7a0849-ad6c-4446-962c-991612c1e243
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 14:15:00+00:00
+----------------------------------------
+
+Instruction #3:
+  Timestep: 2
+  Time: 2025-11-05 14:20:00+00:00
+  ID: 1a74f25c-dac4-41b0-b8ab-0fb51ae8cd95
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 14:20:00+00:00
+----------------------------------------
+
+Instruction #4:
+  Timestep: 3
+  Time: 2025-11-05 14:25:00+00:00
+  ID: d66956c2-e904-4e69-9bfc-175a96926377
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 14:25:00+00:00
+----------------------------------------
+
+Instruction #5:
+  Timestep: 4
+  Time: 2025-11-05 14:30:00+00:00
+  ID: 87a39cec-19ed-4c70-93b0-6d6d2bfe842d
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 14:30:00+00:00
+----------------------------------------
+
+Instruction #6:
+  Timestep: 5
+  Time: 2025-11-05 14:35:00+00:00
+  ID: f05b6540-7c25-4c8c-b2c9-b93cfbfc8299
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 14:35:00+00:00
+----------------------------------------
+
+Instruction #7:
+  Timestep: 6
+  Time: 2025-11-05 14:40:00+00:00
+  ID: 1aeabc8f-a212-43b4-86e0-beb6f4c04a2f
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 14:40:00+00:00
+----------------------------------------
+
+Instruction #8:
+  Timestep: 7
+  Time: 2025-11-05 14:45:00+00:00
+  ID: ffb3d047-d2b7-44e0-ac0c-b84750230f84
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 14:45:00+00:00
+----------------------------------------
+
+Instruction #9:
+  Timestep: 8
+  Time: 2025-11-05 14:50:00+00:00
+  ID: aabb95e6-3f9c-4f59-a628-a955e8210d2b
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 14:50:00+00:00
+----------------------------------------
+
+Instruction #10:
+  Timestep: 9
+  Time: 2025-11-05 14:55:00+00:00
+  ID: a2f01523-8833-41db-98c0-f7905439481f
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 14:55:00+00:00
+----------------------------------------
+
+Instruction #11:
+  Timestep: 10
+  Time: 2025-11-05 15:00:00+00:00
+  ID: a4b0d48f-0645-44d1-8d2e-8878223de140
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 15:00:00+00:00
+----------------------------------------
+
+Instruction #12:
+  Timestep: 11
+  Time: 2025-11-05 15:05:00+00:00
+  ID: a114f19f-9393-4ea1-a401-041dae2c0aad
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 15:05:00+00:00
+----------------------------------------
+
+Instruction #13:
+  Timestep: 12
+  Time: 2025-11-05 15:10:00+00:00
+  ID: 68f6fa97-e658-4f0d-a2c0-6198d971d319
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 15:10:00+00:00
+----------------------------------------
+
+Instruction #14:
+  Timestep: 13
+  Time: 2025-11-05 15:15:00+00:00
+  ID: f9cab0d2-d477-4457-a950-da1f5c254019
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 15:15:00+00:00
+----------------------------------------
+
+Instruction #15:
+  Timestep: 14
+  Time: 2025-11-05 15:20:00+00:00
+  ID: d85fb2e6-dc4c-4e95-a66c-8f9d743432a7
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 15:20:00+00:00
+----------------------------------------
+
+Instruction #16:
+  Timestep: 15
+  Time: 2025-11-05 15:25:00+00:00
+  ID: 93c3d453-3880-4a55-8d74-726800f42a29
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 15:25:00+00:00
+----------------------------------------
+
+Instruction #17:
+  Timestep: 16
+  Time: 2025-11-05 15:30:00+00:00
+  ID: 98fd64df-5d60-4102-b0d6-efa54e9bba00
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 15:30:00+00:00
+----------------------------------------
+
+Instruction #18:
+  Timestep: 17
+  Time: 2025-11-05 15:35:00+00:00
+  ID: e1cfb574-5a8a-422c-b4bf-6da482e6746c
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 15:35:00+00:00
+----------------------------------------
+
+Instruction #19:
+  Timestep: 18
+  Time: 2025-11-05 15:40:00+00:00
+  ID: bd35c9ae-2532-4489-9407-18f9a965db92
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 15:40:00+00:00
+----------------------------------------
+
+Instruction #20:
+  Timestep: 19
+  Time: 2025-11-05 15:45:00+00:00
+  ID: 1413cfb4-8273-493b-82ec-de7f780d555d
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 15:45:00+00:00
+----------------------------------------
+
+Instruction #21:
+  Timestep: 20
+  Time: 2025-11-05 15:50:00+00:00
+  ID: c50639a8-4c74-445b-a024-acce1f58a77d
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 15:50:00+00:00
+----------------------------------------
+
+Instruction #22:
+  Timestep: 21
+  Time: 2025-11-05 15:55:00+00:00
+  ID: b774d7fe-3287-4f0b-b561-a6b4228c84f5
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 15:55:00+00:00
+----------------------------------------
+
+Instruction #23:
+  Timestep: 22
+  Time: 2025-11-05 16:00:00+00:00
+  ID: 04e8c6dc-010c-475e-9a33-fd0b5caa01fc
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 16:00:00+00:00
+----------------------------------------
+
+Instruction #24:
+  Timestep: 23
+  Time: 2025-11-05 16:05:00+00:00
+  ID: e3a46199-901e-4a71-b156-d86b45744a8e
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 16:05:00+00:00
+----------------------------------------
+
+Instruction #25:
+  Timestep: 24
+  Time: 2025-11-05 16:10:00+00:00
+  ID: 77baa0ec-667f-49a2-a420-cb97163bf5a9
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 16:10:00+00:00
+----------------------------------------
+
+Instruction #26:
+  Timestep: 25
+  Time: 2025-11-05 16:15:00+00:00
+  ID: 31e9dfe5-5c4a-4865-9d79-f89ea6fe1df4
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 16:15:00+00:00
+----------------------------------------
+
+Instruction #27:
+  Timestep: 26
+  Time: 2025-11-05 16:20:00+00:00
+  ID: 29b12ab2-5929-4508-84de-5f5f45dc4caa
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 16:20:00+00:00
+----------------------------------------
+
+Instruction #28:
+  Timestep: 27
+  Time: 2025-11-05 16:25:00+00:00
+  ID: 55e6d25c-78f6-41b0-8f8b-045ba2da76d1
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 16:25:00+00:00
+----------------------------------------
+
+Instruction #29:
+  Timestep: 28
+  Time: 2025-11-05 16:30:00+00:00
+  ID: 7c2ccebb-b399-4c75-ab2b-93a8a1c8ef7e
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 16:30:00+00:00
+----------------------------------------
+
+Instruction #30:
+  Timestep: 29
+  Time: 2025-11-05 16:35:00+00:00
+  ID: 42546ee8-7230-49bb-b0b1-88f6dfa3a66f
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 16:35:00+00:00
+----------------------------------------
+
+Instruction #31:
+  Timestep: 30
+  Time: 2025-11-05 16:40:00+00:00
+  ID: ceb16ed4-9d74-4aa6-92a1-f909190ce40c
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 16:40:00+00:00
+----------------------------------------
+
+Instruction #32:
+  Timestep: 31
+  Time: 2025-11-05 16:45:00+00:00
+  ID: c459bcbb-4484-4cad-b1a8-7c3afdb294c9
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 16:45:00+00:00
+----------------------------------------
+
+Instruction #33:
+  Timestep: 32
+  Time: 2025-11-05 16:50:00+00:00
+  ID: 98e8dda3-8752-4261-a704-f324c0b02b09
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 16:50:00+00:00
+----------------------------------------
+
+Instruction #34:
+  Timestep: 33
+  Time: 2025-11-05 16:55:00+00:00
+  ID: 9826e3c7-da68-4b01-991b-3281dfae9fec
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 16:55:00+00:00
+----------------------------------------
+
+Instruction #35:
+  Timestep: 34
+  Time: 2025-11-05 17:00:00+00:00
+  ID: 44100e91-704a-490f-86da-a670f317528c
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 17:00:00+00:00
+----------------------------------------
+
+Instruction #36:
+  Timestep: 35
+  Time: 2025-11-05 17:05:00+00:00
+  ID: 103d8a13-f64b-4304-9faf-f72b77482b66
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 17:05:00+00:00
+----------------------------------------
+
+Instruction #37:
+  Timestep: 36
+  Time: 2025-11-05 17:10:00+00:00
+  ID: ee27e3de-5781-4517-9e94-2d2c700fb033
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 17:10:00+00:00
+----------------------------------------
+
+Instruction #38:
+  Timestep: 37
+  Time: 2025-11-05 17:15:00+00:00
+  ID: 6fc365ba-e1fb-4671-bc1a-18f9a9edf469
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 17:15:00+00:00
+----------------------------------------
+
+Instruction #39:
+  Timestep: 38
+  Time: 2025-11-05 17:20:00+00:00
+  ID: de2e293c-eb79-43de-bec2-46e25efd06ae
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 17:20:00+00:00
+----------------------------------------
+
+Instruction #40:
+  Timestep: 39
+  Time: 2025-11-05 17:25:00+00:00
+  ID: 6fab1d8b-07b1-4cc5-8741-f55dfe923cd8
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 17:25:00+00:00
+----------------------------------------
+
+Instruction #41:
+  Timestep: 40
+  Time: 2025-11-05 17:30:00+00:00
+  ID: efc50d22-16a8-4d1d-95e7-47eff66a0794
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 17:30:00+00:00
+----------------------------------------
+
+Instruction #42:
+  Timestep: 41
+  Time: 2025-11-05 17:35:00+00:00
+  ID: 328750e3-6a3c-4fc9-b8eb-f47b82bdb849
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 17:35:00+00:00
+----------------------------------------
+
+Instruction #43:
+  Timestep: 42
+  Time: 2025-11-05 17:40:00+00:00
+  ID: 848342f2-7742-43cc-ad1f-5d11ce7f9fb3
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 17:40:00+00:00
+----------------------------------------
+
+Instruction #44:
+  Timestep: 43
+  Time: 2025-11-05 17:45:00+00:00
+  ID: 85d7e3ef-00c8-4a7e-96ec-ddfa7fe4d03b
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 17:45:00+00:00
+----------------------------------------
+
+Instruction #45:
+  Timestep: 44
+  Time: 2025-11-05 17:50:00+00:00
+  ID: d2b9ed5b-98e9-48a9-8cc7-d7a6ac95200a
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 17:50:00+00:00
+----------------------------------------
+
+Instruction #46:
+  Timestep: 45
+  Time: 2025-11-05 17:55:00+00:00
+  ID: 427613c8-d9d1-4355-85c0-e28eca4f356a
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 17:55:00+00:00
+----------------------------------------
+
+Instruction #47:
+  Timestep: 46
+  Time: 2025-11-05 18:00:00+00:00
+  ID: 821468c6-5583-44ea-8dd9-8c7c86240918
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 18:00:00+00:00
+----------------------------------------
+
+Instruction #48:
+  Timestep: 47
+  Time: 2025-11-05 18:05:00+00:00
+  ID: c79a1cf7-ddd1-441d-b3af-93f92cd61b02
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 18:05:00+00:00
+----------------------------------------
+
+Instruction #49:
+  Timestep: 48
+  Time: 2025-11-05 18:10:00+00:00
+  ID: abb26b86-7bf1-4c69-a553-dbf7455eed6c
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 18:10:00+00:00
+----------------------------------------
+
+Instruction #50:
+  Timestep: 49
+  Time: 2025-11-05 18:15:00+00:00
+  ID: bbb9b27b-bc08-4ad1-be95-96fd80878c85
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 18:15:00+00:00
+----------------------------------------
+
+Instruction #51:
+  Timestep: 50
+  Time: 2025-11-05 18:20:00+00:00
+  ID: 3905d6f9-11f4-42fd-ab7c-d080a248f586
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 18:20:00+00:00
+----------------------------------------
+
+Instruction #52:
+  Timestep: 51
+  Time: 2025-11-05 18:25:00+00:00
+  ID: a5f6e140-8210-46f0-855b-abf4efbd0dd9
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 18:25:00+00:00
+----------------------------------------
+
+Instruction #53:
+  Timestep: 52
+  Time: 2025-11-05 18:30:00+00:00
+  ID: 3bfeddc3-dbe6-4b5b-8953-8f9d10799834
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 18:30:00+00:00
+----------------------------------------
+
+Instruction #54:
+  Timestep: 53
+  Time: 2025-11-05 18:35:00+00:00
+  ID: 4112b2e0-56f2-432d-9f83-eea36da54984
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 18:35:00+00:00
+----------------------------------------
+
+Instruction #55:
+  Timestep: 54
+  Time: 2025-11-05 18:40:00+00:00
+  ID: d0588239-a3f7-48b8-83c8-86206a3753e6
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 18:40:00+00:00
+----------------------------------------
+
+Instruction #56:
+  Timestep: 55
+  Time: 2025-11-05 18:45:00+00:00
+  ID: 99cf5e5a-8a2a-4b67-b9bd-338763441770
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 18:45:00+00:00
+----------------------------------------
+
+Instruction #57:
+  Timestep: 56
+  Time: 2025-11-05 18:50:00+00:00
+  ID: 7f1b451d-f747-4694-992c-e078808b6aa6
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 18:50:00+00:00
+----------------------------------------
+
+Instruction #58:
+  Timestep: 57
+  Time: 2025-11-05 18:55:00+00:00
+  ID: dd1852e7-77e9-4aa0-b31c-1f53d885c8e9
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 18:55:00+00:00
+----------------------------------------
+
+Instruction #59:
+  Timestep: 58
+  Time: 2025-11-05 19:00:00+00:00
+  ID: 5530162a-0f46-4a2e-a6c5-d8bb0d823345
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 19:00:00+00:00
+----------------------------------------
+
+Instruction #60:
+  Timestep: 59
+  Time: 2025-11-05 19:05:00+00:00
+  ID: 1ca5a31e-1999-48a3-a278-d5723b408524
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 19:05:00+00:00
+----------------------------------------
+
+Instruction #61:
+  Timestep: 60
+  Time: 2025-11-05 19:10:00+00:00
+  ID: 32fa55ec-e355-418c-967a-7a591f09739c
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 19:10:00+00:00
+----------------------------------------
+
+Instruction #62:
+  Timestep: 61
+  Time: 2025-11-05 19:15:00+00:00
+  ID: d9b2aa76-d3b5-4e75-a637-0b260adf830c
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 19:15:00+00:00
+----------------------------------------
+
+Instruction #63:
+  Timestep: 62
+  Time: 2025-11-05 19:20:00+00:00
+  ID: 1d97a5c4-a9e0-45af-a9d6-4e4cf26c8761
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 19:20:00+00:00
+----------------------------------------
+
+Instruction #64:
+  Timestep: 63
+  Time: 2025-11-05 19:25:00+00:00
+  ID: 3829d685-6937-49e3-b4a6-ad07d3e746b8
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 19:25:00+00:00
+----------------------------------------
+
+Instruction #65:
+  Timestep: 64
+  Time: 2025-11-05 19:30:00+00:00
+  ID: d72cc742-9c90-4396-86fd-38ccd8c415ca
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 19:30:00+00:00
+----------------------------------------
+
+Instruction #66:
+  Timestep: 65
+  Time: 2025-11-05 19:35:00+00:00
+  ID: 069e1529-4ed2-4b0d-b387-eaabe3b4780e
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 19:35:00+00:00
+----------------------------------------
+
+Instruction #67:
+  Timestep: 66
+  Time: 2025-11-05 19:40:00+00:00
+  ID: 895dbab8-03a4-40b3-b025-bb7de65acff5
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 19:40:00+00:00
+----------------------------------------
+
+Instruction #68:
+  Timestep: 67
+  Time: 2025-11-05 19:45:00+00:00
+  ID: 542af801-45ca-45c9-9251-e17c5af1ec72
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 19:45:00+00:00
+----------------------------------------
+
+Instruction #69:
+  Timestep: 68
+  Time: 2025-11-05 19:50:00+00:00
+  ID: a1848f10-077d-45d8-939d-89eaadb6806e
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 19:50:00+00:00
+----------------------------------------
+
+Instruction #70:
+  Timestep: 69
+  Time: 2025-11-05 19:55:00+00:00
+  ID: 4d3ead0b-2a8f-4828-81d8-0cfb2dbd3975
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 19:55:00+00:00
+----------------------------------------
+
+Instruction #71:
+  Timestep: 70
+  Time: 2025-11-05 20:00:00+00:00
+  ID: adad14b2-e3d1-44b2-8f8b-0050819e6234
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 20:00:00+00:00
+----------------------------------------
+
+Instruction #72:
+  Timestep: 71
+  Time: 2025-11-05 20:05:00+00:00
+  ID: 19e61a9d-043d-4199-87b3-c5d914eb5f47
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 20:05:00+00:00
+----------------------------------------
+
+Instruction #73:
+  Timestep: 72
+  Time: 2025-11-05 20:10:00+00:00
+  ID: e6021c41-4103-426a-8765-721389c36454
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 20:10:00+00:00
+----------------------------------------
+
+Instruction #74:
+  Timestep: 73
+  Time: 2025-11-05 20:15:00+00:00
+  ID: 2f6d3baf-7096-4f1e-84ff-4c49058121f4
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 20:15:00+00:00
+----------------------------------------
+
+Instruction #75:
+  Timestep: 74
+  Time: 2025-11-05 20:20:00+00:00
+  ID: 20ca2a82-c841-4405-bafd-bf001fd8a526
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 20:20:00+00:00
+----------------------------------------
+
+Instruction #76:
+  Timestep: 75
+  Time: 2025-11-05 20:25:00+00:00
+  ID: 0e181ea6-6ef3-4876-8702-f1624d0a50dc
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 20:25:00+00:00
+----------------------------------------
+
+Instruction #77:
+  Timestep: 76
+  Time: 2025-11-05 20:30:00+00:00
+  ID: 3e805c7f-7dfe-4f4e-b31c-2b7c96693681
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 20:30:00+00:00
+----------------------------------------
+
+Instruction #78:
+  Timestep: 77
+  Time: 2025-11-05 20:35:00+00:00
+  ID: 2d1711f5-58c3-425d-abd0-ed8bb8e4f309
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 20:35:00+00:00
+----------------------------------------
+
+Instruction #79:
+  Timestep: 78
+  Time: 2025-11-05 20:40:00+00:00
+  ID: 656988d8-7d13-4919-9782-b77939ffcaca
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 20:40:00+00:00
+----------------------------------------
+
+Instruction #80:
+  Timestep: 79
+  Time: 2025-11-05 20:45:00+00:00
+  ID: e586713e-9992-4d94-a28b-06177dcc0da1
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 20:45:00+00:00
+----------------------------------------
+
+Instruction #81:
+  Timestep: 80
+  Time: 2025-11-05 20:50:00+00:00
+  ID: dda8203c-caad-49da-bafc-558c16825a1d
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 20:50:00+00:00
+----------------------------------------
+
+Instruction #82:
+  Timestep: 81
+  Time: 2025-11-05 20:55:00+00:00
+  ID: 7339772a-f20f-4ff1-8397-3ca260a2c152
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 20:55:00+00:00
+----------------------------------------
+
+Instruction #83:
+  Timestep: 82
+  Time: 2025-11-05 21:00:00+00:00
+  ID: 98e5fe7d-07f7-40d3-bae6-c993a9eaaa0b
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 21:00:00+00:00
+----------------------------------------
+
+Instruction #84:
+  Timestep: 83
+  Time: 2025-11-05 21:05:00+00:00
+  ID: f516bdc8-77b6-4732-9b63-fb6533c471e9
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 21:05:00+00:00
+----------------------------------------
+
+Instruction #85:
+  Timestep: 84
+  Time: 2025-11-05 21:10:00+00:00
+  ID: 0404a191-f425-4977-87f3-210f74d2a49a
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 21:10:00+00:00
+----------------------------------------
+
+Instruction #86:
+  Timestep: 85
+  Time: 2025-11-05 21:15:00+00:00
+  ID: d6c0ec61-7ee5-4382-a700-1f033365bb83
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 21:15:00+00:00
+----------------------------------------
+
+Instruction #87:
+  Timestep: 86
+  Time: 2025-11-05 21:20:00+00:00
+  ID: cbb03cc2-1d4f-4e35-a385-3501d8f2aa26
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 21:20:00+00:00
+----------------------------------------
+
+Instruction #88:
+  Timestep: 87
+  Time: 2025-11-05 21:25:00+00:00
+  ID: 10b0ecb2-715b-476e-85e5-395731d782f4
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 21:25:00+00:00
+----------------------------------------
+
+Instruction #89:
+  Timestep: 88
+  Time: 2025-11-05 21:30:00+00:00
+  ID: 48c73627-8ddf-44ac-9e04-1536a94d6923
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 21:30:00+00:00
+----------------------------------------
+
+Instruction #90:
+  Timestep: 89
+  Time: 2025-11-05 21:35:00+00:00
+  ID: c23e2d55-ff8c-4257-89b3-a52f83f049b3
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 21:35:00+00:00
+----------------------------------------
+
+Instruction #91:
+  Timestep: 90
+  Time: 2025-11-05 21:40:00+00:00
+  ID: 92179365-fc76-44b1-b02c-4903552930c0
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 21:40:00+00:00
+----------------------------------------
+
+Instruction #92:
+  Timestep: 91
+  Time: 2025-11-05 21:45:00+00:00
+  ID: fda08542-2b94-4b14-9b7a-8818d7d8742d
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 21:45:00+00:00
+----------------------------------------
+
+Instruction #93:
+  Timestep: 92
+  Time: 2025-11-05 21:50:00+00:00
+  ID: c25151aa-20bb-42c8-81ef-fdd90bcc76d6
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 21:50:00+00:00
+----------------------------------------
+
+Instruction #94:
+  Timestep: 93
+  Time: 2025-11-05 21:55:00+00:00
+  ID: 6302cc46-6e5d-4b9d-96b5-ec83bd4ba19e
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 21:55:00+00:00
+----------------------------------------
+
+Instruction #95:
+  Timestep: 94
+  Time: 2025-11-05 22:00:00+00:00
+  ID: 812b8c68-35f6-4b10-91da-84d60863b015
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 22:00:00+00:00
+----------------------------------------
+
+Instruction #96:
+  Timestep: 95
+  Time: 2025-11-05 22:05:00+00:00
+  ID: fa8f903c-ae41-4b84-bae4-89d5312968c7
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 22:05:00+00:00
+----------------------------------------
+
+Instruction #97:
+  Timestep: 96
+  Time: 2025-11-05 22:10:00+00:00
+  ID: 52da8785-a1ed-4d5f-bf65-a2ec5a3101ec
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 22:10:00+00:00
+----------------------------------------
+
+Instruction #98:
+  Timestep: 97
+  Time: 2025-11-05 22:15:00+00:00
+  ID: 116c6cc1-c5fc-4481-b3bb-f6abfc2d549f
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 22:15:00+00:00
+----------------------------------------
+
+Instruction #99:
+  Timestep: 98
+  Time: 2025-11-05 22:20:00+00:00
+  ID: 6c78a1b8-94dc-4391-ada3-5f54c11c39d5
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 22:20:00+00:00
+----------------------------------------
+
+Instruction #100:
+  Timestep: 99
+  Time: 2025-11-05 22:25:00+00:00
+  ID: 5ffba73d-299a-4a9e-bd8c-cc6fe816cbe1
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 22:25:00+00:00
+----------------------------------------
+
+Instruction #101:
+  Timestep: 100
+  Time: 2025-11-05 22:30:00+00:00
+  ID: 545f7466-5dae-4d75-a694-057bae68edf6
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 22:30:00+00:00
+----------------------------------------
+
+Instruction #102:
+  Timestep: 101
+  Time: 2025-11-05 22:35:00+00:00
+  ID: bea09ea9-ad25-430b-a978-94a85c49a2ed
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 22:35:00+00:00
+----------------------------------------
+
+Instruction #103:
+  Timestep: 102
+  Time: 2025-11-05 22:40:00+00:00
+  ID: 97fafde2-7237-4398-921a-faebb10d443b
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 22:40:00+00:00
+----------------------------------------
+
+Instruction #104:
+  Timestep: 103
+  Time: 2025-11-05 22:45:00+00:00
+  ID: e1458564-27e5-4184-b9b7-fa61da8446a0
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 22:45:00+00:00
+----------------------------------------
+
+Instruction #105:
+  Timestep: 104
+  Time: 2025-11-05 22:50:00+00:00
+  ID: 9f802d9e-a74b-4b8d-80ce-e991c8b788f8
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 22:50:00+00:00
+----------------------------------------
+
+Instruction #106:
+  Timestep: 105
+  Time: 2025-11-05 22:55:00+00:00
+  ID: a3f86417-33ae-4e6f-bcab-a7563d755632
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 22:55:00+00:00
+----------------------------------------
+
+Instruction #107:
+  Timestep: 106
+  Time: 2025-11-05 23:00:00+00:00
+  ID: 40f35609-75a0-407f-ac08-cd8e28f95c67
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 23:00:00+00:00
+----------------------------------------
+
+Instruction #108:
+  Timestep: 107
+  Time: 2025-11-05 23:05:00+00:00
+  ID: 029862fa-4b41-47df-9008-149ffcb640c1
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 23:05:00+00:00
+----------------------------------------
+
+Instruction #109:
+  Timestep: 108
+  Time: 2025-11-05 23:10:00+00:00
+  ID: 4875bff6-ea9d-47a3-a0ee-51ec0d282060
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 23:10:00+00:00
+----------------------------------------
+
+Instruction #110:
+  Timestep: 109
+  Time: 2025-11-05 23:15:00+00:00
+  ID: bdcd95f1-4cb0-404d-aa97-9871ab571095
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 23:15:00+00:00
+----------------------------------------
+
+Instruction #111:
+  Timestep: 110
+  Time: 2025-11-05 23:20:00+00:00
+  ID: 26474c0c-7a0d-48e9-8d93-458281a59bc8
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 23:20:00+00:00
+----------------------------------------
+
+Instruction #112:
+  Timestep: 111
+  Time: 2025-11-05 23:25:00+00:00
+  ID: aa63520d-2310-4008-914a-a78e41b84b34
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 23:25:00+00:00
+----------------------------------------
+
+Instruction #113:
+  Timestep: 112
+  Time: 2025-11-05 23:30:00+00:00
+  ID: 1e73c7ca-352d-4e4b-9616-d3672c8d7458
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 23:30:00+00:00
+----------------------------------------
+
+Instruction #114:
+  Timestep: 113
+  Time: 2025-11-05 23:35:00+00:00
+  ID: 61336d94-29ec-4cc9-807e-60f81e127af0
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 23:35:00+00:00
+----------------------------------------
+
+Instruction #115:
+  Timestep: 114
+  Time: 2025-11-05 23:40:00+00:00
+  ID: d2163c19-b873-463d-8967-7b4782e3d69d
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 23:40:00+00:00
+----------------------------------------
+
+Instruction #116:
+  Timestep: 115
+  Time: 2025-11-05 23:45:00+00:00
+  ID: 60c4558a-7d7a-46c2-93c6-2cb4b7ed92fc
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 23:45:00+00:00
+----------------------------------------
+
+Instruction #117:
+  Timestep: 116
+  Time: 2025-11-05 23:50:00+00:00
+  ID: e56926b3-b030-4a5a-8c5a-d9803fa7dbf4
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 23:50:00+00:00
+----------------------------------------
+
+Instruction #118:
+  Timestep: 117
+  Time: 2025-11-05 23:55:00+00:00
+  ID: 0ff229c9-e308-42b5-a0ee-2ad0710f03c6
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-05 23:55:00+00:00
+----------------------------------------
+
+Instruction #119:
+  Timestep: 118
+  Time: 2025-11-06 00:00:00+00:00
+  ID: 3d50027c-0020-47f3-a94e-3c1672c8d5bd
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 00:00:00+00:00
+----------------------------------------
+
+Instruction #120:
+  Timestep: 119
+  Time: 2025-11-06 00:05:00+00:00
+  ID: da8eef38-2dba-48c8-8982-c44cc4823d5f
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 00:05:00+00:00
+----------------------------------------
+
+Instruction #121:
+  Timestep: 120
+  Time: 2025-11-06 00:10:00+00:00
+  ID: 6e3c77ab-6745-46a5-83f7-74e676ffa5b0
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 00:10:00+00:00
+----------------------------------------
+
+Instruction #122:
+  Timestep: 121
+  Time: 2025-11-06 00:15:00+00:00
+  ID: 498ba0a9-43f5-47fc-96b4-6e0e92b49846
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 00:15:00+00:00
+----------------------------------------
+
+Instruction #123:
+  Timestep: 122
+  Time: 2025-11-06 00:20:00+00:00
+  ID: e6feea40-81b8-4aba-aa9a-43f36ac8cab1
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 00:20:00+00:00
+----------------------------------------
+
+Instruction #124:
+  Timestep: 123
+  Time: 2025-11-06 00:25:00+00:00
+  ID: 7aed39a9-fda9-4214-b7d3-d38843c33389
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 00:25:00+00:00
+----------------------------------------
+
+Instruction #125:
+  Timestep: 124
+  Time: 2025-11-06 00:30:00+00:00
+  ID: 7e426f16-8f44-469a-90f8-96da1cbd68e2
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 00:30:00+00:00
+----------------------------------------
+
+Instruction #126:
+  Timestep: 125
+  Time: 2025-11-06 00:35:00+00:00
+  ID: eaf5897b-75ae-404e-af7d-79802e817de2
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 00:35:00+00:00
+----------------------------------------
+
+Instruction #127:
+  Timestep: 126
+  Time: 2025-11-06 00:40:00+00:00
+  ID: b3ee2c82-4adb-4ea5-9338-9c5c4bf7bc40
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 00:40:00+00:00
+----------------------------------------
+
+Instruction #128:
+  Timestep: 127
+  Time: 2025-11-06 00:45:00+00:00
+  ID: eb88cee9-ff83-4339-aa4f-9b76bcb5c6af
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 00:45:00+00:00
+----------------------------------------
+
+Instruction #129:
+  Timestep: 128
+  Time: 2025-11-06 00:50:00+00:00
+  ID: 9333baf2-2ff2-4853-aed3-1dd07baf1281
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 00:50:00+00:00
+----------------------------------------
+
+Instruction #130:
+  Timestep: 129
+  Time: 2025-11-06 00:55:00+00:00
+  ID: cc48ea9c-2b4f-46e9-8365-2aae75deacaf
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 00:55:00+00:00
+----------------------------------------
+
+Instruction #131:
+  Timestep: 130
+  Time: 2025-11-06 01:00:00+00:00
+  ID: 69229eaf-f42e-4b3f-b2d6-0126cbf7fcc5
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 01:00:00+00:00
+----------------------------------------
+
+Instruction #132:
+  Timestep: 131
+  Time: 2025-11-06 01:05:00+00:00
+  ID: 73938aac-f889-4f8f-8188-597bde222bc7
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 01:05:00+00:00
+----------------------------------------
+
+Instruction #133:
+  Timestep: 132
+  Time: 2025-11-06 01:10:00+00:00
+  ID: daa6590c-079f-4b3e-92e6-1282a2481043
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 01:10:00+00:00
+----------------------------------------
+
+Instruction #134:
+  Timestep: 133
+  Time: 2025-11-06 01:15:00+00:00
+  ID: 157ba8bb-85fd-42bb-b71a-57941953847e
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 01:15:00+00:00
+----------------------------------------
+
+Instruction #135:
+  Timestep: 134
+  Time: 2025-11-06 01:20:00+00:00
+  ID: 4a53341a-59f8-485a-920e-15203a38ce0e
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 01:20:00+00:00
+----------------------------------------
+
+Instruction #136:
+  Timestep: 135
+  Time: 2025-11-06 01:25:00+00:00
+  ID: f7fbd8ff-4a1c-430c-bf56-347c1ee83150
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 01:25:00+00:00
+----------------------------------------
+
+Instruction #137:
+  Timestep: 136
+  Time: 2025-11-06 01:30:00+00:00
+  ID: 4cf7c322-899d-4432-a55c-99e0244e5dac
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 01:30:00+00:00
+----------------------------------------
+
+Instruction #138:
+  Timestep: 137
+  Time: 2025-11-06 01:35:00+00:00
+  ID: 5c6b12d8-36fb-432a-b5a9-95ef1b9b3bc2
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 01:35:00+00:00
+----------------------------------------
+
+Instruction #139:
+  Timestep: 138
+  Time: 2025-11-06 01:40:00+00:00
+  ID: 11c691cd-58a0-420e-8d65-e811629085a0
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 01:40:00+00:00
+----------------------------------------
+
+Instruction #140:
+  Timestep: 139
+  Time: 2025-11-06 01:45:00+00:00
+  ID: 9d43b5b9-e303-48ea-a56c-1cb090ade2d5
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 01:45:00+00:00
+----------------------------------------
+
+Instruction #141:
+  Timestep: 140
+  Time: 2025-11-06 01:50:00+00:00
+  ID: 64d5f716-145b-4efd-a6bb-7d607b94af8e
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 01:50:00+00:00
+----------------------------------------
+
+Instruction #142:
+  Timestep: 141
+  Time: 2025-11-06 01:55:00+00:00
+  ID: c66e358a-efdb-486a-a800-ffd8bf7eca81
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 01:55:00+00:00
+----------------------------------------
+
+Instruction #143:
+  Timestep: 142
+  Time: 2025-11-06 02:00:00+00:00
+  ID: 8a6bedad-74c7-461b-a865-b47e3081f47f
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 02:00:00+00:00
+----------------------------------------
+
+Instruction #144:
+  Timestep: 143
+  Time: 2025-11-06 02:05:00+00:00
+  ID: 52192718-7125-4531-82a0-58c4101f8372
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 02:05:00+00:00
+----------------------------------------
+
+Instruction #145:
+  Timestep: 144
+  Time: 2025-11-06 02:10:00+00:00
+  ID: 76cccdf4-81f8-4ed4-b29d-51d844357724
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 02:10:00+00:00
+----------------------------------------
+
+Instruction #146:
+  Timestep: 145
+  Time: 2025-11-06 02:15:00+00:00
+  ID: 68781f1f-73ae-4a8e-8a2f-d07ce7972187
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 02:15:00+00:00
+----------------------------------------
+
+Instruction #147:
+  Timestep: 146
+  Time: 2025-11-06 02:20:00+00:00
+  ID: 324c6036-69de-4e32-9b44-35f214251b32
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 02:20:00+00:00
+----------------------------------------
+
+Instruction #148:
+  Timestep: 147
+  Time: 2025-11-06 02:25:00+00:00
+  ID: 564dbf95-7d57-4674-959b-6df6c98bd6d2
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 02:25:00+00:00
+----------------------------------------
+
+Instruction #149:
+  Timestep: 148
+  Time: 2025-11-06 02:30:00+00:00
+  ID: 3c87fe4c-4810-4659-adb0-e436e72f98a0
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 02:30:00+00:00
+----------------------------------------
+
+Instruction #150:
+  Timestep: 149
+  Time: 2025-11-06 02:35:00+00:00
+  ID: d7505a1a-60d3-450a-b2a3-be598ce3ddbc
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 02:35:00+00:00
+----------------------------------------
+
+Instruction #151:
+  Timestep: 150
+  Time: 2025-11-06 02:40:00+00:00
+  ID: ecc38d26-5904-41bf-bd73-53547d66d84a
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 02:40:00+00:00
+----------------------------------------
+
+Instruction #152:
+  Timestep: 151
+  Time: 2025-11-06 02:45:00+00:00
+  ID: 99f1cb77-2654-4f5d-aa51-16ef38a8f893
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 02:45:00+00:00
+----------------------------------------
+
+Instruction #153:
+  Timestep: 152
+  Time: 2025-11-06 02:50:00+00:00
+  ID: 1c6e279f-d6ca-4a29-9483-bbf9e346ae4f
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 02:50:00+00:00
+----------------------------------------
+
+Instruction #154:
+  Timestep: 153
+  Time: 2025-11-06 02:55:00+00:00
+  ID: 01265509-b920-4a4a-b047-a1208e968535
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 02:55:00+00:00
+----------------------------------------
+
+Instruction #155:
+  Timestep: 154
+  Time: 2025-11-06 03:00:00+00:00
+  ID: eb8d9bc8-b3ec-48c6-a69d-d7a2288b978f
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 03:00:00+00:00
+----------------------------------------
+
+Instruction #156:
+  Timestep: 155
+  Time: 2025-11-06 03:05:00+00:00
+  ID: 4aa8c290-77bf-4540-b462-ee59e69bf0ed
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 03:05:00+00:00
+----------------------------------------
+
+Instruction #157:
+  Timestep: 156
+  Time: 2025-11-06 03:10:00+00:00
+  ID: 4c4bf144-ca55-48ef-b719-03f7d04e94a9
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 03:10:00+00:00
+----------------------------------------
+
+Instruction #158:
+  Timestep: 157
+  Time: 2025-11-06 03:15:00+00:00
+  ID: 1ecca388-821c-4a70-af43-d3b3ed546ad7
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 03:15:00+00:00
+----------------------------------------
+
+Instruction #159:
+  Timestep: 158
+  Time: 2025-11-06 03:20:00+00:00
+  ID: 51230534-a7ed-4fae-b294-4a45aece98aa
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 03:20:00+00:00
+----------------------------------------
+
+Instruction #160:
+  Timestep: 159
+  Time: 2025-11-06 03:25:00+00:00
+  ID: f1c82e0f-fcd1-4446-8e7c-8f6464f2d2f5
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 03:25:00+00:00
+----------------------------------------
+
+Instruction #161:
+  Timestep: 160
+  Time: 2025-11-06 03:30:00+00:00
+  ID: 1fa099c9-0124-4109-9e36-7321d7eda90c
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 03:30:00+00:00
+----------------------------------------
+
+Instruction #162:
+  Timestep: 161
+  Time: 2025-11-06 03:35:00+00:00
+  ID: 5e9f46ed-cdfa-4ef1-afa4-fe147bb7bb37
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 03:35:00+00:00
+----------------------------------------
+
+Instruction #163:
+  Timestep: 162
+  Time: 2025-11-06 03:40:00+00:00
+  ID: 867348d0-e0b8-4d12-8c24-4d4447b308c1
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 03:40:00+00:00
+----------------------------------------
+
+Instruction #164:
+  Timestep: 163
+  Time: 2025-11-06 03:45:00+00:00
+  ID: c8e9e326-ad5b-4238-867a-ef6011a881be
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 03:45:00+00:00
+----------------------------------------
+
+Instruction #165:
+  Timestep: 164
+  Time: 2025-11-06 03:50:00+00:00
+  ID: 0b6eb68d-1335-4e49-827f-d65f977e44f1
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 03:50:00+00:00
+----------------------------------------
+
+Instruction #166:
+  Timestep: 165
+  Time: 2025-11-06 03:55:00+00:00
+  ID: fc602029-b588-4f6b-a566-581f5d7850e2
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 03:55:00+00:00
+----------------------------------------
+
+Instruction #167:
+  Timestep: 166
+  Time: 2025-11-06 04:00:00+00:00
+  ID: 5348a8bd-4dd2-4d9f-8b27-575ad014b32e
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 04:00:00+00:00
+----------------------------------------
+
+Instruction #168:
+  Timestep: 167
+  Time: 2025-11-06 04:05:00+00:00
+  ID: 257a3cc5-ffd9-4138-bf13-4870ea134c75
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 04:05:00+00:00
+----------------------------------------
+
+Instruction #169:
+  Timestep: 168
+  Time: 2025-11-06 04:10:00+00:00
+  ID: 8418ecec-46f9-49ab-98b1-91570ba32ebf
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 04:10:00+00:00
+----------------------------------------
+
+Instruction #170:
+  Timestep: 169
+  Time: 2025-11-06 04:15:00+00:00
+  ID: 5c1a055f-1767-455b-bbf0-88ebfb2dc659
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 04:15:00+00:00
+----------------------------------------
+
+Instruction #171:
+  Timestep: 170
+  Time: 2025-11-06 04:20:00+00:00
+  ID: 7d9af51f-37b6-449c-8700-8516710604b9
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 04:20:00+00:00
+----------------------------------------
+
+Instruction #172:
+  Timestep: 171
+  Time: 2025-11-06 04:25:00+00:00
+  ID: c580bd49-3414-46b0-97bc-a5e3811a45af
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 04:25:00+00:00
+----------------------------------------
+
+Instruction #173:
+  Timestep: 172
+  Time: 2025-11-06 04:30:00+00:00
+  ID: 5d6c99aa-c324-45fc-9dab-fafd50194509
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 04:30:00+00:00
+----------------------------------------
+
+Instruction #174:
+  Timestep: 173
+  Time: 2025-11-06 04:35:00+00:00
+  ID: 369d8428-4c4b-4709-a89e-bf6e7161877c
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 04:35:00+00:00
+----------------------------------------
+
+Instruction #175:
+  Timestep: 174
+  Time: 2025-11-06 04:40:00+00:00
+  ID: dbac193a-6653-4996-bb2e-89acd5aee35a
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 04:40:00+00:00
+----------------------------------------
+
+Instruction #176:
+  Timestep: 175
+  Time: 2025-11-06 04:45:00+00:00
+  ID: f677e734-c2b1-47f9-afb5-11c116897b7f
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 04:45:00+00:00
+----------------------------------------
+
+Instruction #177:
+  Timestep: 176
+  Time: 2025-11-06 04:50:00+00:00
+  ID: c0239d1f-6520-486f-9928-82bcc6034b42
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 04:50:00+00:00
+----------------------------------------
+
+Instruction #178:
+  Timestep: 177
+  Time: 2025-11-06 04:55:00+00:00
+  ID: 07b9b89f-d30a-48f2-813e-f0eb5dd2a99b
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 04:55:00+00:00
+----------------------------------------
+
+Instruction #179:
+  Timestep: 178
+  Time: 2025-11-06 05:00:00+00:00
+  ID: 16a0e7de-62df-473e-818e-71552ab206bd
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 05:00:00+00:00
+----------------------------------------
+
+Instruction #180:
+  Timestep: 179
+  Time: 2025-11-06 05:05:00+00:00
+  ID: d531138a-7a2c-4807-8504-dd07a9705a72
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 05:05:00+00:00
+----------------------------------------
+
+Instruction #181:
+  Timestep: 180
+  Time: 2025-11-06 05:10:00+00:00
+  ID: ac0ca978-23dc-4f70-b3d4-9a503c94166a
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 05:10:00+00:00
+----------------------------------------
+
+Instruction #182:
+  Timestep: 181
+  Time: 2025-11-06 05:15:00+00:00
+  ID: f6bbb161-98ab-4717-83ad-d8546d245ba4
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 05:15:00+00:00
+----------------------------------------
+
+Instruction #183:
+  Timestep: 182
+  Time: 2025-11-06 05:20:00+00:00
+  ID: a48373b7-168b-413b-82f8-5d94c765d10f
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 05:20:00+00:00
+----------------------------------------
+
+Instruction #184:
+  Timestep: 183
+  Time: 2025-11-06 05:25:00+00:00
+  ID: 617de272-3555-4534-b3c6-acef2c47bb26
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 05:25:00+00:00
+----------------------------------------
+
+Instruction #185:
+  Timestep: 184
+  Time: 2025-11-06 05:30:00+00:00
+  ID: fb5f57a2-00ea-4ffb-8028-f0f4bd5b2aee
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 05:30:00+00:00
+----------------------------------------
+
+Instruction #186:
+  Timestep: 185
+  Time: 2025-11-06 05:35:00+00:00
+  ID: df12081f-e373-44e1-a172-55d4e136b2e7
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 05:35:00+00:00
+----------------------------------------
+
+Instruction #187:
+  Timestep: 186
+  Time: 2025-11-06 05:40:00+00:00
+  ID: 1f652783-fa41-4b42-965f-2674d8eef106
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 05:40:00+00:00
+----------------------------------------
+
+Instruction #188:
+  Timestep: 187
+  Time: 2025-11-06 05:45:00+00:00
+  ID: ab7391df-3d94-44d1-b518-14048a742351
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 05:45:00+00:00
+----------------------------------------
+
+Instruction #189:
+  Timestep: 188
+  Time: 2025-11-06 05:50:00+00:00
+  ID: c9bacd21-278d-45dc-ac54-78a462333f80
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 05:50:00+00:00
+----------------------------------------
+
+Instruction #190:
+  Timestep: 189
+  Time: 2025-11-06 05:55:00+00:00
+  ID: 76ad44e5-2686-4778-b615-712d2fb29670
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 05:55:00+00:00
+----------------------------------------
+
+Instruction #191:
+  Timestep: 190
+  Time: 2025-11-06 06:00:00+00:00
+  ID: 91a05fd2-37cd-4f2d-81c8-65e04e2943a1
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 06:00:00+00:00
+----------------------------------------
+
+Instruction #192:
+  Timestep: 191
+  Time: 2025-11-06 06:05:00+00:00
+  ID: ccfae7c9-e73b-49cd-addf-e18e53293036
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 06:05:00+00:00
+----------------------------------------
+
+Instruction #193:
+  Timestep: 192
+  Time: 2025-11-06 06:10:00+00:00
+  ID: 7b57d126-70ac-4088-bc18-3ff32dc9e5ac
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 06:10:00+00:00
+----------------------------------------
+
+Instruction #194:
+  Timestep: 193
+  Time: 2025-11-06 06:15:00+00:00
+  ID: 16cbf763-18cf-402a-a844-628e14b027ca
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 06:15:00+00:00
+----------------------------------------
+
+Instruction #195:
+  Timestep: 194
+  Time: 2025-11-06 06:20:00+00:00
+  ID: 33f8fe77-202e-49cd-b0d9-bf05f4e5a93d
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 06:20:00+00:00
+----------------------------------------
+
+Instruction #196:
+  Timestep: 195
+  Time: 2025-11-06 06:25:00+00:00
+  ID: bdfb055e-6a1e-45f1-8a0a-c1c41fc8d8c8
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 06:25:00+00:00
+----------------------------------------
+
+Instruction #197:
+  Timestep: 196
+  Time: 2025-11-06 06:30:00+00:00
+  ID: 36308266-a5e4-4fa4-8e1d-af917f8296c8
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 06:30:00+00:00
+----------------------------------------
+
+Instruction #198:
+  Timestep: 197
+  Time: 2025-11-06 06:35:00+00:00
+  ID: d94f7c4c-572e-4183-8329-a1a638ba3854
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 06:35:00+00:00
+----------------------------------------
+
+Instruction #199:
+  Timestep: 198
+  Time: 2025-11-06 06:40:00+00:00
+  ID: 1378be99-5233-48fc-ba95-b90aa03db619
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 06:40:00+00:00
+----------------------------------------
+
+Instruction #200:
+  Timestep: 199
+  Time: 2025-11-06 06:45:00+00:00
+  ID: 8a5bf51c-450e-4c49-ade3-421443f8f865
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 06:45:00+00:00
+----------------------------------------
+
+Instruction #201:
+  Timestep: 200
+  Time: 2025-11-06 06:50:00+00:00
+  ID: b9d3665d-593f-4da9-be5e-c1ee86cf9713
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 06:50:00+00:00
+----------------------------------------
+
+Instruction #202:
+  Timestep: 201
+  Time: 2025-11-06 06:55:00+00:00
+  ID: 7d2e0d74-70fc-4bf1-8a69-84c68eb41809
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 06:55:00+00:00
+----------------------------------------
+
+Instruction #203:
+  Timestep: 202
+  Time: 2025-11-06 07:00:00+00:00
+  ID: 984bf498-c8e8-4631-a743-a22dc9679616
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 07:00:00+00:00
+----------------------------------------
+
+Instruction #204:
+  Timestep: 203
+  Time: 2025-11-06 07:05:00+00:00
+  ID: 9095b838-1bf5-43b2-9ce1-7365142e9935
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 07:05:00+00:00
+----------------------------------------
+
+Instruction #205:
+  Timestep: 204
+  Time: 2025-11-06 07:10:00+00:00
+  ID: 39357caf-91cb-471c-b776-c80a44e47a89
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 07:10:00+00:00
+----------------------------------------
+
+Instruction #206:
+  Timestep: 205
+  Time: 2025-11-06 07:15:00+00:00
+  ID: c6deecbd-ee86-484b-afe9-8a38a6e72c10
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 07:15:00+00:00
+----------------------------------------
+
+Instruction #207:
+  Timestep: 206
+  Time: 2025-11-06 07:20:00+00:00
+  ID: 58c8bfa8-cb4c-40dc-88fb-9dfaec98f7eb
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 07:20:00+00:00
+----------------------------------------
+
+Instruction #208:
+  Timestep: 207
+  Time: 2025-11-06 07:25:00+00:00
+  ID: e0d10bf7-7035-4abe-a729-ac4dd38ad031
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 07:25:00+00:00
+----------------------------------------
+
+Instruction #209:
+  Timestep: 208
+  Time: 2025-11-06 07:30:00+00:00
+  ID: 3818fbf4-ba0b-4927-a07d-89a62eac2fbb
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_ON
+  Operation Mode ID: 31314092-4456-43f8-89dd-0421194bc821
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 07:30:00+00:00
+----------------------------------------
+
+Instruction #210:
+  Timestep: 209
+  Time: 2025-11-06 07:35:00+00:00
+  ID: 649f00fa-8583-4631-be3d-2316780c9311
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 07:35:00+00:00
+----------------------------------------
+
+Instruction #211:
+  Timestep: 210
+  Time: 2025-11-06 07:40:00+00:00
+  ID: 52b3a9e2-c96a-4e01-8030-dea7cbca29bd
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 07:40:00+00:00
+----------------------------------------
+
+Instruction #212:
+  Timestep: 211
+  Time: 2025-11-06 07:45:00+00:00
+  ID: c0849362-503e-4b01-9ad8-a02c9f336599
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 07:45:00+00:00
+----------------------------------------
+
+Instruction #213:
+  Timestep: 212
+  Time: 2025-11-06 07:50:00+00:00
+  ID: b38fca6b-7460-46a7-b8f8-f9f241c9bafd
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 07:50:00+00:00
+----------------------------------------
+
+Instruction #214:
+  Timestep: 213
+  Time: 2025-11-06 07:55:00+00:00
+  ID: e3afcc3d-5e02-4a0d-8158-fb77c0ca509f
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 07:55:00+00:00
+----------------------------------------
+
+Instruction #215:
+  Timestep: 214
+  Time: 2025-11-06 08:00:00+00:00
+  ID: bfea6500-1470-41ef-9044-5e41a762b7fb
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 08:00:00+00:00
+----------------------------------------
+
+Instruction #216:
+  Timestep: 215
+  Time: 2025-11-06 08:05:00+00:00
+  ID: 05d7cccb-d4a6-4113-bd71-fb7943a467b7
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 08:05:00+00:00
+----------------------------------------
+
+Instruction #217:
+  Timestep: 216
+  Time: 2025-11-06 08:10:00+00:00
+  ID: d9bd37c8-94e5-46da-97a5-f521e0801aae
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 08:10:00+00:00
+----------------------------------------
+
+Instruction #218:
+  Timestep: 217
+  Time: 2025-11-06 08:15:00+00:00
+  ID: a29900fd-740b-46bb-87a7-8ae1b05e5057
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 08:15:00+00:00
+----------------------------------------
+
+Instruction #219:
+  Timestep: 218
+  Time: 2025-11-06 08:20:00+00:00
+  ID: 9341fa89-4798-490c-be37-31846f9e149b
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 08:20:00+00:00
+----------------------------------------
+
+Instruction #220:
+  Timestep: 219
+  Time: 2025-11-06 08:25:00+00:00
+  ID: 40ad3695-2aad-4947-8369-eab0c933f1b5
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 08:25:00+00:00
+----------------------------------------
+
+Instruction #221:
+  Timestep: 220
+  Time: 2025-11-06 08:30:00+00:00
+  ID: dd57595d-d860-44ef-adc6-b10a0aff7fe6
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 08:30:00+00:00
+----------------------------------------
+
+Instruction #222:
+  Timestep: 221
+  Time: 2025-11-06 08:35:00+00:00
+  ID: 7dee7c2f-6fc0-4098-b24b-cf6367b2be53
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 08:35:00+00:00
+----------------------------------------
+
+Instruction #223:
+  Timestep: 222
+  Time: 2025-11-06 08:40:00+00:00
+  ID: d0db5447-7585-43da-9a7a-b6bcc6307960
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 08:40:00+00:00
+----------------------------------------
+
+Instruction #224:
+  Timestep: 223
+  Time: 2025-11-06 08:45:00+00:00
+  ID: 5c832413-0dfa-4ef9-934b-eea951b7fe93
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 08:45:00+00:00
+----------------------------------------
+
+Instruction #225:
+  Timestep: 224
+  Time: 2025-11-06 08:50:00+00:00
+  ID: 3a4cdf54-5584-47b3-b2af-4179167a5596
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 08:50:00+00:00
+----------------------------------------
+
+Instruction #226:
+  Timestep: 225
+  Time: 2025-11-06 08:55:00+00:00
+  ID: 67c8f614-c930-4c31-a59e-fc488a0afb93
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 08:55:00+00:00
+----------------------------------------
+
+Instruction #227:
+  Timestep: 226
+  Time: 2025-11-06 09:00:00+00:00
+  ID: 5004bad1-8a64-49a2-8b8e-51a1199fcb82
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 09:00:00+00:00
+----------------------------------------
+
+Instruction #228:
+  Timestep: 227
+  Time: 2025-11-06 09:05:00+00:00
+  ID: bf584a0d-6d86-43b3-9302-50ab5f558d57
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 09:05:00+00:00
+----------------------------------------
+
+Instruction #229:
+  Timestep: 228
+  Time: 2025-11-06 09:10:00+00:00
+  ID: 943a3e62-e1e5-4a06-9b3c-da7b533fc7b2
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 09:10:00+00:00
+----------------------------------------
+
+Instruction #230:
+  Timestep: 229
+  Time: 2025-11-06 09:15:00+00:00
+  ID: 1a8b6ed6-bb39-4e3c-9266-b645a3b608ba
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 09:15:00+00:00
+----------------------------------------
+
+Instruction #231:
+  Timestep: 230
+  Time: 2025-11-06 09:20:00+00:00
+  ID: 1a6256da-3344-434c-bdb8-2364f0c4bfd1
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 09:20:00+00:00
+----------------------------------------
+
+Instruction #232:
+  Timestep: 231
+  Time: 2025-11-06 09:25:00+00:00
+  ID: 75ca5c13-4f8f-41b7-b0d1-671ab2c14045
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 09:25:00+00:00
+----------------------------------------
+
+Instruction #233:
+  Timestep: 232
+  Time: 2025-11-06 09:30:00+00:00
+  ID: 7bd3f610-7aeb-4a81-b1d3-098f68cc94e3
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 09:30:00+00:00
+----------------------------------------
+
+Instruction #234:
+  Timestep: 233
+  Time: 2025-11-06 09:35:00+00:00
+  ID: 3886258a-3e9c-405f-98ca-b464faf02482
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 09:35:00+00:00
+----------------------------------------
+
+Instruction #235:
+  Timestep: 234
+  Time: 2025-11-06 09:40:00+00:00
+  ID: fb48ab2e-748d-4a03-acf5-b045845a0b93
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 09:40:00+00:00
+----------------------------------------
+
+Instruction #236:
+  Timestep: 235
+  Time: 2025-11-06 09:45:00+00:00
+  ID: 61b9a444-2c4c-4422-99b6-843768eb4673
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 09:45:00+00:00
+----------------------------------------
+
+Instruction #237:
+  Timestep: 236
+  Time: 2025-11-06 09:50:00+00:00
+  ID: fffc1575-9c67-4e7b-810a-15d0b0239b63
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 09:50:00+00:00
+----------------------------------------
+
+Instruction #238:
+  Timestep: 237
+  Time: 2025-11-06 09:55:00+00:00
+  ID: 71ef5036-08de-4283-80d8-446a2770f82b
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 09:55:00+00:00
+----------------------------------------
+
+Instruction #239:
+  Timestep: 238
+  Time: 2025-11-06 10:00:00+00:00
+  ID: c8ff4eca-7337-49fe-bbdf-2ff36cce9021
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 10:00:00+00:00
+----------------------------------------
+
+Instruction #240:
+  Timestep: 239
+  Time: 2025-11-06 10:05:00+00:00
+  ID: 6537b669-7c97-43a2-b721-fb5d35c6928c
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 10:05:00+00:00
+----------------------------------------
+
+Instruction #241:
+  Timestep: 240
+  Time: 2025-11-06 10:10:00+00:00
+  ID: ce4fafa5-ecdb-4d9a-b790-c9374635b62e
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 10:10:00+00:00
+----------------------------------------
+
+Instruction #242:
+  Timestep: 241
+  Time: 2025-11-06 10:15:00+00:00
+  ID: 5517ce79-66de-4dc8-a99a-a29ddd0951e9
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 10:15:00+00:00
+----------------------------------------
+
+Instruction #243:
+  Timestep: 242
+  Time: 2025-11-06 10:20:00+00:00
+  ID: adc1e21e-d73d-480a-a0cc-2b63ba467c4e
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 10:20:00+00:00
+----------------------------------------
+
+Instruction #244:
+  Timestep: 243
+  Time: 2025-11-06 10:25:00+00:00
+  ID: 2076d7a3-5a00-4fbc-909d-eabba7335530
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 10:25:00+00:00
+----------------------------------------
+
+Instruction #245:
+  Timestep: 244
+  Time: 2025-11-06 10:30:00+00:00
+  ID: a6417141-3e92-46c6-8aa3-fc3d7f83c1a1
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 10:30:00+00:00
+----------------------------------------
+
+Instruction #246:
+  Timestep: 245
+  Time: 2025-11-06 10:35:00+00:00
+  ID: d23b12f2-9600-40d6-ba24-698dfe0c4507
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 10:35:00+00:00
+----------------------------------------
+
+Instruction #247:
+  Timestep: 246
+  Time: 2025-11-06 10:40:00+00:00
+  ID: 8787d207-75a3-4808-a5c5-1ab6f64156ef
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 10:40:00+00:00
+----------------------------------------
+
+Instruction #248:
+  Timestep: 247
+  Time: 2025-11-06 10:45:00+00:00
+  ID: ff0d7a4d-b44a-44d7-b826-87d10b6ee8f5
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 10:45:00+00:00
+----------------------------------------
+
+Instruction #249:
+  Timestep: 248
+  Time: 2025-11-06 10:50:00+00:00
+  ID: 723e1ab3-72b1-45d2-a209-7dc58b3957b3
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 10:50:00+00:00
+----------------------------------------
+
+Instruction #250:
+  Timestep: 249
+  Time: 2025-11-06 10:55:00+00:00
+  ID: 67d70eb2-e77b-40ce-9136-975545373dae
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 10:55:00+00:00
+----------------------------------------
+
+Instruction #251:
+  Timestep: 250
+  Time: 2025-11-06 11:00:00+00:00
+  ID: 0a67383a-9d7f-4007-869f-3128873dc484
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 11:00:00+00:00
+----------------------------------------
+
+Instruction #252:
+  Timestep: 251
+  Time: 2025-11-06 11:05:00+00:00
+  ID: 9a3beea4-43a2-4d6d-ac97-d8c42cac73d1
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 11:05:00+00:00
+----------------------------------------
+
+Instruction #253:
+  Timestep: 252
+  Time: 2025-11-06 11:10:00+00:00
+  ID: 40859fc5-07e9-4ac3-80f0-513f35bc1b8d
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 11:10:00+00:00
+----------------------------------------
+
+Instruction #254:
+  Timestep: 253
+  Time: 2025-11-06 11:15:00+00:00
+  ID: f31a5ba0-8601-443c-8abe-17b113d055bc
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 11:15:00+00:00
+----------------------------------------
+
+Instruction #255:
+  Timestep: 254
+  Time: 2025-11-06 11:20:00+00:00
+  ID: f479043d-1a0b-4769-9c67-8a585e4445d6
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 11:20:00+00:00
+----------------------------------------
+
+Instruction #256:
+  Timestep: 255
+  Time: 2025-11-06 11:25:00+00:00
+  ID: 96d996df-fb76-4e78-a211-6871a7520530
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 11:25:00+00:00
+----------------------------------------
+
+Instruction #257:
+  Timestep: 256
+  Time: 2025-11-06 11:30:00+00:00
+  ID: 71c5cf45-5b9c-4d27-aaf0-914b3e4c66cd
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 11:30:00+00:00
+----------------------------------------
+
+Instruction #258:
+  Timestep: 257
+  Time: 2025-11-06 11:35:00+00:00
+  ID: e36688b2-94f3-41f0-a213-199dfb0d3014
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 11:35:00+00:00
+----------------------------------------
+
+Instruction #259:
+  Timestep: 258
+  Time: 2025-11-06 11:40:00+00:00
+  ID: 8bfab8d2-32d6-4724-be46-57e7cef0ddb6
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 11:40:00+00:00
+----------------------------------------
+
+Instruction #260:
+  Timestep: 259
+  Time: 2025-11-06 11:45:00+00:00
+  ID: 88de47e9-aa5c-4d2f-af95-8b266bd7578c
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 11:45:00+00:00
+----------------------------------------
+
+Instruction #261:
+  Timestep: 260
+  Time: 2025-11-06 11:50:00+00:00
+  ID: fba6b767-8f80-4f14-ba52-9e64affa96b7
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 11:50:00+00:00
+----------------------------------------
+
+Instruction #262:
+  Timestep: 261
+  Time: 2025-11-06 11:55:00+00:00
+  ID: 5eac828e-9d59-410f-bc42-cf7601fffb67
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 11:55:00+00:00
+----------------------------------------
+
+Instruction #263:
+  Timestep: 262
+  Time: 2025-11-06 12:00:00+00:00
+  ID: 87270fb2-7a59-4089-bc03-6f3f7e649d15
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 12:00:00+00:00
+----------------------------------------
+
+Instruction #264:
+  Timestep: 263
+  Time: 2025-11-06 12:05:00+00:00
+  ID: ed3f690a-39ce-4d8b-a203-14a242c0d54d
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 12:05:00+00:00
+----------------------------------------
+
+Instruction #265:
+  Timestep: 264
+  Time: 2025-11-06 12:10:00+00:00
+  ID: 775b15cf-e945-4c3d-9664-75cedc515825
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 12:10:00+00:00
+----------------------------------------
+
+Instruction #266:
+  Timestep: 265
+  Time: 2025-11-06 12:15:00+00:00
+  ID: 1ba0db26-b5ac-4233-9892-0a183c07ed60
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 12:15:00+00:00
+----------------------------------------
+
+Instruction #267:
+  Timestep: 266
+  Time: 2025-11-06 12:20:00+00:00
+  ID: 5150a558-1d0b-4eec-80e6-b01d9c96c59f
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 12:20:00+00:00
+----------------------------------------
+
+Instruction #268:
+  Timestep: 267
+  Time: 2025-11-06 12:25:00+00:00
+  ID: 00487922-a65f-4c67-9657-a69459d19eb7
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 12:25:00+00:00
+----------------------------------------
+
+Instruction #269:
+  Timestep: 268
+  Time: 2025-11-06 12:30:00+00:00
+  ID: 53b11f96-f09d-4304-903d-67de39e6d260
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 12:30:00+00:00
+----------------------------------------
+
+Instruction #270:
+  Timestep: 269
+  Time: 2025-11-06 12:35:00+00:00
+  ID: a9f5dcc8-1c19-46bf-8a84-9b050e07b560
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 12:35:00+00:00
+----------------------------------------
+
+Instruction #271:
+  Timestep: 270
+  Time: 2025-11-06 12:40:00+00:00
+  ID: 7c7cc8d4-7534-423f-b06f-9e4cd7d78fdb
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 12:40:00+00:00
+----------------------------------------
+
+Instruction #272:
+  Timestep: 271
+  Time: 2025-11-06 12:45:00+00:00
+  ID: 580b8807-2df6-4ebd-9335-f84b61c0f1da
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 12:45:00+00:00
+----------------------------------------
+
+Instruction #273:
+  Timestep: 272
+  Time: 2025-11-06 12:50:00+00:00
+  ID: b54b3759-d6a6-43cc-942a-e44a277d74f4
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 12:50:00+00:00
+----------------------------------------
+
+Instruction #274:
+  Timestep: 273
+  Time: 2025-11-06 12:55:00+00:00
+  ID: d9150ee8-9d33-47ab-9a6d-42066263c1da
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 12:55:00+00:00
+----------------------------------------
+
+Instruction #275:
+  Timestep: 274
+  Time: 2025-11-06 13:00:00+00:00
+  ID: 9266f5e2-537d-4f55-9eca-109e4067b6e7
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 13:00:00+00:00
+----------------------------------------
+
+Instruction #276:
+  Timestep: 275
+  Time: 2025-11-06 13:05:00+00:00
+  ID: ad93e9b7-f793-4207-8633-8ddd1225d61b
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 13:05:00+00:00
+----------------------------------------
+
+Instruction #277:
+  Timestep: 276
+  Time: 2025-11-06 13:10:00+00:00
+  ID: c10943db-17d6-4f77-b6fe-a072f7098554
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 13:10:00+00:00
+----------------------------------------
+
+Instruction #278:
+  Timestep: 277
+  Time: 2025-11-06 13:15:00+00:00
+  ID: 2b45be86-a0d4-4a8a-ab8f-848c304d220b
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 13:15:00+00:00
+----------------------------------------
+
+Instruction #279:
+  Timestep: 278
+  Time: 2025-11-06 13:20:00+00:00
+  ID: ca4bd560-3319-4c84-b411-ee0137634b69
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 13:20:00+00:00
+----------------------------------------
+
+Instruction #280:
+  Timestep: 279
+  Time: 2025-11-06 13:25:00+00:00
+  ID: e5d0e58e-30ba-4e71-b969-10d0e9ed84f5
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 13:25:00+00:00
+----------------------------------------
+
+Instruction #281:
+  Timestep: 280
+  Time: 2025-11-06 13:30:00+00:00
+  ID: 83e18688-a642-4d8f-8914-7f1cb2212092
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 13:30:00+00:00
+----------------------------------------
+
+Instruction #282:
+  Timestep: 281
+  Time: 2025-11-06 13:35:00+00:00
+  ID: 36b577a5-0971-4dc2-a3be-e364b305ae86
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 13:35:00+00:00
+----------------------------------------
+
+Instruction #283:
+  Timestep: 282
+  Time: 2025-11-06 13:40:00+00:00
+  ID: a8bdf3b8-0ba8-450f-ac9d-54c7c0bfa2ae
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 13:40:00+00:00
+----------------------------------------
+
+Instruction #284:
+  Timestep: 283
+  Time: 2025-11-06 13:45:00+00:00
+  ID: 2cdcdf7f-4428-45ef-b021-f336768d6a76
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 13:45:00+00:00
+----------------------------------------
+
+Instruction #285:
+  Timestep: 284
+  Time: 2025-11-06 13:50:00+00:00
+  ID: 86f52287-9782-4e2d-a86e-a4a8b501c844
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 13:50:00+00:00
+----------------------------------------
+
+Instruction #286:
+  Timestep: 285
+  Time: 2025-11-06 13:55:00+00:00
+  ID: a725b018-5dce-4fdd-a476-53f583a5f0db
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 13:55:00+00:00
+----------------------------------------
+
+Instruction #287:
+  Timestep: 286
+  Time: 2025-11-06 14:00:00+00:00
+  ID: af427759-40ae-4e32-9acc-caead28d50fc
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 14:00:00+00:00
+----------------------------------------
+
+Instruction #288:
+  Timestep: 287
+  Time: 2025-11-06 14:05:00+00:00
+  ID: 0f5d6517-b80f-4616-89f1-4b54086c1dab
+  Actuator ID: 189f6a58-e78a-4c3f-bcda-6cd151342285
+  Operation Mode: DHW_OFF
+  Operation Mode ID: 959eb2c3-3d92-4ca1-8005-1d9caab972a5
+  Operation Mode Factor: 0.0
+  Execution Time: 2025-11-06 14:05:00+00:00
+----------------------------------------
