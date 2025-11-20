@@ -1,0 +1,50 @@
+from typing import List, Optional
+from flexmeasures_s2.profile_steering.common.abstract_profile import AbstractProfile
+from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
+from datetime import datetime
+
+
+class SoCProfile(AbstractProfile[float, "SoCProfile"]):
+    def __init__(
+        self, profile_metadata: ProfileMetadata, elements: Optional[List[float]] = None
+    ):
+        self.profile_metadata = profile_metadata
+        self.timestep_duration = self.profile_metadata.timestep_duration
+        self.profile_start = self.profile_metadata.profile_start
+        self.profile_end = self.profile_metadata.profile_end
+        super().__init__(
+            self.profile_metadata, elements if elements is not None else []
+        )
+
+    # mypy complains that the return is None
+    def default_value(self) -> None:  # type: ignore
+        return None
+
+    def __str__(self) -> str:
+        return f"SoCProfile(elements={self.elements}, profile_start={self.profile_start}, timestep_duration={self.timestep_duration})"
+
+    def is_compatible(self, other: AbstractProfile) -> bool:
+        return (
+            self.metadata.timestep_duration == other.metadata.timestep_duration
+            and len(self.elements) == len(other.elements)
+        )
+
+    def validate(self, profile_metadata: ProfileMetadata, elements: List[float]):
+        super().validate(profile_metadata, elements)
+
+    def subprofile(self, new_start_date: datetime) -> "SoCProfile":
+        index = self.index_at(new_start_date)
+        if index < 0:
+            raise ValueError("New start date is outside profile range")
+        new_elements = self.elements[index:]
+        return SoCProfile(self.metadata, new_elements)
+
+    def adjust_nr_of_elements(self, nr_of_elements: int) -> "SoCProfile":
+        if nr_of_elements < len(self.elements):
+            new_elements = self.elements[:nr_of_elements]
+        else:
+            new_elements = self.elements + [0.0] * (nr_of_elements - len(self.elements))
+        return SoCProfile(
+            self.metadata,
+            new_elements,
+        )
