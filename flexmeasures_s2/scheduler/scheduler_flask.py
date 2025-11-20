@@ -932,6 +932,7 @@ class S2FlaskScheduler(Scheduler):
                     system_descriptions=[system_desc] if system_desc else [],
                     demand_forecasts=demand_forecasts,
                     actuator_statuses=actuator_statuses,
+                    gas_price_per_m3=2.0,  # €2 per m3 of gas
                 )
 
                 device_states[device_id] = device_state
@@ -971,6 +972,7 @@ class S2FlaskScheduler(Scheduler):
                         system_descriptions=[system_desc] if system_desc else [],
                         demand_forecasts=demand_forecasts,
                         actuator_statuses=actuator_statuses,
+                        gas_price_per_m3=2.0,  # €2 per m3 of gas
                     )
 
                     device_states[device_id] = device_state

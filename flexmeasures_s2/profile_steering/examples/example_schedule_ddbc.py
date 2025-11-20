@@ -209,6 +209,7 @@ def create_hybrid_heating_device_state(
         system_descriptions=[system_description],
         demand_forecasts=[demand_rate_forecast],
         actuator_statuses=actuator_statuses,
+        gas_price_per_m3=2.0,  # €2 per m3 of gas
     )
 
     return device_state
