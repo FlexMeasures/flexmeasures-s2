@@ -42,9 +42,11 @@ from s2python.common import NumberRange, PowerRange, CommodityQuantity, Commodit
 import matplotlib.pyplot as plt
 
 # Configuration parameters
-PLANNING_RESOLUTION = pd.Timedelta("PT5M")  # 5 minutes
-T = 10  # Number of timesteps
-S = 30  # Number of stratification layers (matching FRBC)
+PLANNING_WINDOW = pd.Timedelta("PT24H")
+PLANNING_RESOLUTION = pd.Timedelta("PT1H")
+# S = 30  # Number of stratification layers (matching FRBC) [NOT CURRENTLY USED]
+
+T = PLANNING_WINDOW // PLANNING_RESOLUTION  # number of time steps
 TIMESTEP_DURATION = PLANNING_RESOLUTION / pd.Timedelta("PT1S")
 
 
@@ -293,9 +295,10 @@ def test_ddbc_with_flask_scheduler(
         )
         app.config.setdefault("FLEXMEASURES_S2_PRICE_SENSOR", 2)
 
-        # Start time aligned to 5-minute intervals
+        # Start time aligned to the planning resolution
+        resolution_minutes = PLANNING_RESOLUTION // pd.Timedelta(minutes=1)
         now = datetime.now(timezone.utc)
-        minutes = (now.minute // 5) * 5
+        minutes = (now.minute // resolution_minutes) * resolution_minutes
         start_time = now.replace(minute=minutes, second=0, microsecond=0)
         print(f"Planning start time: {start_time}")
 
