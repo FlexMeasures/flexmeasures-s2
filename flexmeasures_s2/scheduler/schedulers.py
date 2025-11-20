@@ -30,14 +30,6 @@ from flexmeasures_s2.profile_steering.device_planner.nocontrol.s2_nocontrol_devi
 from flexmeasures_s2.profile_steering.device_planner.nocontrol.s2_nocontrol_device_state import (
     S2NoControlDeviceState,
 )
-
-# NoControl planner is on a different branch
-# from flexmeasures_s2.profile_steering.device_planner.nocontrol.s2_nocontrol_device_planner import (
-#     S2NoControlDevicePlanner,
-# )
-# from flexmeasures_s2.profile_steering.device_planner.nocontrol.s2_nocontrol_device_state import (
-#     S2NoControlDeviceState,
-# )
 from flexmeasures_s2.profile_steering.device_planner.ddbc.s2_ddbc_device_planner import (
     S2DdbcDevicePlanner,
 )
@@ -193,15 +185,15 @@ class PlanningServiceImpl(PlanningService):
                         congestion_point,
                     )
                 )
-            # elif isinstance(device_state, S2NoControlDeviceState):
-            #     logger.debug("S2 NoControl planner created!")
-            #     cpc.add_device_controller(
-            #         S2NoControlDevicePlanner(
-            #             device_state,
-            #             target.metadata,
-            #             congestion_point,
-            #         )
-            #     )
+            elif isinstance(device_state, S2NoControlDeviceState):
+                logger.debug("S2 NoControl planner created!")
+                cpc.add_device_controller(
+                    S2NoControlDevicePlanner(
+                        device_state,
+                        target.metadata,
+                        congestion_point,
+                    )
+                )
             elif isinstance(device_state, S2DdbcDeviceState):
                 logger.debug("S2 DDBC planner created!")
                 cpc.add_device_controller(

@@ -1129,17 +1129,17 @@ def test_ddbc_price_tradeoff():
     energy_profile = cluster_plan.get_joule_profile()
 
     # Convert Joules to Watts
-    power_profile_watts = [
-        energy / TIMESTEP_DURATION if energy is not None else 0
-        for energy in energy_profile.elements
-    ]
+    # power_profile_watts = [
+    #     energy / TIMESTEP_DURATION if energy is not None else 0
+    #     for energy in energy_profile.elements
+    # ]
 
     # Extract insights and operation mode factors
     device_plan = device_plans[0] if device_plans else None
     factor_hp = []
     factor_gas = []
-    supply_rates = []
-    demand_rates = [11556.54, 11556.54, 11556.527159385734]
+    # supply_rates = []
+    # demand_rates = [11556.54, 11556.54, 11556.527159385734]
 
     # Get actuator IDs from device state for matching
     hp_actuator_id = None
@@ -1203,18 +1203,18 @@ def test_ddbc_price_tradeoff():
     print(f"\nTotal energy consumption: {total_energy_kwh:.2f} kWh")
 
     # Plot results
-    plot_ddbc_results(
-        timestep_duration=timedelta(seconds=TIMESTEP_DURATION),
-        nr_of_timesteps=profile_length,
-        energy_profile=power_profile_watts,
-        supply_rates=supply_rates if supply_rates else None,
-        demand_rates=demand_rates,
-        factor_hp=factor_hp if factor_hp else None,
-        factor_gas=factor_gas if factor_gas else None,
-        start_time=start_time,
-        suffix="_price_tradeoff",
-        test_name="DDBC Price Tradeoff",
-    )
+    # plot_ddbc_results(
+    #     timestep_duration=timedelta(seconds=TIMESTEP_DURATION),
+    #     nr_of_timesteps=profile_length,
+    #     energy_profile=power_profile_watts,
+    #     supply_rates=supply_rates if supply_rates else None,
+    #     demand_rates=demand_rates,
+    #     factor_hp=factor_hp if factor_hp else None,
+    #     factor_gas=factor_gas if factor_gas else None,
+    #     start_time=start_time,
+    #     suffix="_price_tradeoff",
+    #     test_name="DDBC Price Tradeoff",
+    # )
 
     print("DDBC price tradeoff test completed successfully!")
     return cluster_plan

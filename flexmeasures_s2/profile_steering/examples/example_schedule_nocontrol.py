@@ -6,7 +6,7 @@ import pandas as pd
 import os
 import uuid
 from s2python.common import PowerForecast, PowerValue, CommodityQuantity
-from s2python.common import PowerForecastElement, PowerForecastValue
+from s2python.common import PowerForecastElement, PowerForecastValue, Duration
 from flexmeasures_s2.profile_steering.device_planner.nocontrol.s2_nocontrol_device_state import (
     S2NoControlDeviceState,
 )
@@ -60,7 +60,8 @@ def create_simple_power_forecast(
         )
 
         element = PowerForecastElement(
-            duration=int(timestep_duration), power_values=[power_value]
+            duration=Duration.from_timedelta(timedelta(seconds=timestep_duration)),
+            power_values=[power_value],
         )
         elements.append(element)
 
@@ -161,10 +162,10 @@ def get_target_profile_elements(number_of_elements: int):
     """Create target profile elements."""
     target_elements = []
     target_elements.extend([0] * 38)
-    target_elements.extend([8400000] * 62)
+    target_elements.extend([84000] * 62)
     target_elements.extend([0] * 45)
-    target_elements.extend([8400000] * 28)
-    target_elements.extend([176000000] * 115)
+    target_elements.extend([84000] * 28)
+    target_elements.extend([170000] * 115)
     return target_elements[:number_of_elements]
 
 
