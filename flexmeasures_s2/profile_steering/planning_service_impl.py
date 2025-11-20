@@ -100,7 +100,7 @@ class PlanningServiceImpl(PlanningService):
         """
         self.config = config
         self.context = context
-        logger.info("Planning service initialized")
+        # logger.info("Planning service initialized")
 
     def get_congestion_point(
         self, cluster_state: ClusterState, connection_id: str
@@ -171,7 +171,7 @@ class PlanningServiceImpl(PlanningService):
 
             # Add the appropriate device planner based on the device state type
             if isinstance(device_state, S2FrbcDeviceState):
-                logger.debug("S2 FRBC planner created!")
+                # logger.debug("S2 FRBC planner created!")
                 cpc.add_device_controller(
                     S2FrbcDevicePlanner(
                         device_state,
@@ -221,7 +221,7 @@ class PlanningServiceImpl(PlanningService):
         Returns:
             A ClusterPlan for the cluster
         """
-        start_time = datetime.now()
+        # start_time = datetime.now()
 
         # Make sure that all congestion points in the ClusterState have a target:
         for cp in state.get_congestion_points():
@@ -259,11 +259,11 @@ class PlanningServiceImpl(PlanningService):
             plan_data = ClusterPlanData(device_plans, target.metadata)  # type: ignore[arg-type]
             plan = ClusterPlan(state, target, plan_data, reason, plan_due_by_date, None)
 
-            end_time = datetime.now()
-            execution_time = (
-                end_time - start_time
-            ).total_seconds() * 1000  # Convert to milliseconds
-            logger.info(f"Generated new plan in {execution_time} ms")
+            # end_time = datetime.now()
+            # execution_time = (
+            #     end_time - start_time
+            # ).total_seconds() * 1000  # Convert to milliseconds
+            # logger.info(f"Generated new plan in {execution_time} ms")
 
             return plan
         except Exception as e:

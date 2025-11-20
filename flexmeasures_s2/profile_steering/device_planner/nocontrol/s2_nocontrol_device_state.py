@@ -1,10 +1,14 @@
 from datetime import datetime
 from typing import Optional
-from s2python.common import PowerForecast
-from s2python.generated.gen_s2 import PowerValue
+from s2python.common import PowerForecast, PowerValue
 
 
 class S2NoControlDeviceState:
+    """
+    Device state for devices with no control capabilities.
+    These devices only provide a power forecast and cannot be controlled.
+    """
+
     def __init__(
         self,
         device_id: str,
@@ -24,18 +28,6 @@ class S2NoControlDeviceState:
         self.energy_in_current_timestep = energy_in_current_timestep
         self.is_online = is_online
         self.power_forecast = power_forecast
-
-    def get_device_id(self) -> str:
-        return self.device_id
-
-    def get_device_name(self) -> str:
-        return self.device_name
-
-    def get_connection_id(self) -> str:
-        return self.connection_id
-
-    def get_priority_class(self) -> int:
-        return self.priority_class
 
     def get_power_forecast(self) -> Optional[PowerForecast]:
         return self.power_forecast

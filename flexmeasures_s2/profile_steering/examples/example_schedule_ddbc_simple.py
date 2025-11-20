@@ -1,14 +1,17 @@
+"""
+Simplified DDBC test that uses the simplified device state.
+This test demonstrates DDBC device integration without complex S2 objects.
+"""
+
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 from datetime import datetime, timedelta, timezone
 
 # import time
 import pandas as pd
 import os
-import uuid
-from s2python.common import PowerForecast, PowerValue, CommodityQuantity
-from s2python.common import PowerForecastElement, PowerForecastValue
-from flexmeasures_s2.profile_steering.device_planner.nocontrol.s2_nocontrol_device_state import (
-    S2NoControlDeviceState,
+from s2python.common import PowerValue, CommodityQuantity
+from flexmeasures_s2.profile_steering.device_planner.ddbc.s2_ddbc_device_state import (
+    S2DdbcDeviceState,
 )
 from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
 
@@ -21,76 +24,22 @@ from flexmeasures_s2.scheduler.schedulers import (
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 
-D = 3
-PLANNING_WINDOW = pd.Timedelta("PT24H")
+D = 2  # Number of DDBC devices
+PLANNING_WINDOW = pd.Timedelta("PT2H")  # Shorter window for testing
 PLANNING_RESOLUTION = pd.Timedelta("PT5M")
 
 T = PLANNING_WINDOW // PLANNING_RESOLUTION
 TIMESTEP_DURATION = PLANNING_RESOLUTION / pd.Timedelta("PT1S")
 
 
-def create_simple_power_forecast(
-    start_time: datetime, nr_of_timesteps: int, timestep_duration: float
-) -> PowerForecast:
+def create_ddbc_device_state_simple(
+    device_id: str, start_time: datetime
+) -> S2DdbcDeviceState:
     """
-    Create a simple power forecast with varying consumption.
-    This simulates a device with fixed consumption pattern (e.g., a fridge).
-
-    Args:
-        start_time: When the forecast starts
-        nr_of_timesteps: Number of timesteps
-        timestep_duration: Duration of each timestep in seconds
-
-    Returns:
-        A PowerForecast with a realistic consumption pattern
+    Create a simplified DDBC device state for testing.
+    Uses empty lists for system descriptions and demand forecasts.
     """
-    elements = []
-
-    for i in range(nr_of_timesteps):
-        if i % 12 == 0:
-            power_watts = 150.0
-        elif i % 12 < 3:
-            power_watts = 150.0
-        else:
-            power_watts = 0.0
-
-        power_value = PowerForecastValue(
-            value_expected=power_watts,
-            commodity_quantity=CommodityQuantity.ELECTRIC_POWER_L1,
-        )
-
-        element = PowerForecastElement(
-            duration=int(timestep_duration), power_values=[power_value]
-        )
-        elements.append(element)
-
-    return PowerForecast(
-        message_id=str(uuid.uuid4()),
-        start_time=start_time,
-        elements=elements,
-    )
-
-
-def create_nocontrol_device_state(
-    device_id: str, start_time: datetime, nr_of_timesteps: int, timestep_duration: float
-) -> S2NoControlDeviceState:
-    """
-    Create a nocontrol device state (e.g., for a non-controllable load like a fridge).
-
-    Args:
-        device_id: ID of the device
-        start_time: When the planning starts
-        nr_of_timesteps: Number of timesteps
-        timestep_duration: Duration of each timestep in seconds
-
-    Returns:
-        An S2NoControlDeviceState with a power forecast
-    """
-    power_forecast = create_simple_power_forecast(
-        start_time, nr_of_timesteps, timestep_duration
-    )
-
-    device_state = S2NoControlDeviceState(
+    device_state = S2DdbcDeviceState(
         device_id=device_id,
         device_name=device_id,
         connection_id=device_id + "_connection",
@@ -100,7 +49,10 @@ def create_nocontrol_device_state(
             value=0, commodity_quantity=CommodityQuantity.ELECTRIC_POWER_L1
         ),
         is_online=True,
-        power_forecast=power_forecast,
+        power_forecast=None,  # DDBC devices don't need power forecast
+        system_descriptions=[],  # Simplified: empty list
+        demand_forecasts=[],  # Simplified: empty list
+        gas_price_per_m3=2.0,  # €2 per m3 of gas
     )
     return device_state
 
@@ -112,12 +64,7 @@ def plot_planning_results(
     target_energy_elements,
 ):
     """
-    Plots the energy comparison.
-
-    :param timestep_duration: Duration of each timestep.
-    :param nr_of_timesteps: Number of timesteps.
-    :param predicted_energy_elements: List of predicted energy values.
-    :param target_energy_elements: List of target energy values.
+    Plots the energy comparison for DDBC devices.
     """
     timestep_start_times = [
         datetime(1970, 1, 1, tzinfo=timezone.utc)
@@ -130,8 +77,8 @@ def plot_planning_results(
     ax1.plot(
         timestep_start_times,
         predicted_energy_elements,
-        label="Predicted Energy (NoControl Devices)",
-        color="green",
+        label="Predicted Energy (DDBC Devices)",
+        color="blue",
     )
     ax1.plot(
         timestep_start_times,
@@ -143,34 +90,39 @@ def plot_planning_results(
     )
 
     ax1.set_ylabel("Energy (Joules)")
-    ax1.set_title("Predicted vs Target Energy - NoControl Devices")
+    ax1.set_title("Predicted vs Target Energy - DDBC Devices (Simplified)")
     ax1.legend(loc="best")
     ax1.grid(True)
 
-    ax1.xaxis.set_major_locator(mdates.MinuteLocator(interval=30))
-    ax1.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M:%S"))
+    ax1.xaxis.set_major_locator(mdates.MinuteLocator(interval=15))
+    ax1.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
     fig.autofmt_xdate()
 
     plt.tight_layout()
     os.makedirs("plots", exist_ok=True)
-    plt.savefig(f"plots/nocontrol_plot_D={D}_T={T}.png")
-    # print(f"Plot saved to plots/nocontrol_plot_D={D}_T={T}.png")
+    plt.savefig(f"plots/ddbc_simple_plot_D={D}_T={T}.png")
+    # print(f"Plot saved to plots/ddbc_simple_plot_D={D}_T={T}.png")
 
 
 def get_target_profile_elements(number_of_elements: int):
-    """Create target profile elements."""
+    """Create target profile elements for testing."""
     target_elements = []
-    target_elements.extend([0] * 38)
-    target_elements.extend([8400000] * 62)
-    target_elements.extend([0] * 45)
-    target_elements.extend([8400000] * 28)
-    target_elements.extend([176000000] * 115)
-    return target_elements[:number_of_elements]
+    # Simple varying target for testing
+    for i in range(number_of_elements):
+        if i < number_of_elements // 4:
+            target_elements.append(5000000)  # 5 MJ
+        elif i < number_of_elements // 2:
+            target_elements.append(3000000)  # 3 MJ
+        elif i < 3 * number_of_elements // 4:
+            target_elements.append(2000000)  # 2 MJ
+        else:
+            target_elements.append(4000000)  # 4 MJ
+    return target_elements
 
 
-def test_planning_service_impl_with_nocontrol_devices():
-    """Test the PlanningServiceImpl with nocontrol devices."""
-    # print("Testing PlanningServiceImpl with nocontrol devices")
+def test_planning_service_impl_with_ddbc_devices_simple():
+    """Test the PlanningServiceImpl with simplified DDBC devices."""
+    # print("Testing PlanningServiceImpl with simplified DDBC devices")
     # print(f"Number of devices: {D}")
     # print(f"Number of timesteps: {T}")
 
@@ -189,11 +141,9 @@ def test_planning_service_impl_with_nocontrol_devices():
     )
 
     device_states = [
-        create_nocontrol_device_state(
-            f"nocontrol_device_{i + 1}",
+        create_ddbc_device_state_simple(
+            f"ddbc_device_{i + 1}",
             target_metadata.profile_start,
-            T,
-            TIMESTEP_DURATION,
         )
         for i in range(D)
     ]
@@ -235,7 +185,7 @@ def test_planning_service_impl_with_nocontrol_devices():
         state=cluster_state,
         target=cluster_target,
         planning_window=TIMESTEP_DURATION * T,
-        reason="Testing NoControl planning",
+        reason="Testing DDBC planning (simplified)",
         plan_due_by_date=plan_due_by_date,
         optimize_for_target=True,
         max_priority_class=1,
@@ -270,15 +220,18 @@ def test_planning_service_impl_with_nocontrol_devices():
     for device_plan in device_plans:
         if device_plan:
             # print(f"Device {device_plan.device_id}:")
-            # print(
-            #     f"  Total energy: {sum(e for e in device_plan.energy_profile.elements if e is not None)} Joules"
+            # total_energy = sum(
+            #     e for e in device_plan.energy_profile.elements if e is not None
             # )
+            # print(f"  Total energy: {total_energy} Joules (zero for simplified test)")
             # print(f"  Instruction profile: {device_plan.instruction_profile}")
             pass
 
     assert len(energy_profile.elements) == target_metadata.nr_of_timesteps
     # print("Test completed successfully!")
+    # print("\nNote: This is a simplified test. Full DDBC planning with state trees")
+    # print("      and optimization would be implemented in ddbc_planning_window.py")
 
 
 if __name__ == "__main__":
-    test_planning_service_impl_with_nocontrol_devices()
+    test_planning_service_impl_with_ddbc_devices_simple()

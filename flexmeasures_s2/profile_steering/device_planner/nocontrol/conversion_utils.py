@@ -1,150 +1,115 @@
-from datetime import datetime
-from typing import List, Optional
-from s2python.common import PowerForecast, PowerForecastElement, CommodityQuantity
+from typing import Optional
+from s2python.common import PowerForecast, CommodityQuantity
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMetadata
 
 
-def get_expected_electrical_power(element: PowerForecastElement) -> float:
+def convert_power_forecast_to_joule_profile(
+    power_forecast: Optional[PowerForecast], profile_metadata: ProfileMetadata
+) -> JouleProfile:
     """
-    Get the expected electrical power from a PowerForecastElement.
-    Sums up power values for electrical commodity quantities.
+    Convert a PowerForecast to a JouleProfile.
+    This is a Python port of the Java ConversionTools.convertPowerForecast method.
 
     Args:
-        element: PowerForecastElement to extract power from
+        power_forecast: The power forecast to convert (can be None)
+        profile_metadata: The metadata for the output profile
 
     Returns:
-        Expected power in watts
+        A JouleProfile with energy values aligned to the profile metadata
+    """
+    if power_forecast is None:
+        return JouleProfile(
+            metadata=profile_metadata,
+            value=0,
+        )
+
+    forecast_start = power_forecast.start_time
+    profile_start = profile_metadata.profile_start
+
+    if forecast_start > profile_start:
+        current_forecast_element_index = 0
+        time_diff = forecast_start - profile_start
+        current_profile_step_index = int(
+            time_diff.total_seconds()
+            / profile_metadata.timestep_duration.total_seconds()
+        )
+    else:
+        current_profile_step_index = 0
+        time_diff = profile_start - forecast_start
+        seconds_into_forecast = time_diff.total_seconds()
+        current_forecast_element_index = 0
+        accumulated_seconds = 0
+
+        for i, element in enumerate(power_forecast.elements):
+            # element.duration is a Duration object with .root in milliseconds
+            # We need to convert to seconds
+            element_duration_seconds = element.duration.root / 1000.0
+            if accumulated_seconds + element_duration_seconds > seconds_into_forecast:
+                current_forecast_element_index = i
+                break
+            accumulated_seconds += element_duration_seconds
+        else:
+            current_forecast_element_index = len(power_forecast.elements)
+
+    joule_profile_elements = [0] * profile_metadata.nr_of_timesteps
+    forecast_elements = power_forecast.elements
+
+    if (
+        0 <= current_profile_step_index < profile_metadata.nr_of_timesteps
+        and 0 <= current_forecast_element_index < len(forecast_elements)
+    ):
+        profile_timestep_duration_seconds = (
+            profile_metadata.timestep_duration.total_seconds()
+        )
+        while (
+            current_profile_step_index < profile_metadata.nr_of_timesteps
+            and current_forecast_element_index < len(forecast_elements)
+        ):
+            forecast_element = forecast_elements[current_forecast_element_index]
+            power_watts = get_expected_electrical_power(forecast_element)
+            # forecast_element.duration is a Duration object with .root in milliseconds
+            # We need to convert to seconds
+            forecast_element_duration_seconds = forecast_element.duration.root / 1000.0
+            energy_joules = int(power_watts * forecast_element_duration_seconds)
+            number_of_profile_steps = int(
+                forecast_element_duration_seconds / profile_timestep_duration_seconds
+            )
+
+            for _ in range(number_of_profile_steps):
+                if current_profile_step_index >= profile_metadata.nr_of_timesteps:
+                    break
+                joule_profile_elements[current_profile_step_index] = int(
+                    energy_joules / number_of_profile_steps
+                )
+                current_profile_step_index += 1
+
+            current_forecast_element_index += 1
+
+    return JouleProfile(
+        metadata=profile_metadata,
+        elements=joule_profile_elements,  # type: ignore[arg-type]
+    )
+
+
+def get_expected_electrical_power(forecast_element) -> float:
+    """
+    Get the expected electrical power from a forecast element.
+    Sums up all electrical power values from different phases.
+
+    Args:
+        forecast_element: The forecast element containing power values
+
+    Returns:
+        The total expected electrical power in watts
     """
     expected_power = 0.0
-    for power_value in element.power_values:
-        commodity = power_value.commodity_quantity
-        if commodity in (
+    for power_value in forecast_element.power_values:
+        if power_value.commodity_quantity in [
             CommodityQuantity.ELECTRIC_POWER_L1,
             CommodityQuantity.ELECTRIC_POWER_L2,
             CommodityQuantity.ELECTRIC_POWER_L3,
             CommodityQuantity.ELECTRIC_POWER_3_PHASE_SYMMETRIC,
-        ):
+        ]:
             expected_power += power_value.value_expected
     return expected_power
-
-
-def find_starting_index_for(forecast: PowerForecast, profile_start: datetime) -> int:
-    """
-    Find the starting index in the forecast that corresponds to the profile_start time.
-
-    Args:
-        forecast: PowerForecast to search
-        profile_start: Start time of the profile
-
-    Returns:
-        Index of the forecast element that starts at or before profile_start
-    """
-    current_time = forecast.start_time
-    for i, element in enumerate(forecast.elements):
-        if current_time >= profile_start:
-            return i
-        current_time += element.duration.to_timedelta()
-    return len(forecast.elements)
-
-
-def convert_power_forecast(
-    forecast: PowerForecast, profile_metadata: ProfileMetadata
-) -> JouleProfile:
-    """
-    Convert a PowerForecast to a JouleProfile.
-
-    Args:
-        forecast: PowerForecast to convert
-        profile_metadata: Metadata describing the target profile
-
-    Returns:
-        JouleProfile with energy values in joules
-    """
-    forecast_start = forecast.start_time
-    current_forecast_element_index: int
-    current_profile_step_index: int
-
-    if forecast_start > profile_metadata.profile_start:
-        current_forecast_element_index = 0
-        current_profile_step_index = profile_metadata.get_starting_step_nr(
-            forecast_start
-        )
-    else:
-        current_forecast_element_index = find_starting_index_for(
-            forecast, profile_metadata.profile_start
-        )
-        current_profile_step_index = 0
-
-    joule_profile_elements: List[Optional[int]] = [0] * profile_metadata.nr_of_timesteps
-
-    if (
-        0 <= current_profile_step_index < profile_metadata.nr_of_timesteps
-        and 0 <= current_forecast_element_index < len(forecast.elements)
-    ):
-        current_profile_step_start = profile_metadata.get_profile_start_at_timestep(
-            current_profile_step_index
-        )
-        current_forecast_element = forecast.elements[current_forecast_element_index]
-        current_forecast_element_start = forecast_start
-        for i in range(current_forecast_element_index):
-            current_forecast_element_start += forecast.elements[
-                i
-            ].duration.to_timedelta()
-
-        current_forecast_element_end = (
-            current_forecast_element_start
-            + current_forecast_element.duration.to_timedelta()
-        )
-
-        while (
-            current_forecast_element_index < len(forecast.elements)
-            and current_profile_step_index < profile_metadata.nr_of_timesteps
-        ):
-            current_forecast_element = forecast.elements[current_forecast_element_index]
-            current_profile_step_end = (
-                current_profile_step_start + profile_metadata.timestep_duration
-            )
-
-            start_of_fit = max(
-                current_profile_step_start, current_forecast_element_start
-            )
-            end_of_fit: datetime
-            profile_fit_index = current_profile_step_index
-
-            if current_forecast_element_end >= current_profile_step_end:
-                current_profile_step_index += 1
-                if current_profile_step_index < profile_metadata.nr_of_timesteps:
-                    current_profile_step_start = current_profile_step_end
-
-            if current_profile_step_end >= current_forecast_element_end:
-                end_of_fit = current_forecast_element_end
-                current_forecast_element_index += 1
-                if current_forecast_element_index < len(forecast.elements):
-                    current_forecast_element_start = current_forecast_element_end
-                    next_element = forecast.elements[current_forecast_element_index]
-                    current_forecast_element_end = (
-                        current_forecast_element_start
-                        + next_element.duration.to_timedelta()
-                    )
-            else:
-                end_of_fit = current_profile_step_end
-                current_forecast_element_start = current_profile_step_end
-
-            overlap_seconds = (end_of_fit - start_of_fit).total_seconds()
-            if overlap_seconds > 0:
-                expected_power = get_expected_electrical_power(current_forecast_element)
-                joule_in_fit = int(round(expected_power * overlap_seconds))
-                current_value = joule_profile_elements[profile_fit_index]
-                if current_value is None:
-                    joule_profile_elements[profile_fit_index] = joule_in_fit
-                else:
-                    joule_profile_elements[profile_fit_index] = (
-                        current_value + joule_in_fit
-                    )
-
-    return JouleProfile(
-        profile_start=profile_metadata.profile_start,
-        timestep_duration=profile_metadata.timestep_duration,
-        elements=joule_profile_elements,
-    )
