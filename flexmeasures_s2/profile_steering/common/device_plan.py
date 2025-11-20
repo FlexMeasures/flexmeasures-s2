@@ -1,3 +1,4 @@
+from typing import Optional
 from flexmeasures_s2.profile_steering.common.pydantic_base import FlexMeasuresBaseModel
 
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
@@ -13,5 +14,5 @@ class DevicePlan(FlexMeasuresBaseModel):
     device_name: str
     connection_id: str
     energy_profile: JouleProfile
-    fill_level_profile: SoCProfile
-    instruction_profile: S2FrbcInstructionProfile
+    fill_level_profile: Optional[SoCProfile] = None
+    instruction_profile: Optional[S2FrbcInstructionProfile] = None

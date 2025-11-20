@@ -343,6 +343,10 @@ class S2FlaskScheduler(Scheduler):
 
             try:
                 # Convert device plan to instructions
+                # Skip if there's no instruction profile (e.g., for nocontrol devices)
+                if device_plan.instruction_profile is None:
+                    continue
+
                 device_instructions = device_plan.instruction_profile.elements
 
                 frbc_count = sum(
