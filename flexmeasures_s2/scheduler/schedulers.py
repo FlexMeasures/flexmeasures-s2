@@ -24,6 +24,12 @@ from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_planner
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import (
     S2FrbcDeviceState,
 )
+from flexmeasures_s2.profile_steering.device_planner.nocontrol.s2_nocontrol_device_planner import (
+    S2NoControlDevicePlanner,
+)
+from flexmeasures_s2.profile_steering.device_planner.nocontrol.s2_nocontrol_device_state import (
+    S2NoControlDeviceState,
+)
 
 # NoControl planner is on a different branch
 # from flexmeasures_s2.profile_steering.device_planner.nocontrol.s2_nocontrol_device_planner import (
