@@ -7,16 +7,29 @@ from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMeta
 def convert_power_forecast_to_joule_profile(
     power_forecast: Optional[PowerForecast], profile_metadata: ProfileMetadata
 ) -> JouleProfile:
-    """
-    Convert a PowerForecast to a JouleProfile.
+    """Convert a PowerForecast to a JouleProfile.
+
+    Converts a power forecast (with variable-duration elements) into a
+    JouleProfile (with fixed-duration timesteps) by:
+    1. Aligning the forecast start time with the profile start time
+    2. Distributing power values across profile timesteps
+    3. Converting power (watts) to energy (joules) using timestep durations
+
+    This handles cases where:
+    - Forecast starts before or after profile start
+    - Forecast elements have different durations than profile timesteps
+    - Forecast may be None (returns zero profile)
+
     This is a Python port of the Java ConversionTools.convertPowerForecast method.
 
     Args:
         power_forecast: The power forecast to convert (can be None)
-        profile_metadata: The metadata for the output profile
+        profile_metadata: The metadata for the output profile (start time,
+            timestep duration, number of timesteps)
 
     Returns:
-        A JouleProfile with energy values aligned to the profile metadata
+        A JouleProfile with energy values aligned to the profile metadata.
+        Returns a zero profile if power_forecast is None.
     """
     if power_forecast is None:
         return JouleProfile(
@@ -93,15 +106,18 @@ def convert_power_forecast_to_joule_profile(
 
 
 def get_expected_electrical_power(forecast_element) -> float:
-    """
-    Get the expected electrical power from a forecast element.
-    Sums up all electrical power values from different phases.
+    """Get the expected electrical power from a forecast element.
+
+    Extracts and sums all electrical power values from different phases
+    (L1, L2, L3, or 3-phase symmetric) in the forecast element.
 
     Args:
-        forecast_element: The forecast element containing power values
+        forecast_element: The PowerForecastElement containing power values
+            with commodity quantities
 
     Returns:
-        The total expected electrical power in watts
+        The total expected electrical power in watts, summed across all
+        electrical phases. Returns 0.0 if no electrical power values are found.
     """
     expected_power = 0.0
     for power_value in forecast_element.power_values:

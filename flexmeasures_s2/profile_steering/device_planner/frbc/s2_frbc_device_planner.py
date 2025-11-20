@@ -27,6 +27,30 @@ from s2python.frbc import FRBCInstruction
 
 
 class S2FrbcDevicePlanner(DevicePlanner):
+    """Device planner for Fill Rate Based Control (FRBC) devices.
+
+    FRBC devices are storage systems (e.g., EV batteries, thermal storage)
+    that can be charged/discharged to match energy targets. The planner
+    optimizes operation modes to achieve fill level targets while respecting
+    usage forecasts and constraints.
+
+    The planning process:
+    1. Creates a state tree (OperationModeProfileTree) representing possible
+       storage states over time
+    2. Searches for optimal operation mode sequences that meet fill level
+       targets and usage forecasts
+    3. Converts plans to instruction profiles for device control
+
+    FRBC devices typically have:
+    - Storage with fill level targets (state of charge targets)
+    - Usage forecasts indicating expected consumption/production
+    - Operation modes defining charge/discharge rates
+    - Leakage behavior modeling energy losses
+    - Multiple actuators with different characteristics
+
+    The planner uses dynamic programming to explore the state space efficiently.
+    """
+
     def __init__(
         self,
         s2_frbc_state: S2FrbcDeviceState,
@@ -58,6 +82,19 @@ class S2FrbcDevicePlanner(DevicePlanner):
         self.accepted_plan: Optional[S2FrbcPlan] = None
 
     def is_storage_available(self, storage_state: S2FrbcDeviceState) -> bool:
+        """Check if storage is available for planning.
+
+        Determines if the device has active storage that can be planned for
+        the current planning window. Checks:
+        1. Device is online
+        2. System descriptions exist and are active during the planning window
+
+        Args:
+            storage_state: The FRBC device state to check
+
+        Returns:
+            True if storage is available, False otherwise
+        """
         latest_before_first_ptu = OperationModeProfileTree.get_latest_before(
             self.profile_metadata.profile_start.replace(tzinfo=None),
             storage_state.get_system_descriptions(),
@@ -112,6 +149,33 @@ class S2FrbcDevicePlanner(DevicePlanner):
         diff_to_min: JouleProfile,
         plan_due_by_date: datetime,
     ) -> Proposal:
+        """Create an improved planning based on the difference to global target.
+
+        This method searches for a better plan that moves toward the global target
+        while respecting congestion point constraints and fill level targets. It:
+        1. Computes absolute targets from difference profiles
+        2. Searches the operation mode profile tree for the best plan
+        3. Creates a proposal comparing the new plan to the accepted plan
+
+        The search considers:
+        - Fill level targets (state of charge targets)
+        - Usage forecasts (expected consumption/production)
+        - Global energy targets
+        - Congestion point constraints
+
+        Args:
+            diff_to_global_target: Difference between global target and current
+                root-level planning
+            diff_to_max: Difference to congestion point maximum constraint
+            diff_to_min: Difference to congestion point minimum constraint
+            plan_due_by_date: Deadline for completing the plan
+
+        Returns:
+            A Proposal object with the improved plan
+
+        Raises:
+            ValueError: If no accepted plan exists
+        """
         if self.accepted_plan is None:
             raise ValueError("No accepted plan found")
 
@@ -213,6 +277,19 @@ class S2FrbcDevicePlanner(DevicePlanner):
     def create_initial_planning(
         self, plan_due_by_date: datetime, ids: Optional[dict] = None
     ) -> S2FrbcPlan:
+        """Create an initial planning.
+
+        Creates a baseline plan that meets fill level targets and usage forecasts
+        without optimizing for global energy targets. This is used as the starting
+        point for iterative improvement.
+
+        Args:
+            plan_due_by_date: Deadline for completing the plan
+            ids: Optional dictionary for tracking IDs (used for debugging)
+
+        Returns:
+            An S2FrbcPlan representing the initial plan
+        """
         if self.is_storage_available(self.s2_frbc_state):
             if ids is None:
                 self.latest_plan = self.state_tree.find_best_plan(
@@ -238,6 +315,17 @@ class S2FrbcDevicePlanner(DevicePlanner):
         return self.latest_plan
 
     def accept_proposal(self, accepted_proposal: Proposal) -> None:
+        """Accept a proposal and update the accepted plan.
+
+        Validates that the proposal is from this planner and matches the latest
+        plan, then updates the accepted plan.
+
+        Args:
+            accepted_proposal: The proposal to accept
+
+        Raises:
+            ValueError: If the proposal is invalid or doesn't match expectations
+        """
         if self.latest_plan is None:
             raise ValueError("No latest plan found")
         if accepted_proposal.origin != self:
@@ -255,19 +343,51 @@ class S2FrbcDevicePlanner(DevicePlanner):
         self.accepted_plan = self.latest_plan
 
     def get_latest_plan(self) -> Optional[S2FrbcPlan]:
+        """Get the latest calculated plan.
+
+        Returns:
+            The latest plan, which may not have been accepted yet
+        """
         return self.latest_plan
 
     def set_accepted_plan(self, plan: S2FrbcPlan) -> None:
+        """Set the accepted plan forcefully.
+
+        This is used during initial planning to set the baseline plan.
+
+        Args:
+            plan: The plan to set as accepted
+
+        Raises:
+            TypeError: If the plan is not an S2FrbcPlan instance
+        """
         if not isinstance(plan, S2FrbcPlan):
             raise TypeError(f"Expected S2FrbcPlan, but got {type(plan)}")
         self.accepted_plan = plan
 
     def current_profile(self) -> JouleProfile:
+        """Get the current accepted energy profile.
+
+        Returns:
+            The energy profile from the accepted plan
+
+        Raises:
+            ValueError: If no accepted plan exists
+        """
         if self.accepted_plan is None:
             raise ValueError("No accepted plan found")
         return self.accepted_plan.energy
 
     def get_device_plan(self) -> Optional[DevicePlan]:
+        """Get the device plan for this FRBC device.
+
+        Converts the accepted plan to a DevicePlan with energy profile,
+        fill level profile, and instruction profile for device control.
+
+        Returns:
+            A DevicePlan with energy profile, fill level profile, and instructions,
+            or None if no accepted plan exists
+        """
         if self.accepted_plan is None:
             return None
         # logging.debug(
@@ -297,6 +417,19 @@ class S2FrbcDevicePlanner(DevicePlanner):
     def convert_plan_to_instructions(
         profile_metadata: ProfileMetadata, device_plan: S2FrbcPlan
     ) -> S2FrbcInstructionProfile:
+        """Convert a plan to instruction profile.
+
+        Converts operation mode configurations from the plan into FRBCInstruction
+        objects that can be sent to the device for control. Each instruction
+        specifies which operation mode to use for each actuator at each timestep.
+
+        Args:
+            profile_metadata: Metadata describing the profile timing
+            device_plan: The device plan containing operation mode configurations
+
+        Returns:
+            An S2FrbcInstructionProfile with FRBCInstruction elements for device control
+        """
         import uuid
         from datetime import timedelta
 

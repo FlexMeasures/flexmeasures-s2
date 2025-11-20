@@ -42,7 +42,20 @@ logger = logging.getLogger(__name__)
 
 
 class PlanningServiceConfig:
-    """Configuration for the planning service."""
+    """Configuration for the planning service.
+
+    This class holds configuration parameters that control the behavior of the
+    profile steering algorithm, including convergence criteria and execution mode.
+
+    Attributes:
+        energy_improvement_criterion: Minimum improvement threshold for energy
+            optimization. Planning stops when improvement falls below this value.
+        cost_improvement_criterion: Minimum improvement threshold for cost
+            optimization. Used when optimizing for cost targets.
+        congestion_retry_iterations: Maximum number of iterations to retry
+            congestion point optimization.
+        multithreaded: Whether to use multiprocessing for parallel device planning.
+    """
 
     def __init__(
         self,
@@ -70,7 +83,13 @@ class PlanningServiceConfig:
 
 
 class PlanningService:
-    """Interface for planning services."""
+    """Interface for planning services.
+
+    This abstract interface defines the contract for planning services that
+    create cluster plans from cluster states and targets. Implementations
+    coordinate the hierarchical planning algorithm across root, congestion point,
+    and device levels.
+    """
 
     def plan(
         self,
@@ -87,7 +106,17 @@ class PlanningService:
 
 
 class PlanningServiceImpl(PlanningService):
-    """Implementation of the planning service."""
+    """Implementation of the planning service.
+
+    This class orchestrates the profile steering algorithm by:
+    1. Creating a hierarchical controller tree (RootPlanner -> CongestionPointPlanner -> DevicePlanner)
+    2. Coordinating the iterative optimization process
+    3. Collecting device plans into a ClusterPlan
+
+    The algorithm optimizes device schedules to match global energy targets while
+    respecting congestion point constraints. It supports multiple device types
+    (FRBC, DDBC, NoControl) and can run in single-threaded or multithreaded mode.
+    """
 
     DEFAULT_CONGESTION_POINT = ""
 

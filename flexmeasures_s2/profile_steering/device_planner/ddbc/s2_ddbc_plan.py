@@ -8,7 +8,17 @@ if TYPE_CHECKING:
 
 
 class S2DdbcPlan:
-    """Plan for a DDBC device."""
+    """Plan for a DDBC device.
+
+    Represents a complete plan for a DDBC device, including:
+    - Energy profile: Planned energy consumption/production over time
+    - Operation mode IDs: Actuator configurations for each timestep
+    - Insights profile: Additional information about demand and supply rates
+    - Idle flag: Whether the device is in idle state
+
+    Plans are created by the DdbcPlanningWindow state tree search and
+    converted to instruction profiles for device control.
+    """
 
     def __init__(
         self,

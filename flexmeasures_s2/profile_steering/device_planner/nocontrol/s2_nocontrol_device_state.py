@@ -4,9 +4,25 @@ from s2python.common import PowerForecast, PowerValue
 
 
 class S2NoControlDeviceState:
-    """
-    Device state for devices with no control capabilities.
-    These devices only provide a power forecast and cannot be controlled.
+    """Device state for devices with no control capabilities.
+
+    Represents devices that have fixed consumption/production patterns and
+    cannot be controlled (e.g., refrigerators, lighting, fixed loads). These
+    devices only provide a power forecast indicating their expected behavior.
+
+    NoControl devices are included in planning to account for their fixed
+    consumption in the cluster's total energy profile, but they cannot
+    contribute proposals for optimization since their behavior is fixed.
+
+    Attributes:
+        device_id: Unique identifier for the device
+        device_name: Human-readable device name
+        connection_id: Connection point identifier
+        priority_class: Priority class for planning (typically 1)
+        timestamp: Current timestamp
+        energy_in_current_timestep: Current energy consumption/production
+        is_online: Whether the device is currently online
+        power_forecast: Power forecast indicating expected consumption/production
     """
 
     def __init__(

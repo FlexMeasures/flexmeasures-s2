@@ -23,7 +23,27 @@ from flexmeasures_s2.profile_steering.device_planner.device_planner_abstract imp
 
 
 class S2DdbcDevicePlanner(DevicePlanner):
-    """Device planner for Demand-Driven Based Control (DDBC) devices."""
+    """Device planner for Demand-Driven Based Control (DDBC) devices.
+
+    DDBC devices are demand-driven systems (e.g., hybrid heating systems) that
+    respond to average demand rate forecasts. The planner optimizes actuator
+    operation modes to meet demand while minimizing cost.
+
+    The planning process:
+    1. Creates a state tree (DdbcPlanningWindow) representing possible device states
+    2. Searches for the best plan that matches targets while respecting constraints
+    3. Converts plans to instruction profiles for device control
+
+    DDBC devices typically have:
+    - Multiple actuators (e.g., gas boiler, heat pump) with different commodities
+    - Average demand rate forecasts indicating expected demand
+    - Operation modes defining actuator configurations
+    - Cost considerations (e.g., gas price vs. electricity price)
+
+    Attributes:
+        STRATIFICATION_LAYERS: Number of stratification layers used in planning
+            (matching FRBC for consistency)
+    """
 
     STRATIFICATION_LAYERS = 30  # Number of stratification layers (matching FRBC)
 
@@ -93,7 +113,27 @@ class S2DdbcDevicePlanner(DevicePlanner):
         diff_to_min: JouleProfile,
         plan_due_by_date: datetime,
     ) -> Proposal:
-        """Create an improved planning based on the difference to global target."""
+        """Create an improved planning based on the difference to global target.
+
+        This method searches for a better plan that moves toward the global target
+        while respecting congestion point constraints. It:
+        1. Computes absolute targets from difference profiles
+        2. Searches the state tree for the best plan matching these targets
+        3. Creates a proposal comparing the new plan to the accepted plan
+
+        Args:
+            diff_to_global_target: Difference between global target and current
+                root-level planning
+            diff_to_max: Difference to congestion point maximum constraint
+            diff_to_min: Difference to congestion point minimum constraint
+            plan_due_by_date: Deadline for completing the plan
+
+        Returns:
+            A Proposal object with the improved plan
+
+        Raises:
+            ValueError: If no accepted plan exists or device is unavailable
+        """
         if self.accepted_plan is None:
             raise ValueError("No accepted plan found")
 
@@ -130,7 +170,18 @@ class S2DdbcDevicePlanner(DevicePlanner):
         return proposal
 
     def create_initial_planning(self, plan_due_by_date: datetime) -> S2DdbcPlan:
-        """Create an initial planning."""
+        """Create an initial planning.
+
+        Creates a baseline plan without optimization targets. This is used as
+        the starting point for iterative improvement. The initial plan is
+        typically the most cost-effective or default operation mode.
+
+        Args:
+            plan_due_by_date: Deadline for completing the plan
+
+        Returns:
+            An S2DdbcPlan representing the initial plan
+        """
         if (
             self._is_device_available(self.s2_ddbc_state)
             and self.state_tree is not None
@@ -151,7 +202,17 @@ class S2DdbcDevicePlanner(DevicePlanner):
         return self.latest_plan
 
     def accept_proposal(self, accepted_proposal: Proposal) -> None:
-        """Accept a proposal."""
+        """Accept a proposal and update the accepted plan.
+
+        Validates that the proposal is from this planner and matches the latest
+        plan, then updates the accepted plan.
+
+        Args:
+            accepted_proposal: The proposal to accept
+
+        Raises:
+            ValueError: If the proposal is invalid or doesn't match expectations
+        """
         if self.latest_plan is None:
             raise ValueError("No latest plan found")
         if accepted_proposal.origin != self:
@@ -169,23 +230,51 @@ class S2DdbcDevicePlanner(DevicePlanner):
         self.accepted_plan = self.latest_plan
 
     def get_latest_plan(self) -> Optional[S2DdbcPlan]:
-        """Get the latest plan."""
+        """Get the latest calculated plan.
+
+        Returns:
+            The latest plan, which may not have been accepted yet
+        """
         return self.latest_plan
 
     def set_accepted_plan(self, plan: S2DdbcPlan) -> None:
-        """Set the accepted plan."""
+        """Set the accepted plan forcefully.
+
+        This is used during initial planning to set the baseline plan.
+
+        Args:
+            plan: The plan to set as accepted
+
+        Raises:
+            TypeError: If the plan is not an S2DdbcPlan instance
+        """
         if not isinstance(plan, S2DdbcPlan):
             raise TypeError(f"Expected S2DdbcPlan, but got {type(plan)}")
         self.accepted_plan = plan
 
     def current_profile(self) -> JouleProfile:
-        """Get the current profile."""
+        """Get the current accepted energy profile.
+
+        Returns:
+            The energy profile from the accepted plan
+
+        Raises:
+            ValueError: If no accepted plan exists
+        """
         if self.accepted_plan is None:
             raise ValueError("No accepted plan found")
         return self.accepted_plan.get_energy()
 
     def get_device_plan(self) -> Optional[DevicePlan]:
-        """Get the device plan."""
+        """Get the device plan for this DDBC device.
+
+        Converts the accepted plan to a DevicePlan with instruction profile
+        and insights profile for device control.
+
+        Returns:
+            A DevicePlan with energy profile, instruction profile, and insights,
+            or None if no accepted plan exists
+        """
         if self.accepted_plan is None:
             return None
 
@@ -216,7 +305,18 @@ class S2DdbcDevicePlanner(DevicePlanner):
     def convert_plan_to_instructions(
         profile_metadata: ProfileMetadata, device_plan: S2DdbcPlan
     ) -> S2DdbcInstructionProfile:
-        """Convert a plan to instruction profile."""
+        """Convert a plan to instruction profile.
+
+        Converts operation mode IDs from the plan into instruction elements
+        that can be sent to the device for control.
+
+        Args:
+            profile_metadata: Metadata describing the profile timing
+            device_plan: The device plan containing operation mode IDs
+
+        Returns:
+            An S2DdbcInstructionProfile with instruction elements for each timestep
+        """
         elements = []
         actuator_configurations_per_timestep = device_plan.get_operation_mode_id()
 

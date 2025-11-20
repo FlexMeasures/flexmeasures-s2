@@ -3,7 +3,16 @@ from typing import List, Dict, Any, Optional
 
 
 class ClusterState:
-    """Class representing the state of a cluster of devices."""
+    """Represents the state of a cluster of devices.
+
+    This class holds the current state information needed for planning:
+    - Timestamp of the state
+    - Device states (one per device in the cluster)
+    - Mapping of connection IDs to congestion points
+
+    The cluster state is used as input to the planning algorithm along with
+    a ClusterTarget to generate a ClusterPlan.
+    """
 
     def __init__(
         self,

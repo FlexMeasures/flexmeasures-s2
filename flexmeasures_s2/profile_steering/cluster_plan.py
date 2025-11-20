@@ -16,10 +16,24 @@ from flexmeasures_s2.profile_steering.cluster_target import ClusterTarget
 
 
 class ClusterPlanData:
-    """Class representing planning data for a cluster."""
+    """Class representing planning data for a cluster.
+
+    This class holds the results of the planning process, including:
+    - Device plans for each device in the cluster
+    - Aggregated plans per congestion point
+    - Profile metadata (start time, timestep duration, number of timesteps)
+    - Quality scores (deviation from target, constraint violations)
+
+    The data can be converted to/from ClusterPlan objects and supports
+    operations like creating subprofiles and adjusting the number of elements.
+    """
 
     class CpData:
-        """Class representing data for a congestion point."""
+        """Class representing data for a congestion point.
+
+        Holds aggregated planning data for all devices at a congestion point,
+        including total consumption, production, and per-device plans.
+        """
 
         def __init__(
             self,
@@ -400,7 +414,17 @@ def to_float_array(profile: JouleProfile) -> List[float]:
 
 
 class ClusterPlan:
-    """Class representing a plan for a cluster."""
+    """Class representing a plan for a cluster.
+
+    A ClusterPlan is the result of the profile steering algorithm. It contains:
+    - The cluster state at the time of planning
+    - The target that was used for planning
+    - The plan data (device plans, congestion point aggregations)
+    - Quality metrics (deviation scores, constraint violations)
+
+    The plan can be evaluated for quality, checked for constraint violations,
+    and converted to various formats for storage or transmission.
+    """
 
     def __init__(
         self,

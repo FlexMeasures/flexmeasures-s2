@@ -6,9 +6,18 @@ from flexmeasures_s2.profile_steering.device_planner.device_planner_abstract imp
 
 
 class ProposalWithoutImprovement(Proposal):
-    """
-    A special proposal for devices that cannot be improved.
-    This is used for nocontrol devices that have fixed power forecasts.
+    """A special proposal for devices that cannot be improved.
+
+    This proposal type is used for nocontrol devices that have fixed power
+    forecasts and cannot be optimized. It always returns zero improvement
+    values, indicating that no changes can be made to the device's plan.
+
+    The planning algorithm accepts these proposals to acknowledge that the
+    device has been considered, but they never win the proposal comparison
+    since they provide no improvement.
+
+    Attributes:
+        All attributes inherited from Proposal, but with zero improvement values
     """
 
     def __init__(self, plan: JouleProfile, origin: DevicePlanner):

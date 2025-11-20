@@ -29,7 +29,23 @@ T = TypeVar("T")
 
 
 class DdbcPlanningWindow:
-    """Planning window for DDBC device planning."""
+    """Planning window for DDBC device planning.
+
+    This class represents a state tree that explores possible device states
+    over the planning window. It:
+    1. Generates timesteps based on system descriptions and demand forecasts
+    2. Searches for optimal operation mode sequences
+    3. Evaluates plans against targets (energy, cost, congestion constraints)
+
+    The planning window handles:
+    - Multiple system descriptions that may change over time
+    - Average demand rate forecasts indicating expected demand
+    - Actuator operation modes with different cost characteristics
+    - Constraints from congestion points and global targets
+
+    The search algorithm finds the best plan that balances meeting demand,
+    minimizing cost, and respecting constraints.
+    """
 
     def __init__(
         self,

@@ -52,6 +52,23 @@ def _get_initial_device_plan(
 
 
 class CongestionPointPlanner:
+    """Planner for a congestion point that manages multiple devices.
+
+    A congestion point represents a physical location in the grid where multiple
+    devices are connected. This planner:
+    1. Coordinates device planning at the congestion point level
+    2. Ensures aggregated device plans respect congestion point constraints
+    3. Creates initial plans by aggregating device initial plans
+    4. Creates improved plans by requesting proposals from devices
+
+    The planner supports both sequential and parallel (multiprocessing) execution
+    for device planning, which can significantly speed up planning for large
+    numbers of devices.
+
+    Attributes:
+        MAX_ITERATIONS: Maximum number of optimization iterations
+    """
+
     def __init__(
         self,
         congestion_point_id: str,
@@ -61,10 +78,12 @@ class CongestionPointPlanner:
         """Initialize a congestion point planner.
 
         Args:
-
             congestion_point_id: Unique identifier for this congestion point
-            congestion_target: Target profile with range constraints for this congestion point
-            multithreaded: Whether to use multiprocessing for device planning
+            congestion_target: Target profile with range constraints (min/max)
+                for this congestion point. The aggregated device plans must
+                stay within these bounds.
+            multithreaded: Whether to use multiprocessing for device planning.
+                Enables parallel execution but requires devices to be picklable.
         """
         self.MAX_ITERATIONS = 1000
         self.congestion_point_id = congestion_point_id
@@ -87,12 +106,27 @@ class CongestionPointPlanner:
         self.latest_plan = self.empty_profile
 
     def add_device(self, device):
-        """Add a device controller to this congestion point."""
+        """Add a device controller to this congestion point.
+
+        Args:
+            device: The device planner to add to this congestion point
+        """
         self.devices.append(device)
 
     @staticmethod
     def is_storage_available(self) -> bool:
-        """Check if storage is available at this congestion point."""
+        """Check if storage is available at this congestion point.
+
+        Args:
+            self: The congestion point planner instance
+
+        Returns:
+            True if storage is available, False otherwise
+
+        Note:
+            Currently always returns True. In a full implementation, this
+            would check if any devices at this congestion point provide storage.
+        """
         # For now, always assume storage is available
         return True
 
@@ -101,11 +135,19 @@ class CongestionPointPlanner:
     ) -> JouleProfile:  # noqa: C901
         """Create an initial plan for this congestion point.
 
+        This method:
+        1. Requests initial plans from all devices (in parallel or sequentially)
+        2. Aggregates device plans into a congestion point plan
+        3. If the aggregated plan is within the congestion target range, returns it
+        4. Otherwise, optimizes the plan by iteratively improving device plans
+           until constraints are satisfied or iteration limit is reached
+
         Args:
             plan_due_by_date: The date by which the plan must be ready
 
         Returns:
-            A JouleProfile representing the initial plan
+            A JouleProfile representing the initial aggregated plan for this
+            congestion point
         """
         current_planning = self.empty_profile
 
@@ -229,13 +271,23 @@ class CongestionPointPlanner:
     ) -> Optional[Proposal]:
         """Create an improved plan based on the difference profile.
 
+        This method requests proposals from all devices at or below the specified
+        priority class. It computes the difference to congestion point constraints
+        (min/max) and passes this information to devices so they can create proposals
+        that improve both global and congestion point targets.
+
         Args:
-            difference_profile: The difference between target and current planning
-            priority_class: Priority class for this planning iteration
+            difference_profile: The difference between global target and current
+                root-level planning. Devices use this to create proposals that
+                move toward the global target.
+            priority_class: Maximum priority class to consider. Only devices with
+                priority_class <= this value will be asked for proposals.
             plan_due_by_date: The date by which the plan must be ready
 
         Returns:
-            A Proposal object if an improvement was found, None otherwise
+            A Proposal object representing the best improvement found, or None
+            if no improvement is available. The proposal includes information
+            about energy, cost, and congestion point improvements.
         """
         best_proposal = None
 
@@ -315,7 +367,13 @@ class CongestionPointPlanner:
         return best_proposal
 
     def get_current_planning(self) -> JouleProfile:
-        """Get the current planning profile."""
+        """Get the current planning profile for this congestion point.
+
+        Aggregates the current profiles from all devices at this congestion point.
+
+        Returns:
+            A JouleProfile representing the aggregated current planning
+        """
         # Return the latest accepted plan as the current planning
         current_planning = self.empty_profile
         for device in self.devices:
@@ -324,17 +382,29 @@ class CongestionPointPlanner:
         return current_planning
 
     def add_device_controller(self, device):
-        """Add a device controller to this congestion point."""
+        """Add a device controller to this congestion point.
+
+        Args:
+            device: The device planner to add
+        """
         self.devices.append(device)
 
     def max_priority_class(self) -> int:
-        """Get the maximum priority class among all devices."""
+        """Get the maximum priority class among all devices.
+
+        Returns:
+            The maximum priority class, or 1 if no devices are present
+        """
         if not self.devices:
             return 1
         return max(device.priority_class for device in self.devices)
 
     def min_priority_class(self) -> int:
-        """Get the minimum priority class among all devices."""
+        """Get the minimum priority class among all devices.
+
+        Returns:
+            The minimum priority class, or 1 if no devices are present
+        """
         if not self.devices:
             return 1
         return min(device.priority_class for device in self.devices)

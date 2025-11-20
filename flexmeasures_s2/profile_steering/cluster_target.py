@@ -10,16 +10,21 @@ from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 
 
 class ClusterTarget:
-    """
-    ClusterTarget instances are used by traders to express how a plan should look like.
+    """Represents targets for cluster planning.
 
-    There are two levels at which a target can be set:
-    1. Global level (i.e., a target for the cluster as a whole)
-    2. Congestion point level
+    ClusterTarget instances express how a plan should look. There are two
+    hierarchical levels at which targets can be set:
 
-    The global target is a TargetProfile (i.e., a line) and the congestion point targets
-    are JouleRangeProfile instances, allowing congestion targets to be set with
-    minimum and maximum constraints.
+    1. Global level: A target for the cluster as a whole (TargetProfile)
+    2. Congestion point level: Targets for specific congestion points
+       (JouleRangeProfile with min/max constraints)
+
+    The global target is typically a line profile (energy over time), while
+    congestion point targets are range profiles that constrain the aggregated
+    energy at each congestion point to stay within min/max bounds.
+
+    The planning algorithm optimizes device schedules to match the global target
+    while respecting congestion point constraints.
     """
 
     def __init__(

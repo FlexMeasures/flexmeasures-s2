@@ -14,7 +14,25 @@ from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 
 
 class DevicePlanner(ABC):
-    """Abstract base class for all device planners."""
+    """Abstract base class for all device planners.
+
+    Device planners are responsible for creating plans for individual devices.
+    They implement the device-specific logic for:
+    - Creating initial plans based on device state
+    - Creating improved plans (proposals) that optimize toward targets
+    - Managing device plan state (accepted vs. proposed plans)
+
+    The planning algorithm calls device planners through this interface:
+    1. create_initial_planning(): Called once at the start to create baseline plans
+    2. create_improved_planning(): Called iteratively to create proposals
+    3. accept_proposal(): Called when a proposal is accepted
+    4. current_profile(): Returns the current accepted plan
+
+    Implementations exist for:
+    - FRBC (Fill Rate Based Control): Storage devices with fill level targets
+    - DDBC (Demand Driven Based Control): Devices with demand forecasts
+    - NoControl: Non-controllable devices with fixed consumption patterns
+    """
 
     @property
     @abstractmethod

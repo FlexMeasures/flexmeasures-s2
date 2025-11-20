@@ -6,6 +6,19 @@ from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 
 
 class S2FrbcPlan:
+    """Plan for an FRBC device.
+
+    Represents a complete plan for an FRBC storage device, including:
+    - Energy profile: Planned energy consumption/production over time
+    - Fill level profile: Planned state of charge over time
+    - Operation mode IDs: Actuator configurations for each timestep
+    - Idle flag: Whether the device is in idle state
+
+    Plans are created by the OperationModeProfileTree state tree search and
+    converted to instruction profiles for device control. The fill level profile
+    ensures that storage constraints (min/max fill levels) are respected.
+    """
+
     def __init__(
         self,
         idle: bool,

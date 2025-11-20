@@ -12,7 +12,37 @@ from s2python.generated.gen_s2 import FRBCStorageStatus, PowerValue
 
 
 class S2FrbcDeviceState:
+    """Device state for Fill Rate Based Control (FRBC) devices.
+
+    Holds the current state and configuration of an FRBC device, including:
+    - Device identification and connection information
+    - System descriptions defining storage capabilities and operation modes
+    - Leakage behaviors modeling energy losses
+    - Usage forecasts indicating expected consumption/production
+    - Fill level target profiles specifying state of charge targets
+    - Computational parameters (buckets, stratification layers) for planning
+    - Storage status showing current fill level
+    - Actuator statuses showing current actuator states
+
+    FRBC devices are storage systems that can be charged/discharged to match
+    energy targets while respecting fill level constraints and usage forecasts.
+    """
+
     class ComputationalParameters:
+        """Computational parameters for FRBC planning.
+
+        These parameters control the granularity and accuracy of the planning
+        algorithm:
+        - nr_of_buckets: Number of discrete fill level states (higher = more
+          accurate but slower)
+        - stratification_layers: Number of layers for thermal stratification
+          modeling (for thermal storage systems)
+
+        Attributes:
+            nr_of_buckets: Number of fill level buckets for discretization
+            stratification_layers: Number of stratification layers
+        """
+
         def __init__(self, nr_of_buckets: int, stratification_layers: int):
             self.nr_of_buckets = nr_of_buckets
             self.stratification_layers = stratification_layers

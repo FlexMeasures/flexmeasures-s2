@@ -2,6 +2,22 @@ from datetime import datetime, timedelta
 
 
 class ProfileMetadata:
+    """Metadata describing a time-series profile.
+
+    Contains the essential information needed to interpret profile data:
+    - Start time of the profile
+    - Duration of each timestep
+    - Number of timesteps
+
+    This metadata is used throughout the profile steering system to ensure
+    compatibility between profiles and to perform time-based operations.
+
+    Attributes:
+        NR_OF_TIMESTEPS_KEY: Key name for number of timesteps in dictionary representation
+        TIMESTEP_DURATION_KEY: Key name for timestep duration in dictionary representation
+        PROFILE_START_KEY: Key name for profile start time in dictionary representation
+    """
+
     NR_OF_TIMESTEPS_KEY = "nrOfTimesteps"
     TIMESTEP_DURATION_KEY = "timestepDurationMs"
     PROFILE_START_KEY = "profileStart"
@@ -12,6 +28,13 @@ class ProfileMetadata:
         timestep_duration: timedelta,
         nr_of_timesteps: int,
     ):
+        """Initialize profile metadata.
+
+        Args:
+            profile_start: Start time of the profile
+            timestep_duration: Duration of each timestep
+            nr_of_timesteps: Number of timesteps in the profile
+        """
         self.profile_start = profile_start
         self.timestep_duration = timestep_duration
         self.nr_of_timesteps = nr_of_timesteps

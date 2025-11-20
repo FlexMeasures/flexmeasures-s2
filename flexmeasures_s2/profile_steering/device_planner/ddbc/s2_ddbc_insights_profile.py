@@ -3,10 +3,29 @@ from flexmeasures_s2.profile_steering.common.profile_metadata import ProfileMeta
 
 
 class S2DdbcInsightsProfile:
-    """Insights profile for DDBC device providing additional information about the plan."""
+    """Insights profile for DDBC device providing additional information about the plan.
+
+    Provides detailed information about the plan execution, including:
+    - Demand rate forecasts: Expected demand at each timestep
+    - Supply rates: Actual supply provided by actuators
+    - Actuator configurations: Which operation modes were selected
+
+    This information is useful for debugging, analysis, and understanding
+    how the plan responds to demand forecasts.
+    """
 
     class Element:
-        """Single element in the insights profile."""
+        """Single element in the insights profile.
+
+        Contains insights for one timestep, showing the relationship between
+        forecasted demand and actual supply, along with actuator configurations.
+
+        Attributes:
+            demand_rate_forecast: Expected demand rate (can be None)
+            supply_rate: Actual supply rate provided by actuators
+            actuator_configurations: Dictionary mapping actuator IDs to
+                their operation mode configurations
+        """
 
         def __init__(
             self,

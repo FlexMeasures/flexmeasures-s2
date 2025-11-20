@@ -6,6 +6,22 @@ from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 
 
 class RootPlanner:
+    """Root-level planner that coordinates global optimization across congestion points.
+
+    The RootPlanner manages the top-level optimization loop:
+    1. Creates initial plans by aggregating congestion point plans
+    2. Iteratively improves plans by requesting proposals from congestion points
+    3. Accepts best proposals based on improvement criteria
+    4. Continues until convergence or iteration limit
+
+    The planner handles both energy and cost optimization, with different
+    acceptance strategies for each. For energy targets, it accepts one proposal
+    at a time. For pure cost targets, it can accept all valid proposals.
+
+    Attributes:
+        MAX_ITERATIONS: Maximum number of optimization iterations per priority class
+    """
+
     MAX_ITERATIONS = 1000
 
     def __init__(
@@ -16,13 +32,21 @@ class RootPlanner:
         always_accept_all_proposals: bool,
         context: Any,
     ):
-        """
-        target: An object that provides a profile.
-                It must support a method get_profile_start(),
-                have attributes timestep_duration and nr_of_timesteps,
-                and (for optimization purposes) support a subtract() method.
-        always_accept_all_proposals: If True, accept all valid proposals (for pure cost targets)
-        context: In a full implementation, this might be an executor or similar. Here it is passed along.
+        """Initialize the root planner.
+
+        Args:
+            target: Global target profile that the cluster should match.
+                Must support get_profile_start(), have timestep_duration and
+                nr_of_timesteps attributes, and support subtract() for optimization.
+            energy_iteration_criterion: Minimum improvement threshold for energy
+                optimization. Planning stops when improvement falls below this value.
+            cost_iteration_criterion: Minimum improvement threshold for cost
+                optimization. Used when optimizing for cost targets.
+            always_accept_all_proposals: If True, accept all valid proposals
+                simultaneously (for pure cost targets). If False, accept one
+                proposal at a time (for energy targets).
+            context: Execution context (e.g., executor for multithreading).
+                Passed along to child planners.
         """
         self.context = context
         self.target = self.remove_null_values(target)
@@ -40,16 +64,41 @@ class RootPlanner:
         self.root_ctrl_planning = self.empty_profile
 
     def remove_null_values(self, target: Any) -> Any:
+        """Remove or replace null values in the target profile.
+
+        Args:
+            target: The target profile to process
+
+        Returns:
+            The target profile with null values removed or replaced
+
+        Note:
+            Currently a stub implementation. In a full implementation, this
+            would remove or replace null elements in the target profile.
+        """
         # TODO: Stub: simply return the target.
         # In a full implementation, you would remove or replace null elements.
         return target
 
     def add_congestion_point_controller(self, cpc: CongestionPointPlanner):
+        """Add a congestion point controller to this root planner.
+
+        Args:
+            cpc: The congestion point planner to add
+        """
         self.cp_controllers.append(cpc)
 
     def get_congestion_point_controller(
         self, cp_id: str
     ) -> Optional[CongestionPointPlanner]:
+        """Get a congestion point controller by ID.
+
+        Args:
+            cp_id: The congestion point ID
+
+        Returns:
+            The congestion point planner if found, None otherwise
+        """
         for cp in self.cp_controllers:
             if cp.congestion_point_id == cp_id:
                 return cp
@@ -62,6 +111,28 @@ class RootPlanner:
         max_priority_class_external: int,
         multithreaded: bool = False,
     ):
+        """Execute the root-level planning algorithm.
+
+        This method orchestrates the iterative optimization process:
+        1. Creates initial plans from all congestion points
+        2. Iterates over priority classes (from min to max)
+        3. For each priority class, iteratively improves plans by:
+           - Computing difference between target and current planning
+           - Requesting proposals from congestion points
+           - Accepting best proposals until convergence
+
+        The algorithm stops when:
+        - No proposals are available
+        - Improvement falls below threshold (energy or cost)
+        - Maximum iterations reached
+
+        Args:
+            plan_due_by_date: Deadline for completing the plan
+            optimize_for_target: Whether to optimize for the target (if False,
+                only initial planning is done)
+            max_priority_class_external: Maximum priority class to optimize
+            multithreaded: Whether to use multithreading for device planning
+        """
         # Compute an initial plan by summing each congestion point's initial planning.
         self.root_ctrl_planning = self.empty_profile
         for cpc in self.cp_controllers:
@@ -170,7 +241,20 @@ class RootPlanner:
                 pass
 
     def _accept_proposal(self, proposal):
-        """Accept a proposal and update the planning accordingly."""
+        """Accept a proposal and update the planning accordingly.
+
+        This method:
+        1. Updates the root controller's planning by subtracting the old plan
+           and adding the proposed plan
+        2. Finds the real device object (not the copy in the proposal)
+        3. Updates the device's accepted plan
+
+        Args:
+            proposal: The proposal to accept
+
+        Raises:
+            Exception: If the congestion point controller or device cannot be found
+        """
         # Update the root controller's planning based on the proposal.
         self.root_ctrl_planning = self.root_ctrl_planning.subtract(proposal.old_plan)
         self.root_ctrl_planning = self.root_ctrl_planning.add(proposal.proposed_plan)

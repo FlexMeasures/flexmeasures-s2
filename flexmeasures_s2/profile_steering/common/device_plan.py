@@ -12,6 +12,16 @@ from flexmeasures_s2.profile_steering.device_planner.ddbc.s2_ddbc_instruction_pr
 
 
 class DevicePlan(FlexMeasuresBaseModel):
+    """Represents a plan for a single device.
+
+    A DevicePlan contains:
+    - Device identification (device_id, device_name, connection_id)
+    - Energy profile: The planned energy consumption/production over time
+    - Fill level profile: For storage devices, the planned state of charge
+    - Instruction profile: Device-specific instructions (FRBC or DDBC format)
+
+    Device plans are created by device planners and aggregated into cluster plans.
+    """
 
     device_id: str
     device_name: str
