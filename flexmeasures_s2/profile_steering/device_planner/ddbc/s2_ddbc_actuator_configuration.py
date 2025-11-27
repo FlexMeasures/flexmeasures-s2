@@ -49,3 +49,12 @@ class S2DdbcActuatorConfiguration(S2ActuatorConfiguration):
             f"supplyRate={self.supply_rate}, "
             f"powerPerCommodityQuantity={self.power_per_commodity_quantity}]"
         )
+
+    def __repr__(self):
+        return (
+            f"S2DdbcActuatorConfiguration["
+            f"operationModeId={self.operation_mode_id}, "
+            f"factor={self.factor}, "
+            f"supplyRate={self.supply_rate}, "
+            f"powerPerCommodityQuantity={self.power_per_commodity_quantity}]"
+        )
