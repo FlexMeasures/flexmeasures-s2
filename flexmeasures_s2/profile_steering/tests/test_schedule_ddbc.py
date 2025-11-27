@@ -14,6 +14,8 @@ To run:
     python flexmeasures_s2/profile_steering/examples/example_schedule_ddbc.py
 """
 
+import pytest
+
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 from datetime import datetime, timedelta, timezone
 from typing import Optional
@@ -1180,26 +1182,18 @@ def test_ddbc_price_tradeoff():
         # Note: The optimization might not always achieve perfect factors due to demand constraints
         # We check that the system is responding to price signals
         if tariff < 1.034:  # Below cutoff - should favor heat pump
-            # When electricity is cheaper, HP should be used more than gas
-            if hp_f == 0 and gas_f == 0:
-                print(
-                    f"  Warning: Timestep {i}: Both factors are 0 (might indicate no demand or planning issue)"
-                )
-            elif hp_f < gas_f:
-                print(
-                    f"  Warning: Timestep {i}: HP factor ({hp_f:.2f}) < Gas factor ({gas_f:.2f}) when electricity is cheaper"
-                )
+            assert (
+                hp_f > gas_f
+            ), "When electricity is cheaper, HP should be used more than gas"
         else:  # Above cutoff - should favor gas
-            # When electricity is more expensive, Gas should be used more than HP
-            if hp_f > gas_f and hp_f > 0.1:
-                print(
-                    f"  Warning: Timestep {i}: HP factor ({hp_f:.2f}) > Gas factor ({gas_f:.2f}) when electricity is more expensive"
-                )
+            assert (
+                hp_f < gas_f
+            ), "When electricity is more expensive, Gas should be used more than HP"
 
     # Calculate total energy consumption
     total_energy_joules = sum(energy_profile.elements) if energy_profile.elements else 0
     total_energy_kwh = total_energy_joules / 3_600_000
-    print(f"\nTotal energy consumption: {total_energy_kwh:.2f} kWh")
+    assert 0.197 == pytest.approx(total_energy_kwh, 0.001)
 
     # Plot results
     # plot_ddbc_results(
