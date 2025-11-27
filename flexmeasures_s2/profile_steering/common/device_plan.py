@@ -31,3 +31,4 @@ class DevicePlan(FlexMeasuresBaseModel):
     instruction_profile: Optional[
         Union[S2FrbcInstructionProfile, S2DdbcInstructionProfile]
     ] = None
+    insights_profile: Optional = None
