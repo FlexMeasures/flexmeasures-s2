@@ -1,7 +1,6 @@
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 from datetime import datetime, timedelta, timezone
 import uuid
-import logging
 import time
 import pandas as pd
 import os
@@ -1865,46 +1864,3 @@ def test_itho_planning_with_fill_level_target_only():
     # print("ITHO fill level target only test completed successfully!")
 
     return cluster_plan
-
-
-if __name__ == "__main__":
-    # Configure logging to show DEBUG messages
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        datefmt="%H:%M:%S",
-    )
-
-    # Optionally, set specific loggers to different levels
-    # logging.getLogger('matplotlib').setLevel(logging.WARNING)
-
-    # print("=" * 80)
-    # print("ITHO DHW Heat Pump Planning Examples with DEBUG Logging")
-    # print("=" * 80)
-    # print()
-
-    # Test 1: Energy targeting
-    # test_itho_planning_with_energy_target()
-
-    # print("\n" + "=" * 80 + "\n")
-
-    # Test 2: Constant cost (1 EUR/kWh)
-    # test_itho_planning_with_constant_cost()
-
-    # print("\n" + "=" * 80 + "\n")
-
-    # Test 3: Variable cost targeting (with both fill level target and usage forecast)
-    # test_itho_planning_with_cost_target()
-
-    # print("\n" + "=" * 80 + "\n")
-
-    # Test 4: Usage forecast ONLY (no fill level target)
-    # test_itho_planning_with_usage_forecast_only()
-
-    # print("\n" + "=" * 80 + "\n")
-
-    # Test 5: Fill level target ONLY (no usage forecast)
-    test_itho_planning_with_fill_level_target_only()
-
-    # Default: run Test 3 (variable cost with both profiles)
-    # test_itho_planning_with_cost_target()
