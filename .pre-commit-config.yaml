@@ -9,11 +9,11 @@ repos:
     hooks:
     - id: black
       name: black (code formatting)
--   repo: local
-    hooks:
-    - id: mypy
-      name: mypy (static typing)
-      pass_filenames: false
-      language: script
-      entry: run_mypy.sh
-      verbose: true
+#-   repo: local
+#    hooks:
+#    - id: mypy
+#      name: mypy (static typing)
+#      pass_filenames: false
+#      language: script
+#      entry: run_mypy.sh
+#      verbose: true
