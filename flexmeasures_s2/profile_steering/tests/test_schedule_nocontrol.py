@@ -279,7 +279,3 @@ def test_planning_service_impl_with_nocontrol_devices():
 
     assert len(energy_profile.elements) == target_metadata.nr_of_timesteps
     # print("Test completed successfully!")
-
-
-if __name__ == "__main__":
-    test_planning_service_impl_with_nocontrol_devices()
