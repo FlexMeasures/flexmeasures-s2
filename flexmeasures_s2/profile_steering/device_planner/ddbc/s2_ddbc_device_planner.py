@@ -137,7 +137,11 @@ class S2DdbcDevicePlanner(DevicePlanner):
         if self.accepted_plan is None:
             raise ValueError("No accepted plan found")
 
-        target = diff_to_global_target.add(self.accepted_plan.get_energy())
+        # if target is Joule target then add diff_to_global_target
+        if diff_to_global_target.nr_of_joule_target_elements() != 0:
+            target = diff_to_global_target.add(self.accepted_plan.get_energy())
+        else:
+            target = diff_to_global_target
         max_profile = diff_to_max.add(self.accepted_plan.get_energy())
         min_profile = diff_to_min.add(self.accepted_plan.get_energy())
 
