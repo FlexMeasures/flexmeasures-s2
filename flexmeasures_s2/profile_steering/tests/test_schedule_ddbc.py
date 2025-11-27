@@ -388,7 +388,7 @@ def create_price_tradeoff_device_state(
     # Gas boiler actuator
     gas_actuator = DDBCActuatorDescription(
         id=gas_id,
-        diagnostic_label=gas_id,
+        diagnostic_label="gas",
         supported_commodites=[Commodity.GAS],
         operation_modes=[
             DDBCOperationMode(
