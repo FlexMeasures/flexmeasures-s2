@@ -44,23 +44,22 @@ For profiling, use:
 
 ## Profile Steering Examples
 
-The `flexmeasures_s2/profile_steering/examples/` directory contains example scripts demonstrating
-different aspects of the profile steering algorithm. These examples show how to use the
-planning service with different device types.
+The `flexmeasures_s2/profile_steering/examples/` and `flexmeasures_s2/profile_steering/tests/` directories contains example scripts and tests demonstrating different aspects of the profile steering algorithm.
+These show how to use the planning service with different device types.
 
 ### Running Examples
 
-All examples can be run directly from the command line. Make sure you're in the project root
-directory or have the flexmeasures_s2 package installed.
+All examples can be run directly from the command line. Make sure you're in the project root directory or have the flexmeasures_s2 package installed.
+
+For the tests, run `pytest -k <module name>` or just run `pytest` to cover all tests.
 
 #### NoControl Device Example
 
 Demonstrates planning with non-controllable devices (e.g., fixed consumption loads):
 
-    python -m flexmeasures_s2.profile_steering.examples.example_schedule_nocontrol
+    pytest -k test_schedule_nocontrol
 
-This example creates multiple NoControl devices with fixed power forecasts and generates
-a plan that matches a target energy profile.
+This test creates multiple NoControl devices with fixed power forecasts and generates a plan that matches a target energy profile.
 
 #### DDBC Simple Example
 
@@ -74,7 +73,7 @@ This demonstrates basic DDBC device planning without complex system descriptions
 
 Full DDBC example with hybrid heating system (gas boiler + heat pump):
 
-    python -m flexmeasures_s2.profile_steering.examples.example_schedule_ddbc
+    pytest -k test_schedule_ddbc
 
 This example creates a hybrid heating system with:
 - Gas boiler actuator (natural gas commodity)
@@ -96,11 +95,11 @@ This demonstrates planning for storage devices (e.g., EV batteries) with:
 - Usage forecasts
 - Operation mode optimization
 
-#### ITHO Example
+#### Itho Example
 
-Complex example with ITHO heating system configuration:
+Complex example with Itho heating system configuration:
 
-    python -m flexmeasures_s2.profile_steering.examples.example_schedule_itho
+    pytest -k test_schedule_itho
 
 This is a comprehensive example that may require additional configuration files.
 Check the example file and `itho.yaml` for specific requirements.
