@@ -18,7 +18,6 @@ from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 import uuid
-import logging
 import time
 import pandas as pd
 import os
@@ -1218,41 +1217,3 @@ def test_ddbc_price_tradeoff():
 
     print("DDBC price tradeoff test completed successfully!")
     return cluster_plan
-
-
-if __name__ == "__main__":
-    # Configure logging
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        datefmt="%H:%M:%S",
-    )
-
-    print("=" * 80)
-    print("DDBC Planning Examples")
-    print("=" * 80)
-    print()
-
-    try:
-        # Test 1: Basic plotting test
-        test_ddbc_by_plotting()
-
-        print("\n" + "=" * 80 + "\n")
-
-        # Test 2: Changing demand test
-        test_ddbc_changing_demand()
-
-        print("\n" + "=" * 80 + "\n")
-
-        # Test 3: Price tradeoff test
-        test_ddbc_price_tradeoff()
-
-        print("\n" + "=" * 80)
-        print("All DDBC tests completed successfully!")
-        print("=" * 80)
-    except Exception as e:
-        print(f"\n❌ Test failed with error: {e}")
-        import traceback
-
-        traceback.print_exc()
-        raise
