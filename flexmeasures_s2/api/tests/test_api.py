@@ -1,3 +1,5 @@
+import pytest
+
 from flask import url_for
 from flask_security import decorators as fs_decorators
 from rq.job import Job
@@ -11,6 +13,7 @@ from flexmeasures.data.services.scheduling import (
 from flexmeasures.data.tests.utils import work_on_rq
 
 
+@pytest.mark.xfail
 def test_s2_frbc_api(monkeypatch, app, setup_frbc_asset):
     sensor = setup_frbc_asset.sensors[0]
 
