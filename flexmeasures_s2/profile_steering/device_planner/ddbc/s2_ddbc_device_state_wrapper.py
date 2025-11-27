@@ -22,7 +22,7 @@ class S2DdbcDeviceStateWrapper:
     """
 
     EPSILON = 1e-4
-    STRATIFICATION_LAYERS = 30  # Number of stratification layers (matching FRBC)
+    STRATIFICATION_LAYERS = 50  # Number of stratification layers
 
     def __init__(self, device_state: S2DdbcDeviceState):
         self.device_state = device_state
