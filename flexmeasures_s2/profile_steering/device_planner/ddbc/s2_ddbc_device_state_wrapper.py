@@ -22,9 +22,8 @@ class S2DdbcDeviceStateWrapper:
     """
 
     EPSILON = 1e-4
-    STRATIFICATION_LAYERS = 50  # Number of stratification layers
 
-    def __init__(self, device_state: S2DdbcDeviceState):
+    def __init__(self, device_state: S2DdbcDeviceState, stratification_layers: int):
         self.device_state = device_state
 
         self.actuator_operation_mode_map_per_timestep: Dict[
@@ -35,6 +34,7 @@ class S2DdbcDeviceStateWrapper:
         ] = {}
         self.operation_mode_uses_factor_map: Dict[str, bool] = {}
         self.operation_modes: Dict[str, DdbcOperationModeWrapper] = {}
+        self.stratification_layers = stratification_layers
 
     def is_online(self) -> bool:
         return self.device_state.is_device_online()
@@ -285,14 +285,14 @@ class S2DdbcDeviceStateWrapper:
         om = self.get_operation_mode(target_timestep, actuator_id, operation_mode_id)
 
         # If stratification is disabled, just use factor 0.0
-        if self.STRATIFICATION_LAYERS == 0:
+        if self.stratification_layers == 0:
             config_actuator_map = dict(copy)
             config_actuator_map[actuator_id] = om.convert_to_actuator_config(0.0)
             configs.append(config_actuator_map)
         else:
-            for i in range(self.STRATIFICATION_LAYERS + 1):
+            for i in range(self.stratification_layers + 1):
                 config_actuator_map = dict(copy)
-                factor_for_actuator = i * (1.0 / self.STRATIFICATION_LAYERS)
+                factor_for_actuator = i * (1.0 / self.stratification_layers)
                 config_actuator_map[actuator_id] = om.convert_to_actuator_config(
                     factor_for_actuator
                 )

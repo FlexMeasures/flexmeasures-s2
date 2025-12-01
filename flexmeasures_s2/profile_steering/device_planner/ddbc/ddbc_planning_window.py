@@ -52,8 +52,11 @@ class DdbcPlanningWindow:
         device_state: S2DdbcDeviceState,
         profile_metadata: ProfileMetadata,
         plan_due_by_date: datetime,
+        stratification_layers: int,
     ):
-        self.device_state = S2DdbcDeviceStateWrapper(device_state)
+        self.device_state = S2DdbcDeviceStateWrapper(
+            device_state, stratification_layers=stratification_layers
+        )
         self.profile_metadata = profile_metadata
         self.plan_due_by_date = plan_due_by_date
         self.timestep_duration_seconds = int(

@@ -45,14 +45,13 @@ class S2DdbcDevicePlanner(DevicePlanner):
             (matching FRBC for consistency)
     """
 
-    STRATIFICATION_LAYERS = 30  # Number of stratification layers (matching FRBC)
-
     def __init__(
         self,
         s2_ddbc_state: S2DdbcDeviceState,
         profile_metadata: ProfileMetadata,
         plan_due_by_date: datetime,
         congestion_point_id: str,
+        stratification_layers: int = 50,
     ):
         self._congestion_point_id = congestion_point_id
         self.s2_ddbc_state = s2_ddbc_state
@@ -74,6 +73,7 @@ class S2DdbcDevicePlanner(DevicePlanner):
                 self.s2_ddbc_state,
                 profile_metadata,
                 plan_due_by_date,
+                stratification_layers=stratification_layers,
             )
         else:
             self.state_tree = None
