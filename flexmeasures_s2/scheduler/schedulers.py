@@ -171,7 +171,11 @@ class PlanningServiceImpl(PlanningService):
                         else [],
                     )
 
-                cpc = CongestionPointPlanner(congestion_point, congestion_point_target, self.config.multithreaded())  # type: ignore[arg-type]
+                cpc = CongestionPointPlanner(
+                    congestion_point_id=congestion_point,
+                    congestion_target=congestion_point_target,
+                    multithreaded=self.config.multithreaded(),
+                )  # type: ignore[arg-type]
                 root_planner.add_congestion_point_controller(cpc)
 
             # Add the appropriate device planner based on the device state type

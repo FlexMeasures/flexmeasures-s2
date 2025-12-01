@@ -217,10 +217,10 @@ class CongestionPointPlanner:
                     if device.priority_class <= priority_class:
                         try:
                             proposal = device.create_improved_planning(
-                                self.empty_profile,  # type: ignore[arg-type]
-                                diff_to_max,
-                                diff_to_min,
-                                plan_due_by_date,
+                                diff_to_global_target=self.empty_profile,  # type: ignore[arg-type]
+                                diff_to_max=diff_to_max,
+                                diff_to_min=diff_to_min,
+                                plan_due_by_date=plan_due_by_date,
                             )
                             if proposal is None:
                                 raise ValueError(
