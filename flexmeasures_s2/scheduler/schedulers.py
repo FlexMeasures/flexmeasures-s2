@@ -179,10 +179,10 @@ class PlanningServiceImpl(PlanningService):
                 logger.debug("S2 FRBC planner created!")
                 cpc.add_device_controller(
                     S2FrbcDevicePlanner(
-                        device_state,
-                        target.metadata,
-                        plan_due_by_date,
-                        congestion_point,
+                        s2_frbc_state=device_state,
+                        profile_metadata=target.metadata,
+                        plan_due_by_date=plan_due_by_date,
+                        congestion_point_id=congestion_point,
                     )
                 )
             elif isinstance(device_state, S2NoControlDeviceState):

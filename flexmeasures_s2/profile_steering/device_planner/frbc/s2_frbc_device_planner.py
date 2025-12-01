@@ -293,16 +293,16 @@ class S2FrbcDevicePlanner(DevicePlanner):
         if self.is_storage_available(self.s2_frbc_state):
             if ids is None:
                 self.latest_plan = self.state_tree.find_best_plan(
-                    TargetProfile.null_profile(self.profile_metadata),
-                    self.null_profile,
-                    self.null_profile,
+                    target_profile=TargetProfile.null_profile(self.profile_metadata),
+                    diff_to_min_profile=self.null_profile,
+                    diff_to_max_profile=self.null_profile,
                 )
             else:
                 self.latest_plan = self.state_tree.find_best_plan(
-                    TargetProfile.null_profile(self.profile_metadata),
-                    self.null_profile,
-                    self.null_profile,
-                    ids,
+                    target_profile=TargetProfile.null_profile(self.profile_metadata),
+                    diff_to_min_profile=self.null_profile,
+                    diff_to_max_profile=self.null_profile,
+                    ids=ids,
                 )
         else:
             self.latest_plan = S2FrbcPlan(
