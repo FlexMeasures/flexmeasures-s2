@@ -198,10 +198,10 @@ class PlanningServiceImpl(PlanningService):
                 logger.debug("S2 DDBC planner created!")
                 cpc.add_device_controller(
                     S2DdbcDevicePlanner(
-                        device_state,
-                        target.metadata,
-                        plan_due_by_date,
-                        congestion_point,
+                        s2_ddbc_state=device_state,
+                        profile_metadata=target.metadata,
+                        plan_due_by_date=plan_due_by_date,
+                        congestion_point_id=congestion_point,
                     )
                 )
             # Add other device types here as needed

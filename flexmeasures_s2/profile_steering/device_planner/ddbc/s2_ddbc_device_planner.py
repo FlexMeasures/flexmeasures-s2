@@ -57,22 +57,22 @@ class S2DdbcDevicePlanner(DevicePlanner):
         self.s2_ddbc_state = s2_ddbc_state
         self.profile_metadata = profile_metadata
         self.zero_profile = JouleProfile(
-            profile_metadata.profile_start,
-            profile_metadata.timestep_duration,
-            [0] * profile_metadata.nr_of_timesteps,
+            profile_start=profile_metadata.profile_start,
+            timestep_duration=profile_metadata.timestep_duration,
+            elements=[0] * profile_metadata.nr_of_timesteps,
         )
         self.null_profile = JouleProfile(
-            profile_metadata.profile_start,
-            profile_metadata.timestep_duration,
+            profile_start=profile_metadata.profile_start,
+            timestep_duration=profile_metadata.timestep_duration,
             elements=[None] * profile_metadata.nr_of_timesteps,
         )
 
         self.state_tree: Optional[DdbcPlanningWindow]
         if self._is_device_available(self.s2_ddbc_state):
             self.state_tree = DdbcPlanningWindow(
-                self.s2_ddbc_state,
-                profile_metadata,
-                plan_due_by_date,
+                device_state=self.s2_ddbc_state,
+                profile_metadata=profile_metadata,
+                plan_due_by_date=plan_due_by_date,
                 stratification_layers=stratification_layers,
             )
         else:
@@ -191,9 +191,9 @@ class S2DdbcDevicePlanner(DevicePlanner):
             and self.state_tree is not None
         ):
             self.latest_plan = self.state_tree.find_best_plan(
-                TargetProfile.null_profile(self.profile_metadata),
-                self.null_profile,
-                self.null_profile,
+                target_profile=TargetProfile.null_profile(self.profile_metadata),
+                diff_to_min_profile=self.null_profile,
+                diff_to_max_profile=self.null_profile,
             )
         else:
             self.latest_plan = S2DdbcPlan(
