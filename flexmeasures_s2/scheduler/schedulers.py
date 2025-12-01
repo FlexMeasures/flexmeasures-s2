@@ -189,9 +189,9 @@ class PlanningServiceImpl(PlanningService):
                 logger.debug("S2 NoControl planner created!")
                 cpc.add_device_controller(
                     S2NoControlDevicePlanner(
-                        device_state,
-                        target.metadata,
-                        congestion_point,
+                        device_state=device_state,
+                        profile_metadata=target.metadata,
+                        congestion_point_id=congestion_point,
                     )
                 )
             elif isinstance(device_state, S2DdbcDeviceState):
