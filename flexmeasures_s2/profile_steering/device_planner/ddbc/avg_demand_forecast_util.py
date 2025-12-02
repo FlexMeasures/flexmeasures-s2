@@ -1,29 +1,18 @@
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import List, Any, Optional
 
 
+@dataclass
 class AvgDemandForecastElement:
     """Element representing average demand forecast for a time period."""
 
-    def __init__(self, start: datetime, end: datetime, avg_demand: float):
-        self.start = start
-        self.end = end
-        self.avg_demand = avg_demand
-
-    def get_start(self) -> datetime:
-        return self.start
-
-    def get_end(self) -> datetime:
-        return self.end
-
-    def get_avg_demand(self) -> float:
-        return self.avg_demand
+    start: datetime
+    end: datetime
+    avg_demand: float
 
     def get_duration(self) -> timedelta:
         return self.end - self.start
-
-    def __str__(self) -> str:
-        return f"AvgDemandForecastElement(avgDemand={self.avg_demand}, start={self.start}, end={self.end})"
 
 
 class AvgDemandForecastProfile:
@@ -38,25 +27,25 @@ class AvgDemandForecastProfile:
     def get_start(self) -> Optional[datetime]:
         if not self.elements:
             return None
-        return self.elements[0].get_start()
+        return self.elements[0].start
 
     def get_end(self) -> Optional[datetime]:
         if not self.elements:
             return None
-        return self.elements[-1].get_end()
+        return self.elements[-1].end
 
     def sub_profile(self, start: datetime, end: datetime) -> "AvgDemandForecastProfile":
         """Get a sub-profile between start and end times."""
         sub_elements = []
 
         for element in self.elements:
-            element_start = max(element.get_start(), start)
-            element_end = min(element.get_end(), end)
+            element_start = max(element.start, start)
+            element_end = min(element.end, end)
 
             if element_start < element_end:
                 sub_elements.append(
                     AvgDemandForecastElement(
-                        element_start, element_end, element.get_avg_demand()
+                        element_start, element_end, element.avg_demand
                     )
                 )
 
@@ -112,7 +101,7 @@ class AvgDemandForecastUtil:
         demand = 0.0
         for element in sub_profile.get_elements():
             duration_ms = element.get_duration().total_seconds() * 1000
-            demand += element.get_avg_demand() * duration_ms
+            demand += element.avg_demand * duration_ms
 
         start = sub_profile.get_start()
         end = sub_profile.get_end()
