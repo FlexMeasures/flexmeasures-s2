@@ -188,7 +188,7 @@ class S2DdbcDeviceStateWrapper:
         if result_from_map is None:
             result = self.get_operation_mode(
                 target_timestep, actuator_id, operation_mode_id
-            ).uses_factor_method()
+            ).uses_factor
             self.operation_mode_uses_factor_map[key] = result
             return result
         else:

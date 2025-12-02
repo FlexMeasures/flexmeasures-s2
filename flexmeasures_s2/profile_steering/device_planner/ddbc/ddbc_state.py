@@ -262,7 +262,7 @@ class DdbcState:
             missing_factor_actuator_id,
             actuator_configurations[missing_factor_actuator_id].get_operation_mode_id(),
         )
-        supply_range = om.get_supply_range()
+        supply_range = om.supply_range
         calculated_factor = (
             missing_supply_rate - supply_range.get_start_of_range()
         ) / (supply_range.get_end_of_range() - supply_range.get_start_of_range())
