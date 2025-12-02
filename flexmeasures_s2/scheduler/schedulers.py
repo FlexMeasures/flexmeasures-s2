@@ -144,11 +144,11 @@ class PlanningServiceImpl(PlanningService):
         always_accept_all_proposals = not target.contains_energy_target()
 
         root_planner = RootPlanner(
-            target.get_global_target_profile(),
-            self.config.energy_improvement_criterion(),
-            self.config.cost_improvement_criterion(),
-            always_accept_all_proposals,
-            self.context,
+            target=target.get_global_target_profile(),
+            energy_iteration_criterion=self.config.energy_improvement_criterion(),
+            cost_iteration_criterion=self.config.cost_improvement_criterion(),
+            always_accept_all_proposals=always_accept_all_proposals,
+            context=self.context,
         )
 
         for device_id, device_state in cluster_state.get_device_states().items():
@@ -165,7 +165,7 @@ class PlanningServiceImpl(PlanningService):
                 if congestion_point == self.DEFAULT_CONGESTION_POINT:
                     # This is a dummy congestion point. We will give it an empty profile.
                     congestion_point_target = JouleRangeProfile(
-                        target.get_global_target_profile().metadata,
+                        profile_start=target.get_global_target_profile().metadata,
                         elements=congestion_point_target.elements
                         if congestion_point_target is not None
                         else [],
