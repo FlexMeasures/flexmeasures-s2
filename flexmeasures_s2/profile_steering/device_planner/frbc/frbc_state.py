@@ -11,7 +11,7 @@ from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 import flexmeasures_s2.profile_steering.device_planner.frbc.frbc_timestep as frbc_timestep
 import flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state_wrapper as s2_frbc_device_state_wrapper
 
-from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_actuator_configuration import (
+from flexmeasures_s2.profile_steering.common.s2_actuator_configuration import (
     S2ActuatorConfiguration,
 )
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import (

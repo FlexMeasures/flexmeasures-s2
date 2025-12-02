@@ -3,7 +3,7 @@ from typing import Dict, List, Optional, Any, TYPE_CHECKING
 from functools import lru_cache
 import numpy as np
 
-from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_actuator_configuration import (
+from flexmeasures_s2.profile_steering.common.s2_actuator_configuration import (
     S2ActuatorConfiguration,
 )
 from s2python.common import CommodityQuantity
