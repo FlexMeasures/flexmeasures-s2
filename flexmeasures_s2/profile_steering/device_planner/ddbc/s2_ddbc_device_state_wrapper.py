@@ -60,7 +60,7 @@ class S2DdbcDeviceStateWrapper:
     def get_actuators(self, target_timestep: "DdbcTimestep") -> Set[str]:
         """Get all actuator IDs for a timestep."""
         actuator_operation_mode_map = self.actuator_operation_mode_map_per_timestep.get(
-            target_timestep.get_start_date()
+            target_timestep.start_date
         )
         if actuator_operation_mode_map is None:
             actuator_operation_mode_map = self._create_actuator_operation_mode_map(
@@ -73,7 +73,7 @@ class S2DdbcDeviceStateWrapper:
     ) -> List[str]:
         """Get all normal operation mode IDs for an actuator."""
         actuator_operation_mode_map = self.actuator_operation_mode_map_per_timestep.get(
-            target_timestep.get_start_date()
+            target_timestep.start_date
         )
         if actuator_operation_mode_map is None:
             actuator_operation_mode_map = self._create_actuator_operation_mode_map(
@@ -87,7 +87,7 @@ class S2DdbcDeviceStateWrapper:
         """Create a map from actuator ID to list of normal operation mode IDs."""
         actuator_operation_mode_map: Dict[str, List[str]] = {}
 
-        for actuator in target_timestep.get_system_description().actuators:
+        for actuator in target_timestep.system_description.actuators:
             # Convert both actuator ID and operation mode IDs to strings
             operation_mode_ids = [
                 str(om.id)
@@ -97,7 +97,7 @@ class S2DdbcDeviceStateWrapper:
             actuator_operation_mode_map[str(actuator.id)] = operation_mode_ids
 
         self.actuator_operation_mode_map_per_timestep[
-            target_timestep.get_start_date()
+            target_timestep.start_date
         ] = actuator_operation_mode_map
         return actuator_operation_mode_map
 
@@ -120,7 +120,7 @@ class S2DdbcDeviceStateWrapper:
             return self.operation_modes[om_key]
 
         found_actuator_description = None
-        system_actuators = target_timestep.get_system_description().actuators
+        system_actuators = target_timestep.system_description.actuators
 
         for actuator_description in system_actuators:
             actuator_desc_id_str = str(actuator_description.id)
@@ -198,7 +198,7 @@ class S2DdbcDeviceStateWrapper:
         self, target_timestep: "DdbcTimestep"
     ) -> List[Dict[str, S2DdbcActuatorConfiguration]]:
         """Get all possible actuator configurations for a timestep."""
-        timestep_date = target_timestep.get_start_date()
+        timestep_date = target_timestep.start_date
 
         if timestep_date in self.all_actions:
             return self.all_actions[timestep_date]
@@ -398,7 +398,7 @@ class S2DdbcDeviceStateWrapper:
     ) -> Any:
         """Get actuator description by ID."""
         found_actuator_description = None
-        for actuator_description in target_timestep.get_system_description().actuators:
+        for actuator_description in target_timestep.system_description.actuators:
             if (
                 str(actuator_description.id) == actuator_id
                 or actuator_description.id == actuator_id

@@ -168,7 +168,7 @@ class DdbcPlanningWindow:
 
         first_timestep_index = -1
         for i in range(len(self.timesteps)):
-            if self.timesteps[i].get_system_description() is not None:
+            if self.timesteps[i].system_description is not None:
                 first_timestep_index = i
                 break
 
@@ -206,7 +206,7 @@ class DdbcPlanningWindow:
                     actuators.append(state.get_actuator_configurations())
                     insight_elements.append(
                         S2DdbcInsightsProfile.Element(
-                            timestep.get_avg_demand_rate_forecast(),
+                            timestep.avg_demand_rate_forecast,
                             state.get_supply_rate(),
                             state.get_actuator_configurations(),
                         )

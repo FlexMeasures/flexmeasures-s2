@@ -55,7 +55,7 @@ class DdbcState:
 
         actuator_statuses = self.device_state_wrapper.get_actuator_statuses()
 
-        for actuator in self.timestep.get_system_description().actuators:
+        for actuator in self.timestep.system_description.actuators:
             actuator_id_str = str(actuator.id)
             actuator_status = actuator_statuses.get(actuator_id_str)
 
@@ -79,7 +79,7 @@ class DdbcState:
 
         self.timer_elapse_map = (
             self._get_initial_timer_elapse_map_for_system_description(
-                self.timestep.get_system_description()
+                self.timestep.system_description
             )
         )
         self.gas_price_per_liter = (
@@ -94,13 +94,13 @@ class DdbcState:
         self.gas_price_per_liter = self.previous_state.gas_price_per_liter
 
         self.actuator_configurations = self._calculate_missing_factor(
-            actuator_configurations, self.timestep.get_avg_demand_rate_forecast()
+            actuator_configurations, self.timestep.avg_demand_rate_forecast
         )
 
         timestep_energy = 0.0
         timestep_natural_gas_liters = 0.0
         timestep_supply_rate = 0.0
-        seconds = self.timestep.get_duration_seconds()
+        seconds = self.timestep.duration_seconds
 
         for actuator_id, actuator_configuration in self.actuator_configurations.items():
             om = self.device_state_wrapper.get_operation_mode(
@@ -164,7 +164,7 @@ class DdbcState:
                         duration = S2DdbcDeviceStateWrapper.get_timer_duration(
                             self.timestep, actuator_id, timer_id
                         )
-                        new_finished_at = self.timestep.get_start_date() + duration
+                        new_finished_at = self.timestep.start_date + duration
                         self.timer_elapse_map[
                             self._timer_key(actuator_id, timer_id)
                         ] = new_finished_at
@@ -178,7 +178,7 @@ class DdbcState:
     def _calculate_scores(self, timestep_natural_gas_liters: float):
         """Calculate scoring metrics for this state."""
         assert self.previous_state is not None, "previous_state must not be None"
-        target = self.timestep.get_target()
+        target = self.timestep.target
 
         if isinstance(target, TargetProfile.JouleElement):
             self.sum_squared_distance = (
@@ -200,16 +200,16 @@ class DdbcState:
             self.previous_state.sum_squared_constraint_violation
         )
 
-        if self.timestep.get_max_constraint() is not None:
-            if self.timestep_energy > self.timestep.get_max_constraint():
+        if self.timestep.max_constraint is not None:
+            if self.timestep_energy > self.timestep.max_constraint:
                 squared_constraint_violation += (
-                    self.timestep_energy - self.timestep.get_max_constraint()
+                    self.timestep_energy - self.timestep.max_constraint
                 ) ** 2
 
-        if self.timestep.get_min_constraint() is not None:
-            if self.timestep_energy < self.timestep.get_min_constraint():
+        if self.timestep.min_constraint is not None:
+            if self.timestep_energy < self.timestep.min_constraint:
                 squared_constraint_violation += (
-                    self.timestep.get_min_constraint() - self.timestep_energy
+                    self.timestep.min_constraint - self.timestep_energy
                 ) ** 2
 
         self.sum_natural_gas_cost = self.previous_state.sum_natural_gas_cost + (
@@ -308,7 +308,7 @@ class DdbcState:
 
         if (
             previous_state.get_system_description().valid_from
-            == target_timestep.get_system_description().valid_from
+            == target_timestep.system_description.valid_from
         ):
             for actuator_id, config in actuator_configs_for_target_timestep.items():
                 previous_operation_mode_id = previous_state.actuator_configurations[
@@ -333,7 +333,7 @@ class DdbcState:
                         )
                         if (
                             timer_is_finished_at is not None
-                            and target_timestep.get_start_date() < timer_is_finished_at
+                            and target_timestep.start_date < timer_is_finished_at
                         ):
                             return False
 
@@ -388,13 +388,13 @@ class DdbcState:
 
     def supply_demand_distance(self) -> float:
         """Calculate distance between supply and demand."""
-        return abs(self.supply_rate - self.timestep.get_avg_demand_rate_forecast())
+        return abs(self.supply_rate - self.timestep.avg_demand_rate_forecast)
 
     def get_timestep(self) -> "DdbcTimestep":
         return self.timestep
 
     def get_system_description(self):
-        return self.timestep.get_system_description()
+        return self.timestep.system_description
 
     def get_device_state_wrapper(self) -> "S2DdbcDeviceStateWrapper":
         return self.device_state_wrapper

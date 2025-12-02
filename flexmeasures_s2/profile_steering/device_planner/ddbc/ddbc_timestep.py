@@ -71,32 +71,13 @@ class DdbcTimestep:
         else:
             return self.best_state
 
-    def get_start_date(self) -> datetime:
-        return self.start_date
-
-    def get_end_date(self) -> datetime:
-        return self.end_date
-
-    def get_system_description(self) -> Any:
-        return self.system_description
-
-    def get_duration(self) -> timedelta:
+    @property
+    def duration(self) -> timedelta:
         return self.end_date - self.start_date
 
-    def get_duration_seconds(self) -> int:
-        return int(self.get_duration().total_seconds())
-
-    def get_target(self) -> Optional[TargetProfile.Element]:
-        return self.target
-
-    def get_min_constraint(self) -> Optional[int]:
-        return self.min_constraint
-
-    def get_max_constraint(self) -> Optional[int]:
-        return self.max_constraint
-
-    def get_avg_demand_rate_forecast(self) -> Optional[float]:
-        return self.avg_demand_rate_forecast
+    @property
+    def duration_seconds(self) -> int:
+        return int(self.duration.total_seconds())
 
     def clear(self):
         """Clear the states for this timestep."""
