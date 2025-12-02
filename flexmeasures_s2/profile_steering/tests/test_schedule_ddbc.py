@@ -665,7 +665,7 @@ def extract_insights_from_device_plan(
     # DevicePlan may have insights_profile as an extra field (Pydantic allows arbitrary types)
     insights = getattr(device_plan, "insights_profile", None)
 
-    if insights and hasattr(insights, "get_elements"):
+    if insights and hasattr(insights, "elements"):
         for elem in insights.elements:
             if elem:
                 supply_rates.append(
