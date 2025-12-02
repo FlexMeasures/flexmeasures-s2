@@ -666,8 +666,7 @@ def extract_insights_from_device_plan(
     insights = getattr(device_plan, "insights_profile", None)
 
     if insights and hasattr(insights, "get_elements"):
-        elements = insights.get_elements()
-        for elem in elements:
+        for elem in insights.elements:
             if elem:
                 supply_rates.append(
                     elem.get_supply_rate() if hasattr(elem, "get_supply_rate") else 0
@@ -1178,7 +1177,7 @@ def test_ddbc_price_tradeoff():
         gas_f = factor_gas[i] if i < len(factor_gas) else 0
         expected = "HP on" if tariff < 1.034 else "Gas on"
         print(
-            f"   {i}     | {tariff:.2f}  |   {hp_f:.2f}    |   {gas_f:.2f}   | {expected}"
+            f"   {i}     | {tariff:.2f}  |   {hp_f:.2f}    |   {gas_f:.2f}   | {expected}"  # noqa: E221, E222
         )
 
         # Assertions based on Java test

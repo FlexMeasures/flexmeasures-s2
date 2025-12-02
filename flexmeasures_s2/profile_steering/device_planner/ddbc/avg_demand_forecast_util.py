@@ -15,24 +15,19 @@ class AvgDemandForecastElement:
         return self.end - self.start
 
 
+@dataclass
 class AvgDemandForecastProfile:
     """Profile of average demand forecast elements."""
 
-    def __init__(self, elements: List[AvgDemandForecastElement]):
-        self.elements = elements
+    elements: List[AvgDemandForecastElement]
 
-    def get_elements(self) -> List[AvgDemandForecastElement]:
-        return self.elements
+    @property
+    def start(self) -> Optional[datetime]:
+        return self.elements[0].start if self.elements else None
 
-    def get_start(self) -> Optional[datetime]:
-        if not self.elements:
-            return None
-        return self.elements[0].start
-
-    def get_end(self) -> Optional[datetime]:
-        if not self.elements:
-            return None
-        return self.elements[-1].end
+    @property
+    def end(self) -> Optional[datetime]:
+        return self.elements[-1].end if self.elements else None
 
     def sub_profile(self, start: datetime, end: datetime) -> "AvgDemandForecastProfile":
         """Get a sub-profile between start and end times."""
@@ -95,16 +90,16 @@ class AvgDemandForecastUtil:
             timestep_start, timestep_end_adjusted
         )
 
-        if not sub_profile.get_elements():
+        if not sub_profile.elements:
             return None
 
         demand = 0.0
-        for element in sub_profile.get_elements():
+        for element in sub_profile.elements:
             duration_ms = element.get_duration().total_seconds() * 1000
             demand += element.avg_demand * duration_ms
 
-        start = sub_profile.get_start()
-        end = sub_profile.get_end()
+        start = sub_profile.start
+        end = sub_profile.end
         if start is None or end is None:
             return None
 
