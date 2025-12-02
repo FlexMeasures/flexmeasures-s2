@@ -20,7 +20,7 @@ class FrbcOperationModeElementWrapper:
             element.fill_rate.start_of_range, element.fill_rate.end_of_range
         )
         self.power_ranges: List[PowerRangeWrapper] = [
-            PowerRangeWrapper(pr) for pr in element.power_ranges
+            PowerRangeWrapper(**pr.__dict__) for pr in element.power_ranges
         ]
 
         if element.running_costs is None:
