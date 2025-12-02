@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import Optional
-import logging
 
 from flexmeasures_s2.profile_steering.common.joule_profile import JouleProfile
 from flexmeasures_s2.profile_steering.common.proposal import Proposal
@@ -269,17 +268,6 @@ class S2DdbcDevicePlanner(DevicePlanner):
         if self.accepted_plan is None:
             return None
 
-        logging.debug(
-            dict(
-                device_id=self.device_id,
-                device_name=self.device_name,
-                connection_id=self.connection_id,
-                energy_profile=self.accepted_plan.get_energy(),
-                instruction_profile=self.convert_plan_to_instructions(
-                    self.profile_metadata, self.accepted_plan
-                ),
-            )
-        )
         return DevicePlan(
             device_id=self.device_id,
             device_name=self.device_name,
