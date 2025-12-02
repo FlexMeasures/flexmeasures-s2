@@ -56,16 +56,8 @@ class S2DdbcDevicePlanner(DevicePlanner):
         self._congestion_point_id = congestion_point_id
         self.s2_ddbc_state = s2_ddbc_state
         self.profile_metadata = profile_metadata
-        self.zero_profile = JouleProfile(
-            profile_start=profile_metadata.profile_start,
-            timestep_duration=profile_metadata.timestep_duration,
-            elements=[0] * profile_metadata.nr_of_timesteps,
-        )
-        self.null_profile = JouleProfile(
-            profile_start=profile_metadata.profile_start,
-            timestep_duration=profile_metadata.timestep_duration,
-            elements=[None] * profile_metadata.nr_of_timesteps,
-        )
+        self.zero_profile = JouleProfile.zeros(profile_metadata)
+        self.null_profile = JouleProfile.nulls(profile_metadata)
 
         self.state_tree: Optional[DdbcPlanningWindow]
         if self._is_device_available(self.s2_ddbc_state):

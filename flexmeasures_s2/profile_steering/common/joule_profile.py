@@ -218,3 +218,19 @@ class JouleProfile(AbstractProfile[int, "JouleProfile"]):
 
     def __str__(self) -> str:
         return f"JouleProfile(elements={self.elements}, profile_start={self.metadata.profile_start}, timestep_duration={self.metadata.timestep_duration})"
+
+    @classmethod
+    def zeros(cls, profile_metadata: ProfileMetadata) -> "JouleProfile":
+        return cls(
+            profile_start=profile_metadata.profile_start,
+            timestep_duration=profile_metadata.timestep_duration,
+            elements=[0] * profile_metadata.nr_of_timesteps,
+        )
+
+    @classmethod
+    def nulls(cls, profile_metadata: ProfileMetadata) -> "JouleProfile":
+        return cls(
+            profile_start=profile_metadata.profile_start,
+            timestep_duration=profile_metadata.timestep_duration,
+            elements=[None] * profile_metadata.nr_of_timesteps,
+        )
