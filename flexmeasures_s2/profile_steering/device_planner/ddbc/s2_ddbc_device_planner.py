@@ -69,14 +69,14 @@ class S2DdbcDevicePlanner(DevicePlanner):
         else:
             self.state_tree = None
 
-        self._priority_class = s2_ddbc_state.get_priority_class()
+        self._priority_class = s2_ddbc_state.priority_class
         self.latest_plan: Optional[S2DdbcPlan] = None
         self.accepted_plan: Optional[S2DdbcPlan] = None
 
     @property
     def device_available(self) -> bool:
         """Check if the device is available for planning."""
-        return self.s2_ddbc_state.is_device_online()
+        return self.s2_ddbc_state.is_online
 
     @property
     def priority_class(self) -> int:
@@ -84,11 +84,11 @@ class S2DdbcDevicePlanner(DevicePlanner):
 
     @property
     def device_id(self) -> str:
-        return self.s2_ddbc_state.get_device_id()
+        return self.s2_ddbc_state.device_id
 
     @property
     def connection_id(self) -> str:
-        return self.s2_ddbc_state.get_connection_id()
+        return self.s2_ddbc_state.connection_id
 
     @property
     def congestion_point_id(self) -> str:
@@ -96,7 +96,7 @@ class S2DdbcDevicePlanner(DevicePlanner):
 
     @property
     def device_name(self) -> str:
-        return self.s2_ddbc_state.get_device_name()
+        return self.s2_ddbc_state.device_name
 
     def create_improved_planning(
         self,

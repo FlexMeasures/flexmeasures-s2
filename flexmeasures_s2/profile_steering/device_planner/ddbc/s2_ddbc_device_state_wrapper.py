@@ -37,25 +37,25 @@ class S2DdbcDeviceStateWrapper:
         self.stratification_layers = stratification_layers
 
     def is_online(self) -> bool:
-        return self.device_state.is_device_online()
+        return self.device_state.is_online
 
     def get_power_forecast(self) -> Any:
-        return self.device_state.get_power_forecast()
+        return self.device_state.power_forecast
 
     def get_system_descriptions(self) -> List[Any]:
-        return self.device_state.get_system_descriptions()
+        return self.device_state.system_descriptions
 
     def get_demand_forecasts(self) -> List[Any]:
-        return self.device_state.get_demand_forecasts()
+        return self.device_state.demand_forecasts
 
     def get_energy_in_current_timestep(self) -> float:
-        return self.device_state.get_energy_in_current_timestep()
+        return self.device_state.energy_in_current_timestep
 
     def get_gas_price_per_m3(self) -> float:
-        return self.device_state.get_gas_price_per_m3()
+        return self.device_state.gas_price_per_m3
 
     def get_actuator_statuses(self):
-        return self.device_state.get_actuator_statuses()
+        return self.device_state.actuator_statuses
 
     def get_actuators(self, target_timestep: "DdbcTimestep") -> Set[str]:
         """Get all actuator IDs for a timestep."""
