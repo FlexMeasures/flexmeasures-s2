@@ -37,7 +37,8 @@ class DdbcOperationModeWrapper:
 
         # Wrap power ranges
         self.power_ranges = [
-            PowerRangeWrapper(pr) for pr in self.ddbc_operation_mode.power_ranges
+            PowerRangeWrapper.from_unwrapped(pr)
+            for pr in self.ddbc_operation_mode.power_ranges
         ]
 
         # Wrap supply range
@@ -70,19 +71,17 @@ class DdbcOperationModeWrapper:
             CommodityQuantity.ELECTRIC_POWER_3_PHASE_SYMMETRIC,
         }
         return sum(
-            (pr.get_end_of_range() - pr.get_start_of_range()) * factor
-            + pr.get_start_of_range()
+            (pr.end_of_range - pr.start_of_range) * factor + pr.start_of_range
             for pr in self.power_ranges
-            if pr.get_commodity_quantity() in electric_commodities
+            if pr.commodity_quantity in electric_commodities
         )
 
     def get_operation_mode_gas_consumption(self, factor: float) -> float:
         """Calculate natural gas consumption (liters per second) for a given factor."""
         return sum(
-            (pr.get_end_of_range() - pr.get_start_of_range()) * factor
-            + pr.get_start_of_range()
+            (pr.end_of_range - pr.start_of_range) * factor + pr.start_of_range
             for pr in self.power_ranges
-            if pr.get_commodity_quantity() == CommodityQuantity.NATURAL_GAS_FLOW_RATE
+            if pr.commodity_quantity == CommodityQuantity.NATURAL_GAS_FLOW_RATE
         )
 
     def get_operation_mode_supply_rate(self, factor: float) -> float:
@@ -99,7 +98,7 @@ class DdbcOperationModeWrapper:
         )
 
         power_per_commodity_quantity: dict[str, float] = {
-            pr.get_commodity_quantity().value: pr.get_power(factor)
+            pr.commodity_quantity.value: pr.get_power(factor)
             for pr in self.power_ranges
         }
 
