@@ -55,7 +55,7 @@ class DdbcPlanningWindow:
         stratification_layers: int,
     ):
         self.device_state = S2DdbcDeviceStateWrapper(
-            device_state, stratification_layers=stratification_layers
+            **device_state.__dict__, stratification_layers=stratification_layers
         )
         self.profile_metadata = profile_metadata
         self.plan_due_by_date = plan_due_by_date
@@ -78,13 +78,13 @@ class DdbcPlanningWindow:
 
             current_system_description = self.get_latest_before(
                 timestep_start,
-                self.device_state.get_system_descriptions(),
+                self.device_state.system_descriptions,
                 lambda sd: sd.valid_from,
             )
 
             current_avg_demand_forecast_obj = self.get_latest_before(
                 timestep_start,
-                self.device_state.get_demand_forecasts(),
+                self.device_state.demand_forecasts,
                 lambda df: df.start_time,
             )
 
@@ -220,7 +220,7 @@ class DdbcPlanningWindow:
                 actuators.append({})
                 insight_elements.append(None)
 
-        energy[0] = energy[0] + int(self.device_state.get_energy_in_current_timestep())
+        energy[0] = energy[0] + int(self.device_state.energy_in_current_timestep)
 
         energy_profile = JouleProfile(
             self.profile_metadata.profile_start,

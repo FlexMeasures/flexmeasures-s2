@@ -53,7 +53,7 @@ class DdbcState:
 
         self.actuator_configurations: Dict[str, S2DdbcActuatorConfiguration] = {}
 
-        actuator_statuses = self.device_state_wrapper.get_actuator_statuses()
+        actuator_statuses = self.device_state_wrapper.actuator_statuses
 
         for actuator in self.timestep.system_description.actuators:
             actuator_id_str = str(actuator.id)
@@ -82,9 +82,7 @@ class DdbcState:
                 self.timestep.system_description
             )
         )
-        self.gas_price_per_liter = (
-            self.device_state_wrapper.get_gas_price_per_m3() / 1000.0
-        )
+        self.gas_price_per_liter = self.device_state_wrapper.gas_price_per_m3 / 1000.0
 
     def _init_from_previous_state(
         self, actuator_configurations: Dict[str, S2DdbcActuatorConfiguration]

@@ -1,3 +1,4 @@
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import List, Dict, Set, Optional, Any, TYPE_CHECKING
 from flexmeasures_s2.profile_steering.device_planner.ddbc.s2_ddbc_device_state import (
@@ -16,46 +17,22 @@ if TYPE_CHECKING:
     )
 
 
-class S2DdbcDeviceStateWrapper:
+@dataclass
+class S2DdbcDeviceStateWrapper(S2DdbcDeviceState):
     """
     Wrapper for S2DdbcDeviceState that adds utility functions and caching.
     """
 
+    stratification_layers: int = 50
     EPSILON = 1e-4
-
-    def __init__(self, device_state: S2DdbcDeviceState, stratification_layers: int):
-        self.device_state = device_state
-
-        self.actuator_operation_mode_map_per_timestep: Dict[
-            datetime, Dict[str, List[str]]
-        ] = {}
-        self.all_actions: Dict[
-            datetime, List[Dict[str, S2DdbcActuatorConfiguration]]
-        ] = {}
-        self.operation_mode_uses_factor_map: Dict[str, bool] = {}
-        self.operation_modes: Dict[str, DdbcOperationModeWrapper] = {}
-        self.stratification_layers = stratification_layers
-
-    def is_online(self) -> bool:
-        return self.device_state.is_online
-
-    def get_power_forecast(self) -> Any:
-        return self.device_state.power_forecast
-
-    def get_system_descriptions(self) -> List[Any]:
-        return self.device_state.system_descriptions
-
-    def get_demand_forecasts(self) -> List[Any]:
-        return self.device_state.demand_forecasts
-
-    def get_energy_in_current_timestep(self) -> float:
-        return self.device_state.energy_in_current_timestep
-
-    def get_gas_price_per_m3(self) -> float:
-        return self.device_state.gas_price_per_m3
-
-    def get_actuator_statuses(self):
-        return self.device_state.actuator_statuses
+    actuator_operation_mode_map_per_timestep: dict[
+        datetime, dict[str, List[str]]
+    ] = field(default_factory=dict)
+    all_actions: dict[datetime, list[dict[str, "S2DdbcActuatorConfiguration"]]] = field(
+        default_factory=dict
+    )
+    operation_mode_uses_factor_map: dict[str, bool] = field(default_factory=dict)
+    operation_modes: dict[str, "DdbcOperationModeWrapper"] = field(default_factory=dict)
 
     def get_actuators(self, target_timestep: "DdbcTimestep") -> Set[str]:
         """Get all actuator IDs for a timestep."""
