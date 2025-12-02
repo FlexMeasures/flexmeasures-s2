@@ -106,21 +106,17 @@ class DdbcState:
             om = self.device_state_wrapper.get_operation_mode(
                 self.timestep,
                 actuator_id,
-                actuator_configuration.get_operation_mode_id(),
+                actuator_configuration.operation_mode_id,
             )
             timestep_supply_rate += om.get_operation_mode_supply_rate(
-                actuator_configuration.get_factor()
+                actuator_configuration.factor
             )
             timestep_energy += (
-                om.get_operation_mode_electrical_power(
-                    actuator_configuration.get_factor()
-                )
+                om.get_operation_mode_electrical_power(actuator_configuration.factor)
                 * seconds
             )
             timestep_natural_gas_liters += (
-                om.get_operation_mode_gas_consumption(
-                    actuator_configuration.get_factor()
-                )
+                om.get_operation_mode_gas_consumption(actuator_configuration.factor)
                 * seconds
             )
 
@@ -144,9 +140,9 @@ class DdbcState:
                 previous_operation_mode_id = (
                     self.previous_state.actuator_configurations[
                         actuator_id
-                    ].get_operation_mode_id()
+                    ].operation_mode_id
                 )
-                new_operation_mode_id = actuator_config.get_operation_mode_id()
+                new_operation_mode_id = actuator_config.operation_mode_id
 
                 if previous_operation_mode_id != new_operation_mode_id:
                     from flexmeasures_s2.profile_steering.device_planner.ddbc.s2_ddbc_device_state_wrapper import (
@@ -233,9 +229,9 @@ class DdbcState:
 
         for actuator_id, config in actuator_configurations.items():
             if (
-                config.get_factor() is None
+                config.factor is None
                 and self.device_state_wrapper.operation_mode_uses_factor(
-                    self.timestep, actuator_id, config.get_operation_mode_id()
+                    self.timestep, actuator_id, config.operation_mode_id
                 )
             ):
                 missing_factor_actuator_id = actuator_id
@@ -250,17 +246,17 @@ class DdbcState:
                 om = self.device_state_wrapper.get_operation_mode(
                     self.timestep,
                     actuator_id,
-                    actuator_configuration.get_operation_mode_id(),
+                    actuator_configuration.operation_mode_id,
                 )
                 supply_rate += om.get_operation_mode_supply_rate(
-                    actuator_configuration.get_factor()
+                    actuator_configuration.factor
                 )
 
         missing_supply_rate = desired_supply_rate - supply_rate
         om = self.device_state_wrapper.get_operation_mode(
             self.timestep,
             missing_factor_actuator_id,
-            actuator_configurations[missing_factor_actuator_id].get_operation_mode_id(),
+            actuator_configurations[missing_factor_actuator_id].operation_mode_id,
         )
         supply_range = om.supply_range
         calculated_factor = (missing_supply_rate - supply_range.start_of_range) / (
@@ -313,8 +309,8 @@ class DdbcState:
             for actuator_id, config in actuator_configs_for_target_timestep.items():
                 previous_operation_mode_id = previous_state.actuator_configurations[
                     actuator_id
-                ].get_operation_mode_id()
-                new_operation_mode_id = config.get_operation_mode_id()
+                ].operation_mode_id
+                new_operation_mode_id = config.operation_mode_id
 
                 if previous_operation_mode_id != new_operation_mode_id:
                     transition = S2DdbcDeviceStateWrapper.get_transition(

@@ -271,10 +271,10 @@ class S2DdbcDeviceStateWrapper:
 
         for config_actuator_id, config in list(copy.items()):
             if self.operation_mode_uses_factor(
-                target_timestep, config_actuator_id, config.get_operation_mode_id()
+                target_timestep, config_actuator_id, config.operation_mode_id
             ):
                 actuator_id = config_actuator_id
-                operation_mode_id = config.get_operation_mode_id()
+                operation_mode_id = config.operation_mode_id
                 del copy[config_actuator_id]
                 break
 
@@ -309,7 +309,7 @@ class S2DdbcDeviceStateWrapper:
         found_one = False
         for actuator_id, config in configurations.items():
             if self.operation_mode_uses_factor(
-                target_timestep, actuator_id, config.get_operation_mode_id()
+                target_timestep, actuator_id, config.operation_mode_id
             ):
                 if found_one:
                     return True
