@@ -37,7 +37,7 @@ class DdbcOperationModeWrapper:
 
         # Wrap power ranges
         self.power_ranges = [
-            PowerRangeWrapper.from_unwrapped(pr)
+            PowerRangeWrapper(**pr.__dict__)
             for pr in self.ddbc_operation_mode.power_ranges
         ]
 
