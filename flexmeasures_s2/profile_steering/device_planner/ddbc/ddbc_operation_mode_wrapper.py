@@ -3,10 +3,7 @@ from typing import Any, Optional
 from flexmeasures_s2.profile_steering.common.power_range_wrapper import (
     PowerRangeWrapper,
 )
-from flexmeasures_s2.profile_steering.device_planner.ddbc.number_range_wrapper import (
-    NumberRangeWrapper,
-)
-from s2python.common import CommodityQuantity
+from s2python.common import CommodityQuantity, NumberRange
 
 
 @dataclass
@@ -19,8 +16,8 @@ class DdbcOperationModeWrapper:
     diagnostic_label: Optional[str] = field(init=False)
     abnormal_condition_only: bool = field(init=False)
     power_ranges: list["PowerRangeWrapper"] = field(init=False, default_factory=list)
-    supply_range: "NumberRangeWrapper" = field(init=False)
-    running_costs: Optional["NumberRangeWrapper"] = field(init=False)
+    supply_range: NumberRange = field(init=False)
+    running_costs: Optional[NumberRange] = field(init=False)
     uses_factor: bool = field(init=False)
 
     def __post_init__(self):
@@ -44,17 +41,16 @@ class DdbcOperationModeWrapper:
         # Wrap supply range
         sr = self.ddbc_operation_mode.supply_range
         if isinstance(sr, list):
-            self.supply_range = NumberRangeWrapper(sr[0])
+            self.supply_range = sr[0]
         else:
-            self.supply_range = NumberRangeWrapper(sr)
+            self.supply_range = sr
 
         # Wrap running costs
-        rc = getattr(self.ddbc_operation_mode, "running_costs", None)
-        self.running_costs = NumberRangeWrapper(rc) if rc is not None else None
+        self.running_costs = getattr(self.ddbc_operation_mode, "running_costs", None)
 
         # Determine if this operation mode uses a factor
         self.uses_factor = any(
-            abs(r.get_start_of_range() - r.get_end_of_range()) > self.EPSILON
+            abs(r.start_of_range - r.end_of_range) > self.EPSILON
             for r in [self.supply_range, *self.power_ranges]
         )
 
@@ -87,9 +83,8 @@ class DdbcOperationModeWrapper:
     def get_operation_mode_supply_rate(self, factor: float) -> float:
         """Calculate supply rate for a given factor."""
         return (
-            self.supply_range.get_end_of_range()
-            - self.supply_range.get_start_of_range()
-        ) * factor + self.supply_range.get_start_of_range()
+            self.supply_range.end_of_range - self.supply_range.start_of_range
+        ) * factor + self.supply_range.start_of_range
 
     def convert_to_actuator_config(self, factor: float):
         """Convert to S2DdbcActuatorConfiguration."""
