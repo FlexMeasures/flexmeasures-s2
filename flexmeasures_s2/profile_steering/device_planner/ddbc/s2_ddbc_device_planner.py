@@ -60,7 +60,7 @@ class S2DdbcDevicePlanner(DevicePlanner):
         self.null_profile = JouleProfile.nulls(profile_metadata)
 
         self.state_tree: Optional[DdbcPlanningWindow]
-        if self._is_device_available(self.s2_ddbc_state):
+        if self.device_available:
             self.state_tree = DdbcPlanningWindow(
                 device_state=self.s2_ddbc_state,
                 profile_metadata=profile_metadata,
@@ -74,9 +74,10 @@ class S2DdbcDevicePlanner(DevicePlanner):
         self.latest_plan: Optional[S2DdbcPlan] = None
         self.accepted_plan: Optional[S2DdbcPlan] = None
 
-    def _is_device_available(self, ddbc_state: S2DdbcDeviceState) -> bool:
+    @property
+    def device_available(self) -> bool:
         """Check if the device is available for planning."""
-        return ddbc_state.is_device_online()
+        return self.s2_ddbc_state.is_device_online()
 
     @property
     def priority_class(self) -> int:
@@ -137,10 +138,7 @@ class S2DdbcDevicePlanner(DevicePlanner):
         max_profile = diff_to_max.add(self.accepted_plan.get_energy())
         min_profile = diff_to_min.add(self.accepted_plan.get_energy())
 
-        if (
-            self._is_device_available(self.s2_ddbc_state)
-            and self.state_tree is not None
-        ):
+        if self.device_available and self.state_tree is not None:
             self.latest_plan = self.state_tree.find_best_plan(
                 target, min_profile, max_profile
             )
@@ -178,10 +176,7 @@ class S2DdbcDevicePlanner(DevicePlanner):
         Returns:
             An S2DdbcPlan representing the initial plan
         """
-        if (
-            self._is_device_available(self.s2_ddbc_state)
-            and self.state_tree is not None
-        ):
+        if self.device_available and self.state_tree is not None:
             self.latest_plan = self.state_tree.find_best_plan(
                 target_profile=TargetProfile.null_profile(self.profile_metadata),
                 diff_to_min_profile=self.null_profile,
