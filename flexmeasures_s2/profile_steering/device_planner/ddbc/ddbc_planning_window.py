@@ -202,13 +202,13 @@ class DdbcPlanningWindow:
                 state = timestep.get_best_state()
 
                 if state is not None:
-                    energy.append(int(state.get_timestep_energy()))
-                    actuators.append(state.get_actuator_configurations())
+                    energy.append(int(state.timestep_energy))
+                    actuators.append(state.actuator_configurations)
                     insight_elements.append(
                         S2DdbcInsightsProfile.Element(
                             timestep.avg_demand_rate_forecast,
-                            state.get_supply_rate(),
-                            state.get_actuator_configurations(),
+                            state.supply_rate,
+                            state.actuator_configurations,
                         )
                     )
                 else:

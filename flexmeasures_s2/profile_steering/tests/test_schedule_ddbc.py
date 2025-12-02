@@ -669,11 +669,11 @@ def extract_insights_from_device_plan(
         for elem in insights.elements:
             if elem:
                 supply_rates.append(
-                    elem.get_supply_rate() if hasattr(elem, "get_supply_rate") else 0
+                    elem.supply_rate if hasattr(elem, "supply_rate") else 0
                 )
                 configs = (
-                    elem.get_actuator_configurations()
-                    if hasattr(elem, "get_actuator_configurations")
+                    elem.actuator_configurations
+                    if hasattr(elem, "actuator_configurations")
                     else {}
                 )
                 # Extract factors

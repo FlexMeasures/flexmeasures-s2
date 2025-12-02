@@ -45,7 +45,7 @@ class DdbcTimestep:
 
     def add_state(self, state: "DdbcState"):
         """Add a state to this timestep and track the best state."""
-        distance = state.supply_demand_distance()
+        distance = state.supply_demand_distance
 
         if distance < self.DISTANCE_EPSILON:
             if self.best_state is None:
@@ -55,7 +55,7 @@ class DdbcTimestep:
         else:
             if (
                 self.emergency_state is None
-                or distance < self.emergency_state.supply_demand_distance()
+                or distance < self.emergency_state.supply_demand_distance
             ):
                 self.emergency_state = state
 

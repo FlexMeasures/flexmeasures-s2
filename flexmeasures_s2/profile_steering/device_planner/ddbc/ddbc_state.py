@@ -135,8 +135,8 @@ class DdbcState:
     def _update_timer_elapse_map(self):
         """Update timers based on transitions."""
         if (
-            self.previous_state.get_system_description().valid_from
-            == self.get_system_description().valid_from
+            self.previous_state.system_description.valid_from
+            == self.system_description.valid_from
         ):
             self.timer_elapse_map = dict(self.previous_state.timer_elapse_map)
 
@@ -171,7 +171,7 @@ class DdbcState:
         else:
             self.timer_elapse_map = (
                 self._get_initial_timer_elapse_map_for_system_description(
-                    self.get_system_description()
+                    self.system_description
                 )
             )
 
@@ -307,7 +307,7 @@ class DdbcState:
         )
 
         if (
-            previous_state.get_system_description().valid_from
+            previous_state.system_description.valid_from
             == target_timestep.system_description.valid_from
         ):
             for actuator_id, config in actuator_configs_for_target_timestep.items():
@@ -386,30 +386,11 @@ class DdbcState:
                 else:
                     return self.sum_squared_energy > other.sum_squared_energy
 
+    @property
     def supply_demand_distance(self) -> float:
         """Calculate distance between supply and demand."""
         return abs(self.supply_rate - self.timestep.avg_demand_rate_forecast)
 
-    def get_timestep(self) -> "DdbcTimestep":
-        return self.timestep
-
-    def get_system_description(self):
+    @property
+    def system_description(self):
         return self.timestep.system_description
-
-    def get_device_state_wrapper(self) -> "S2DdbcDeviceStateWrapper":
-        return self.device_state_wrapper
-
-    def get_previous_state(self) -> Optional["DdbcState"]:
-        return self.previous_state
-
-    def get_actuator_configurations(self) -> Dict[str, S2DdbcActuatorConfiguration]:
-        return self.actuator_configurations
-
-    def get_supply_rate(self) -> float:
-        return self.supply_rate
-
-    def get_timestep_energy(self) -> float:
-        return self.timestep_energy
-
-    def get_timer_elapse_map(self) -> Dict[str, datetime]:
-        return self.timer_elapse_map
