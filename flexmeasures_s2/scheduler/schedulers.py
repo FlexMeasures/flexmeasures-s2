@@ -1,4 +1,5 @@
 import pandas as pd
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Dict, Optional
 import logging
@@ -44,32 +45,14 @@ from flexmeasures_s2.scheduler.schemas import S2FlexModelSchema, TNOFlexContextS
 logger = logging.getLogger(__name__)
 
 
+@dataclass
 class PlanningServiceConfig:
     """Configuration for the planning service."""
 
-    def __init__(
-        self,
-        energy_improvement_criterion: float = 0.01,
-        cost_improvement_criterion: float = 0.01,
-        congestion_retry_iterations: int = 5,
-        multithreaded: bool = False,
-    ):
-        self._energy_improvement_criterion = energy_improvement_criterion
-        self._cost_improvement_criterion = cost_improvement_criterion
-        self._congestion_retry_iterations = congestion_retry_iterations
-        self._multithreaded = multithreaded
-
-    def energy_improvement_criterion(self) -> float:
-        return self._energy_improvement_criterion
-
-    def cost_improvement_criterion(self) -> float:
-        return self._cost_improvement_criterion
-
-    def congestion_retry_iterations(self) -> int:
-        return self._congestion_retry_iterations
-
-    def multithreaded(self) -> bool:
-        return self._multithreaded
+    energy_improvement_criterion: float = 0.01
+    cost_improvement_criterion: float = 0.01
+    congestion_retry_iterations: int = 5
+    multithreaded: bool = False
 
 
 class PlanningService:
@@ -145,8 +128,8 @@ class PlanningServiceImpl(PlanningService):
 
         root_planner = RootPlanner(
             target=target.get_global_target_profile(),
-            energy_iteration_criterion=self.config.energy_improvement_criterion(),
-            cost_iteration_criterion=self.config.cost_improvement_criterion(),
+            energy_iteration_criterion=self.config.energy_improvement_criterion,
+            cost_iteration_criterion=self.config.cost_improvement_criterion,
             always_accept_all_proposals=always_accept_all_proposals,
             context=self.context,
         )
@@ -174,7 +157,7 @@ class PlanningServiceImpl(PlanningService):
                 cpc = CongestionPointPlanner(
                     congestion_point_id=congestion_point,
                     congestion_target=congestion_point_target,
-                    multithreaded=self.config.multithreaded(),
+                    multithreaded=self.config.multithreaded,
                 )  # type: ignore[arg-type]
                 root_planner.add_congestion_point_controller(cpc)
 
@@ -265,7 +248,7 @@ class PlanningServiceImpl(PlanningService):
                 plan_due_by_date,
                 optimize_for_target,
                 max_priority_class,
-                self.config.multithreaded(),
+                self.config.multithreaded,
             )
 
             # Collect device plans
