@@ -41,7 +41,7 @@ from flexmeasures_s2.scheduler.schedulers import (
 def adjust_fill_level_target_profile_for_current_time(
     fill_level_target_profile: FRBCFillLevelTargetProfile,
     current_time: datetime,
-) -> FRBCFillLevelTargetProfile:
+) -> FRBCFillLevelTargetProfile | None:
     """
     Adjust fill level target profile when current time is ahead of profile start_time.
 
@@ -53,7 +53,7 @@ def adjust_fill_level_target_profile_for_current_time(
         current_time: The current scheduling time (when planning actually happens)
 
     Returns:
-        Adjusted fill level target profile with start_time set to current_time
+        Adjusted fill level target profile with start_time set to current_time, or None of the profile is entirely before current_time
     """
     if fill_level_target_profile is None:
         return None
@@ -118,6 +118,10 @@ def adjust_fill_level_target_profile_for_current_time(
             # This element is in the future, keep it as-is
             remaining_elements.append(element)
             cumulative_duration_ms = element_end_ms
+
+    # Return None if none of the profile elements are after current_time
+    if not remaining_elements:
+        return None
 
     # Create adjusted profile with current_time as start_time
     adjusted_profile = FRBCFillLevelTargetProfile(
