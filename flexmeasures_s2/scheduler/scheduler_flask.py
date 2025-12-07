@@ -767,6 +767,9 @@ class S2FlaskScheduler(Scheduler):
                 app.logger.error(
                     f"❌ Device state creation failed for {device_id[:8]}...: {e}"
                 )
+                import traceback
+
+                app.logger.debug(f"Traceback: {traceback.format_exc()}")
 
         # Handle dictionary of device data (backward compatibility)
         elif isinstance(self.frbc_device_data, dict):
