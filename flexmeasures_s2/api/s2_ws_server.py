@@ -1,16 +1,3 @@
-from flask_json import as_json
-from flask_security import auth_token_required
-
-from .. import flexmeasures_s2_api_bp
-
-
-@flexmeasures_s2_api_bp.route("/somedata")
-@auth_token_required
-@as_json
-def somedata():
-    return dict(a=1, b=2)
-
-
 """
 Flask implementation of the S2 protocol WebSocket server (sync mode only).
 """
@@ -66,6 +53,8 @@ from s2python.s2_parser import S2Parser
 from s2python.s2_validation_error import S2ValidationError
 from s2python.version import S2_VERSION
 from timely_beliefs import BeliefsDataFrame
+
+from .. import flexmeasures_s2_api_bp
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)

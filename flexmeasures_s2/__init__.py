@@ -30,11 +30,11 @@ except PackageNotFoundError:
 flexmeasures_s2_api_bp: Blueprint = Blueprint(
     "flexmeasures-s2 API", __name__, url_prefix="/s2"
 )
-ensure_bp_routes_are_loaded_fresh("api.somedata")
-from flexmeasures_s2.api import somedata  # noqa: E402,F401
+ensure_bp_routes_are_loaded_fresh("api.s2_ws_server")
+from flexmeasures_s2.api.s2_ws_server import S2FlaskWSServerSync  # noqa: E402,F401
 
 
-s2_ws = somedata.S2FlaskWSServerSync(app=app, sock=sock)  # noqa: F841
+S2FlaskWSServerSync(app=app, sock=sock)  # noqa: F841
 
 # Use as follows:
 # from flexmeasures import Sensor
