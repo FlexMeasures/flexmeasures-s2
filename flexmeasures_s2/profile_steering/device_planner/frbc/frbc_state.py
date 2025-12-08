@@ -9,7 +9,9 @@ from s2python.frbc import (
 
 from flexmeasures_s2.profile_steering.common.target_profile import TargetProfile
 import flexmeasures_s2.profile_steering.device_planner.frbc.frbc_timestep as frbc_timestep
-import flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state_wrapper as s2_frbc_device_state_wrapper
+from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state_wrapper import (
+    S2FrbcDeviceStateWrapper,
+)
 
 from flexmeasures_s2.profile_steering.common.s2_actuator_configuration import (
     S2ActuatorConfiguration,
@@ -47,11 +49,7 @@ class FrbcState:
         self.sum_squared_energy: float
         if previous_state:
             if device_state:
-                self.device_state = (
-                    s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper(
-                        **device_state.__dict__
-                    )
-                )
+                self.device_state = S2FrbcDeviceStateWrapper(**device_state.__dict__)
             else:
                 self.device_state = previous_state.device_state
             self.timestep = timestep
@@ -72,19 +70,15 @@ class FrbcState:
                 self.timestep_energy += power * seconds
                 self.fill_level += fill_rate * seconds
 
-            leakage_rate = (
-                s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_leakage_rate(
-                    self.timestep, self.fill_level
-                )
+            leakage_rate = S2FrbcDeviceStateWrapper.get_leakage_rate(
+                self.timestep, self.fill_level
             )
             leakage = leakage_rate * seconds
             self.fill_level -= leakage
             self.fill_level += self.timestep.forecasted_fill_level_usage
 
-            self.bucket = (
-                s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.calculate_bucket(
-                    self.timestep, self.fill_level
-                )
+            self.bucket = S2FrbcDeviceStateWrapper.calculate_bucket(
+                self.timestep, self.fill_level
             )
             if (
                 previous_state.system_description.valid_from
@@ -100,7 +94,7 @@ class FrbcState:
                     ].operation_mode_id
                     new_operation_mode_id = actuator_configuration.operation_mode_id
                     if previous_operation_mode_id != new_operation_mode_id:
-                        transition = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_transition(
+                        transition = S2FrbcDeviceStateWrapper.get_transition(
                             self.timestep,
                             actuator_id,
                             previous_operation_mode_id,
@@ -110,7 +104,7 @@ class FrbcState:
                         new_finished_at: datetime = datetime.min
                         if transition is not None:
                             for timer_id in transition.start_timers:
-                                duration = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_timer_duration(
+                                duration = S2FrbcDeviceStateWrapper.get_timer_duration(
                                     self.timestep, actuator_id, str(timer_id)
                                 )
                                 new_finished_at = self.timestep.start_date + duration
@@ -177,11 +171,7 @@ class FrbcState:
         else:
             FrbcState.transition_cache.clear()
             if device_state is not None:
-                self.device_state = (
-                    s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper(
-                        **device_state.__dict__
-                    )
-                )
+                self.device_state = S2FrbcDeviceStateWrapper(**device_state.__dict__)
             else:
                 self.device_state = None  # type: ignore[assignment]
             self.timestep = timestep
@@ -255,16 +245,12 @@ class FrbcState:
                 * seconds
             )
         self.fill_level -= (
-            s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_leakage_rate(
-                self.timestep, self.fill_level
-            )
+            S2FrbcDeviceStateWrapper.get_leakage_rate(self.timestep, self.fill_level)
             * seconds
         )
         self.fill_level += self.timestep.forecasted_fill_level_usage
-        self.bucket = (
-            s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.calculate_bucket(
-                self.timestep, self.fill_level
-            )
+        self.bucket = S2FrbcDeviceStateWrapper.calculate_bucket(
+            self.timestep, self.fill_level
         )
         self.update_timers(previous_state, actuator_configurations)
         self.calculate_scores(previous_state)
@@ -286,7 +272,7 @@ class FrbcState:
                 ].operation_mode_id
                 new_operation_mode_id = actuator_configuration.operation_mode_id
                 if previous_operation_mode_id != new_operation_mode_id:
-                    transition = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_transition(
+                    transition = S2FrbcDeviceStateWrapper.get_transition(
                         self.timestep,
                         actuator_id,
                         previous_operation_mode_id,
@@ -295,7 +281,7 @@ class FrbcState:
                     if transition is None:
                         continue
                     for timer_id in transition.start_timers:
-                        duration = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_timer_duration(
+                        duration = S2FrbcDeviceStateWrapper.get_timer_duration(
                             self.timestep, actuator_id, str(timer_id)
                         )
                         new_finished_at = self.timestep.start_date + duration
@@ -421,7 +407,7 @@ class FrbcState:
 
                 new_operation_mode_id = actuator_configuration.operation_mode_id
                 if previous_operation_mode_id != new_operation_mode_id:
-                    transition = s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper.get_transition(
+                    transition = S2FrbcDeviceStateWrapper.get_transition(
                         target_timestep,
                         actuator_id,
                         previous_operation_mode_id,
