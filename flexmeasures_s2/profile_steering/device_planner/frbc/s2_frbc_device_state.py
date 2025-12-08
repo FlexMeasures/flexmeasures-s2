@@ -86,21 +86,3 @@ class S2FrbcDeviceState:
         self.computational_parameters = computational_parameters
         self.storage_status = storage_status
         self.actuator_statuses = actuator_statuses
-
-    def get_system_descriptions(self) -> List[FRBCSystemDescription]:
-        return self.system_descriptions
-
-    def get_leakage_behaviours(self) -> List[FRBCLeakageBehaviour]:
-        return self.leakage_behaviours
-
-    def get_device_name(self) -> str:
-        return self.device_name
-
-    def get_computational_parameters(self) -> ComputationalParameters:
-        return self.computational_parameters
-
-    def get_power_forecast(self) -> Optional[PowerForecast]:
-        return self.power_forecast
-
-    def get_energy_in_current_timestep(self) -> PowerValue:
-        return self.energy_in_current_timestep

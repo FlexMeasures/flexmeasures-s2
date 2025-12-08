@@ -97,10 +97,10 @@ class S2FrbcDevicePlanner(DevicePlanner):
         """
         latest_before_first_ptu = OperationModeProfileTree.get_latest_before(
             self.profile_metadata.profile_start.replace(tzinfo=None),
-            storage_state.get_system_descriptions(),
+            storage_state.system_descriptions,
             lambda sd: sd.valid_from.replace(tzinfo=None),
         )
-        if not storage_state.get_system_descriptions():
+        if not storage_state.system_descriptions:
             return False
         if latest_before_first_ptu is None:
             active_and_upcoming_system_descriptions_has_active_storage = any(
@@ -108,14 +108,14 @@ class S2FrbcDevicePlanner(DevicePlanner):
                 self.profile_metadata.profile_end.replace(tzinfo=None)
                 >= sd.valid_from.replace(tzinfo=None)
                 >= self.profile_metadata.profile_start.replace(tzinfo=None)
-                for sd in storage_state.get_system_descriptions()
+                for sd in storage_state.system_descriptions
             )
         else:
             active_and_upcoming_system_descriptions_has_active_storage = any(
                 self.profile_metadata.profile_end.replace(tzinfo=None)
                 >= sd.valid_from.replace(tzinfo=None)
                 >= latest_before_first_ptu.valid_from.replace(tzinfo=None)
-                for sd in storage_state.get_system_descriptions()
+                for sd in storage_state.system_descriptions
             )
         return (
             storage_state.is_online

@@ -34,7 +34,7 @@ class S2FrbcDeviceStateWrapper:
 
     def __init__(self, device_state: S2FrbcDeviceState):
         self.device_state: S2FrbcDeviceState = device_state
-        computational_params = self.device_state.get_computational_parameters()
+        computational_params = self.device_state.computational_parameters
         self.nr_of_buckets: int = computational_params.get_nr_of_buckets()
         self.nr_of_stratification_layers: int = (
             computational_params.get_stratification_layers()
@@ -51,13 +51,13 @@ class S2FrbcDeviceStateWrapper:
         return self.device_state.is_online
 
     def get_power_forecast(self) -> Any:
-        return self.device_state.get_power_forecast()
+        return self.device_state.power_forecast
 
     def get_system_descriptions(self) -> Any:
-        return self.device_state.get_system_descriptions()
+        return self.device_state.system_descriptions
 
     def get_leakage_behaviours(self) -> Any:
-        return self.device_state.get_leakage_behaviours()
+        return self.device_state.leakage_behaviours
 
     @property
     def usage_forecasts(self) -> Any:
@@ -68,7 +68,7 @@ class S2FrbcDeviceStateWrapper:
         return self.device_state.fill_level_target_profiles
 
     def get_computational_parameters(self) -> Any:
-        return self.device_state.get_computational_parameters()
+        return self.device_state.computational_parameters
 
     @lru_cache(maxsize=None)
     def get_actuators(self, target_timestep: "FrbcTimestep") -> List[str]:
@@ -328,7 +328,7 @@ class S2FrbcDeviceStateWrapper:
         )
 
     def get_energy_in_current_timestep(self) -> CommodityQuantity:
-        return self.device_state.get_energy_in_current_timestep()
+        return self.device_state.energy_in_current_timestep
 
     @property
     def actuator_statuses(self) -> List[FRBCActuatorStatus]:
