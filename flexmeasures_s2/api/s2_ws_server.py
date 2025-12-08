@@ -683,7 +683,9 @@ class S2FlaskWSServerSync:
 
         # Create namespaced logger
         # safe name (no spaces/slashes etc)
-        rm_name = str(message.name).replace(" ", "_")
+        if (name := message.name) is None:
+            name = resource_id[:8]
+        rm_name = str(name).replace(" ", "_")
         dd.logger = logging.getLogger(f"flexmeasures_s2.rm.{rm_name}")
 
         # Inherit app logger handlers/level
