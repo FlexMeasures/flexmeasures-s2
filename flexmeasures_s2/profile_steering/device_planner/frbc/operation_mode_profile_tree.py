@@ -127,7 +127,7 @@ class OperationModeProfileTree:
         profile_metadata: ProfileMetadata,
         plan_due_by_date: datetime,
     ):
-        self.device_state = S2FrbcDeviceStateWrapper(device_state)
+        self.device_state = S2FrbcDeviceStateWrapper(**device_state.__dict__)
         self.profile_metadata = profile_metadata
         self.plan_due_by_date = plan_due_by_date
         self.timestep_duration_seconds = int(
@@ -323,13 +323,11 @@ class OperationModeProfileTree:
         first_timestep = self.timesteps[first_timestep_index]
         last_timestep = self.timesteps[-1]
 
-        initial_fill_level = (
-            self.device_state.device_state.storage_status.present_fill_level
-        )
+        initial_fill_level = self.device_state.storage_status.present_fill_level
         # logger.info(f"Initial fill level: {initial_fill_level}")
 
         state_zero = FrbcState(
-            device_state=self.device_state.device_state,
+            device_state=self.device_state,
             timestep=first_timestep,
             initial_fill_level=initial_fill_level,
         )

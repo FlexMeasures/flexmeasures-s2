@@ -67,9 +67,13 @@ class S2FrbcDeviceState:
         nr_of_buckets: int
         stratification_layers: int
 
-    def __post_init__(self):
-        computational_params = self.computational_parameters
-        self.nr_of_buckets: int = computational_params.nr_of_buckets
-        self.nr_of_stratification_layers: int = (
-            computational_params.stratification_layers
-        )
+    def __hash__(self):
+        return hash((self.device_id, self.timestamp))
+
+    @property
+    def nr_of_buckets(self) -> int:
+        return self.computational_parameters.nr_of_buckets
+
+    @property
+    def nr_of_stratification_layers(self) -> int:
+        return self.computational_parameters.stratification_layers

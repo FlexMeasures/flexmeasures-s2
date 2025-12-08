@@ -1,3 +1,4 @@
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any, TYPE_CHECKING
 from functools import lru_cache
@@ -21,58 +22,29 @@ from s2python.frbc import (
     FRBCLeakageBehaviour,
     FRBCLeakageBehaviourElement,
     FRBCActuatorDescription,
-    FRBCActuatorStatus,
-    FRBCStorageStatus,
 )
 from flexmeasures_s2.profile_steering.device_planner.frbc.s2_frbc_device_state import (
     S2FrbcDeviceState,
 )
 
 
-class S2FrbcDeviceStateWrapper:
-    epsilon = 1e-4
+@dataclass
+class S2FrbcDeviceStateWrapper(S2FrbcDeviceState):
 
-    def __init__(self, device_state: S2FrbcDeviceState):
-        self.device_state: S2FrbcDeviceState = device_state
-        computational_params = self.device_state.computational_parameters
-        self.nr_of_buckets: int = computational_params.nr_of_buckets
-        self.nr_of_stratification_layers: int = (
-            computational_params.stratification_layers
-        )
-        self.actuator_operation_mode_map_per_timestep: Dict[
-            datetime, Dict[str, List[str]]
-        ] = {}
-        self.all_actions: Dict[datetime, List[Dict[str, S2ActuatorConfiguration]]] = {}
-        self.operation_mode_uses_factor_map: Dict[str, bool] = {}
-        self.operation_modes: Dict[str, FrbcOperationModeWrapper] = {}
+    epsilon: float = 1e-4
 
-    @property
-    def is_online(self) -> bool:
-        return self.device_state.is_online
+    # mutable defaults handled with default_factory
+    actuator_operation_mode_map_per_timestep: dict[
+        datetime, dict[str, List[str]]
+    ] = field(default_factory=dict)
+    all_actions: dict[datetime, list[dict[str, S2ActuatorConfiguration]]] = field(
+        default_factory=dict
+    )
+    operation_mode_uses_factor_map: dict[str, bool] = field(default_factory=dict)
+    operation_modes: dict[str, FrbcOperationModeWrapper] = field(default_factory=dict)
 
-    @property
-    def power_forecast(self) -> Any:
-        return self.device_state.power_forecast
-
-    @property
-    def system_descriptions(self) -> Any:
-        return self.device_state.system_descriptions
-
-    @property
-    def leakage_behaviours(self) -> Any:
-        return self.device_state.leakage_behaviours
-
-    @property
-    def usage_forecasts(self) -> Any:
-        return self.device_state.usage_forecasts
-
-    @property
-    def fill_level_target_profiles(self) -> Any:
-        return self.device_state.fill_level_target_profiles
-
-    @property
-    def computational_parameters(self) -> Any:
-        return self.device_state.computational_parameters
+    def __hash__(self):
+        return hash((self.device_id, self.timestamp))
 
     @lru_cache(maxsize=None)
     def get_actuators(self, target_timestep: "FrbcTimestep") -> List[str]:
@@ -330,16 +302,3 @@ class S2FrbcDeviceStateWrapper:
             ),
             None,
         )
-
-    @property
-    def energy_in_current_timestep(self) -> CommodityQuantity:
-        return self.device_state.energy_in_current_timestep
-
-    @property
-    def actuator_statuses(self) -> List[FRBCActuatorStatus]:
-        return self.device_state.actuator_statuses or []
-
-    @property
-    def storage_status(self) -> List[FRBCStorageStatus]:
-        # The return type is correct but mypy does not understand the structure of s2python correctly
-        return self.device_state.storage_status  # type: ignore[return-value]
