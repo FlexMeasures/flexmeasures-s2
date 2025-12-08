@@ -55,6 +55,7 @@ from s2python.version import S2_VERSION
 from timely_beliefs import BeliefsDataFrame
 
 from .. import flexmeasures_s2_api_bp
+from flexmeasures_s2.api.const import MSG_EMOJI, VERBOSE_MESSAGE_TYPES
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -305,27 +306,12 @@ class S2FlaskWSServerSync:
                     s2_msg = self.s2_parser.parse_as_any_message(message)
 
                     # Log with appropriate emoji based on message type
-                    msg_emoji = {
-                        "Handshake": "🤝",
-                        "FRBC.SystemDescription": "📋",
-                        "FRBC.FillLevelTargetProfile": "🎯",
-                        "FRBC.StorageStatus": "🔋",
-                        "FRBC.ActuatorStatus": "⚙️",
-                        "FRBC.UsageForecast": "💧",
-                        "FRBC.LeakageBehaviour": "🔄",
-                        "InstructionStatusUpdate": "📊",
-                        "ResourceManagerDetails": "📝",
-                        "PowerMeasurement": "⚡",
-                    }.get(s2_msg.message_type, "📥")
+                    msg_emoji = MSG_EMOJI.get(s2_msg.message_type, "📥")
 
                     self.app.logger.info(f"{msg_emoji} {s2_msg.message_type}")
 
                     # Don't log verbose message content
-                    verbose_message_types = [
-                        "FRBC.UsageForecast",
-                        "FRBC.ActuatorStatus",
-                    ]
-                    if s2_msg.message_type not in verbose_message_types:
+                    if s2_msg.message_type not in VERBOSE_MESSAGE_TYPES:
                         self.app.logger.debug(s2_msg.to_json())
                 except json.JSONDecodeError:
                     self.app.logger.warning(f"❌ Invalid JSON from client {client_id}")
