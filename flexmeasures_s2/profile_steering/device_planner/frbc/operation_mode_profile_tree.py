@@ -159,12 +159,12 @@ class OperationModeProfileTree:
             time_step_start_dt = time_step_start.astimezone(system_default_timezone)
             current_system_description = self.get_latest_before(
                 time_step_start_dt,
-                self.device_state.get_system_descriptions(),
+                self.device_state.system_descriptions,
                 lambda sd: sd.valid_from,
             )
             current_leakage_behaviour = self.get_latest_before(
                 time_step_start_dt,
-                self.device_state.get_leakage_behaviours(),
+                self.device_state.leakage_behaviours,
                 lambda lb: lb.valid_from,
             )
             current_fill_level = self.get_latest_before(
@@ -223,7 +223,7 @@ class OperationModeProfileTree:
                     current_leakage_behaviour,
                     fill_level_target,
                     usage_forecast,
-                    self.device_state.get_computational_parameters(),
+                    self.device_state.computational_parameters,
                 )
             )
             time_step_start = time_step_end
@@ -502,7 +502,7 @@ class OperationModeProfileTree:
         # logger.info(f"Traced back through {states_traced} states")
 
         # Add current energy
-        current_energy = self.device_state.get_energy_in_current_timestep().value
+        current_energy = self.device_state.energy_in_current_timestep.value
         # logger.info(f"Adding current timestep energy: {current_energy}")
         energy[0] += current_energy
 

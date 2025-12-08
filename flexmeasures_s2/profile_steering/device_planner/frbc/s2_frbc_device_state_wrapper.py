@@ -50,13 +50,16 @@ class S2FrbcDeviceStateWrapper:
     def is_online(self) -> bool:
         return self.device_state.is_online
 
-    def get_power_forecast(self) -> Any:
+    @property
+    def power_forecast(self) -> Any:
         return self.device_state.power_forecast
 
-    def get_system_descriptions(self) -> Any:
+    @property
+    def system_descriptions(self) -> Any:
         return self.device_state.system_descriptions
 
-    def get_leakage_behaviours(self) -> Any:
+    @property
+    def leakage_behaviours(self) -> Any:
         return self.device_state.leakage_behaviours
 
     @property
@@ -67,7 +70,8 @@ class S2FrbcDeviceStateWrapper:
     def fill_level_target_profiles(self) -> Any:
         return self.device_state.fill_level_target_profiles
 
-    def get_computational_parameters(self) -> Any:
+    @property
+    def computational_parameters(self) -> Any:
         return self.device_state.computational_parameters
 
     @lru_cache(maxsize=None)
@@ -327,7 +331,8 @@ class S2FrbcDeviceStateWrapper:
             None,
         )
 
-    def get_energy_in_current_timestep(self) -> CommodityQuantity:
+    @property
+    def energy_in_current_timestep(self) -> CommodityQuantity:
         return self.device_state.energy_in_current_timestep
 
     @property
