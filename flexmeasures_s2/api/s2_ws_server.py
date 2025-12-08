@@ -301,7 +301,6 @@ class S2FlaskWSServerSync:
         try:
             while True:
                 message = websocket.receive()
-                s2_msg = None
                 try:
                     s2_msg = self.s2_parser.parse_as_any_message(message)
 
