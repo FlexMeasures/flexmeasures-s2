@@ -1,6 +1,5 @@
-from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 from s2python.common import PowerForecast
 from s2python.frbc import (
     FRBCSystemDescription,
@@ -12,7 +11,6 @@ from s2python.frbc.frbc_actuator_status import FRBCActuatorStatus
 from s2python.generated.gen_s2 import FRBCStorageStatus, PowerValue
 
 
-@dataclass
 class S2FrbcDeviceState:
     """Device state for Fill Rate Based Control (FRBC) devices.
 
@@ -30,25 +28,6 @@ class S2FrbcDeviceState:
     energy targets while respecting fill level constraints and usage forecasts.
     """
 
-    device_id: str
-    device_name: str
-    connection_id: str
-    priority_class: int
-    timestamp: datetime
-    energy_in_current_timestep: PowerValue
-    is_online: bool
-    power_forecast: Optional[PowerForecast] = None
-    system_descriptions: list[FRBCSystemDescription] = field(default_factory=list)
-    leakage_behaviours: list[FRBCLeakageBehaviour] = field(default_factory=list)
-    usage_forecasts: list[FRBCUsageForecast] = field(default_factory=list)
-    fill_level_target_profiles: list[FRBCFillLevelTargetProfile] = field(
-        default_factory=list
-    )
-    computational_parameters: "S2FrbcDeviceState.ComputationalParameters" = None
-    storage_status: Optional[FRBCStorageStatus] = None
-    actuator_statuses: Optional[list[FRBCActuatorStatus]] = field(default_factory=list)
-
-    @dataclass
     class ComputationalParameters:
         """Computational parameters for FRBC planning.
 
@@ -64,12 +43,46 @@ class S2FrbcDeviceState:
             stratification_layers: Number of stratification layers
         """
 
-        nr_of_buckets: int
-        stratification_layers: int
+        def __init__(self, nr_of_buckets: int, stratification_layers: int):
+            self.nr_of_buckets = nr_of_buckets
+            self.stratification_layers = stratification_layers
 
-    def __post_init__(self):
-        computational_params = self.computational_parameters
-        self.nr_of_buckets: int = computational_params.nr_of_buckets
-        self.nr_of_stratification_layers: int = (
-            computational_params.stratification_layers
-        )
+        def get_nr_of_buckets(self) -> int:
+            return self.nr_of_buckets
+
+        def get_stratification_layers(self) -> int:
+            return self.stratification_layers
+
+    def __init__(
+        self,
+        device_id: str,
+        device_name: str,
+        connection_id: str,
+        priority_class: int,
+        timestamp: datetime,
+        energy_in_current_timestep: PowerValue,
+        is_online: bool,
+        power_forecast: Optional[PowerForecast],
+        system_descriptions: List[FRBCSystemDescription],
+        leakage_behaviours: List[FRBCLeakageBehaviour],
+        usage_forecasts: List[FRBCUsageForecast],
+        fill_level_target_profiles: List[FRBCFillLevelTargetProfile],
+        computational_parameters: ComputationalParameters,
+        storage_status: FRBCStorageStatus = None,
+        actuator_statuses: Optional[List[FRBCActuatorStatus]] = None,
+    ):
+        self.device_id = device_id
+        self.device_name = device_name
+        self.connection_id = connection_id
+        self.priority_class = priority_class
+        self.timestamp = timestamp
+        self.energy_in_current_timestep = energy_in_current_timestep
+        self.is_online = is_online
+        self.power_forecast = power_forecast
+        self.system_descriptions = system_descriptions
+        self.leakage_behaviours = leakage_behaviours
+        self.usage_forecasts = usage_forecasts
+        self.fill_level_target_profiles = fill_level_target_profiles
+        self.computational_parameters = computational_parameters
+        self.storage_status = storage_status
+        self.actuator_statuses = actuator_statuses

@@ -48,9 +48,7 @@ class FrbcState:
         if previous_state:
             if device_state:
                 self.device_state = (
-                    s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper(
-                        **device_state.__dict__
-                    )
+                    s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper(device_state)
                 )
             else:
                 self.device_state = previous_state.device_state
@@ -178,9 +176,7 @@ class FrbcState:
             FrbcState.transition_cache.clear()
             if device_state is not None:
                 self.device_state = (
-                    s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper(
-                        **device_state.__dict__
-                    )
+                    s2_frbc_device_state_wrapper.S2FrbcDeviceStateWrapper(device_state)
                 )
             else:
                 self.device_state = None  # type: ignore[assignment]
