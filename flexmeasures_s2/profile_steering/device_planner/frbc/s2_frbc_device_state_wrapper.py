@@ -35,9 +35,9 @@ class S2FrbcDeviceStateWrapper:
     def __init__(self, device_state: S2FrbcDeviceState):
         self.device_state: S2FrbcDeviceState = device_state
         computational_params = self.device_state.computational_parameters
-        self.nr_of_buckets: int = computational_params.get_nr_of_buckets()
+        self.nr_of_buckets: int = computational_params.nr_of_buckets
         self.nr_of_stratification_layers: int = (
-            computational_params.get_stratification_layers()
+            computational_params.stratification_layers
         )
         self.actuator_operation_mode_map_per_timestep: Dict[
             datetime, Dict[str, List[str]]

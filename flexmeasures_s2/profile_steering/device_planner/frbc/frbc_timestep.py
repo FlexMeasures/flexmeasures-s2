@@ -80,7 +80,7 @@ class FrbcTimestep:
     def get_nr_of_buckets(self) -> int:
         if self.computational_parameters is None:
             raise ValueError("Computational parameters are not set")
-        return self.computational_parameters.get_nr_of_buckets()
+        return self.computational_parameters.nr_of_buckets
 
     def set_targets(
         self,
