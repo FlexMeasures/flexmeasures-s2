@@ -11,7 +11,8 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Callable, Dict, Optional, Type, List
 
 import pandas as pd
-from flask import Flask
+from flask import current_app as app, Flask, request, Response
+from flask_security import current_user
 from flask_sock import ConnectionClosed, Sock
 
 from flexmeasures import Account, Asset, AssetType, Sensor, Source, User
@@ -19,6 +20,7 @@ from flexmeasures.data import db
 from flexmeasures.data.models.time_series import TimedBelief
 from flexmeasures.data.utils import save_to_db
 from flexmeasures.api.common.utils.validators import parse_duration
+from flexmeasures.data.services.data_sources import get_or_create_source
 from flexmeasures.data.services.utils import get_or_create_model
 from flexmeasures.utils.coding_utils import only_if_timer_due
 from flexmeasures.utils.flexmeasures_inflection import capitalize
@@ -287,11 +289,104 @@ class S2FlaskWSServerSync:
         )
 
     def _ws_handler(self, ws: Sock) -> None:
+        self._ws_connection_auth()
         try:
             self.app.logger.info("🔌 New WebSocket connection received")
             self._handle_websocket_connection(ws)
         except Exception as e:
             self.app.logger.error("❌ WebSocket handler error: %s", e)
+
+    def _ws_connection_auth(self):
+        s2_ws = self
+        s2_ws.app = app
+        # Check if this is the S2 WS connection route
+        is_ws_connection = (
+            request.path == s2_ws.blueprint.url_prefix
+            and request.headers.get("Upgrade", "").lower() == "websocket"
+        )
+
+        if not is_ws_connection or current_user.is_authenticated:
+            return  # Let other before_request hooks handle it
+
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            token = auth_header.removeprefix("Bearer ").strip()
+            try:
+                user_id = app.config.get("FLEXMEASURES_S2_BEARERS", {}).get(token, None)
+                user_can_use_ws = user_id is not None
+            except Exception as exc:
+                app.logger.warning(str(exc))
+                user_can_use_ws = token == app.config.get(
+                    "WEBSOCKET_BEARER_TOKEN", None
+                )
+            if user_can_use_ws:
+
+                try:
+                    user = db.session.get(User, user_id)
+                    # Attach account to WebSocket server
+                    s2_ws.account = user.account
+                    s2_ws.user = user
+                    data_source = get_or_create_source(user)
+                    s2_ws.data_source_id = data_source.id
+                    app.logger.info("Account authorized for WebSocket connections")
+                except Exception:
+                    app.logger.warning("Failed to fetch User")
+
+                # Initialize S2Scheduler for this WebSocket connection if not already done
+                if getattr(s2_ws, "s2_scheduler", None) is None:
+                    from datetime import datetime, timedelta, timezone
+
+                    # Get S2FlaskScheduler class from registered schedulers
+                    scheduler_class = app.data_generators["scheduler"][
+                        "S2FlaskScheduler"
+                    ]
+
+                    # Create scheduler instance with minimal setup for WebSocket usage
+                    scheduler = scheduler_class.__new__(scheduler_class)
+
+                    # Set basic time parameters
+                    now = datetime.now(timezone.utc)
+                    resolution = timedelta(minutes=5)
+
+                    # Set required attributes for scheduler
+                    # Note: start, end, and belief_time will be recalculated dynamically
+                    # in s2_ws_sync.py before each scheduler call
+                    scheduler.sensor = None
+                    scheduler.asset = None
+                    scheduler.start = now
+                    scheduler.end = now + timedelta(hours=24)
+                    scheduler.resolution = resolution
+                    scheduler.belief_time = now
+                    scheduler.round_to_decimals = 6
+                    scheduler.flex_model = {}
+                    scheduler.flex_context = {}
+                    scheduler.fallback_scheduler_class = None
+                    scheduler.info = {"scheduler": "S2FlaskScheduler"}
+                    scheduler.config_deserialized = True
+                    scheduler.return_multiple = True
+                    scheduler.data_source = get_or_create_source(
+                        source="FlexMeasures",
+                        source_type="scheduler",
+                        model="S2Scheduler",
+                        version="1",
+                    )
+
+                    # Initialize device states storage
+                    scheduler.device_states = {}
+
+                    # Attach scheduler to WebSocket server
+                    s2_ws.s2_scheduler = scheduler
+                    app.logger.info(
+                        "S2FlaskScheduler initialized for WebSocket connections"
+                    )
+
+                return  # Let other before_request hooks handle it
+
+        app.logger.info(
+            "Unauthorized WS handshake attempt from %s", request.remote_addr
+        )
+        # Send clean 401 without stack trace noise
+        return Response("Unauthorized", status=401)
 
     def _handle_websocket_connection(self, websocket: Sock) -> None:
         client_id = str(uuid.uuid4())
