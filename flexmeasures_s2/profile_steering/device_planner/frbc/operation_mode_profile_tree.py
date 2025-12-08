@@ -334,7 +334,7 @@ class OperationModeProfileTree:
 
         # logger.info(f"Generating states for initial timestep {first_timestep_index}...")
         state_zero.generate_next_timestep_states(first_timestep)
-        initial_states = first_timestep.get_final_states_within_fill_level_target()
+        initial_states = first_timestep.final_states_within_fill_level_target
         # logger.info(f"Generated {len(initial_states)} initial states")
 
         # Sample some initial states to log
@@ -349,7 +349,7 @@ class OperationModeProfileTree:
         for i in range(first_timestep_index, len(self.timesteps) - 1):
             current_timestep = self.timesteps[i]
             next_timestep = self.timesteps[i + 1]
-            final_states = current_timestep.get_final_states_within_fill_level_target()
+            final_states = current_timestep.final_states_within_fill_level_target
 
             # Log progress every 10 timesteps
             if i % 10 == 0 or i == first_timestep_index:
@@ -368,7 +368,7 @@ class OperationModeProfileTree:
                 frbc_state.generate_next_timestep_states(next_timestep)
 
         # Find best end state
-        final_states = last_timestep.get_final_states_within_fill_level_target()
+        final_states = last_timestep.final_states_within_fill_level_target
         # logger.info(f"Final timestep has {len(final_states)} states")
 
         if final_states:

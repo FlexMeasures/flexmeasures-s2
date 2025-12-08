@@ -67,17 +67,19 @@ class FrbcTimestep:
         # Cache for bucket calculation
         self._bucket_calc_params: Optional[Tuple[float, float, int]] = None
 
-    def get_bucket_calculation_params(self) -> Tuple[float, float, int]:
+    @property
+    def bucket_calculation_params(self) -> Tuple[float, float, int]:
         if self._bucket_calc_params is None:
             fill_level_range = self.system_description.storage.fill_level_range
             self._bucket_calc_params = (
                 fill_level_range.start_of_range,
                 fill_level_range.end_of_range,
-                self.get_nr_of_buckets(),
+                self.nr_of_buckets,
             )
         return self._bucket_calc_params
 
-    def get_nr_of_buckets(self) -> int:
+    @property
+    def nr_of_buckets(self) -> int:
         if self.computational_parameters is None:
             raise ValueError("Computational parameters are not set")
         return self.computational_parameters.nr_of_buckets
@@ -96,7 +98,7 @@ class FrbcTimestep:
         if state is None:
             return
 
-        if state.is_within_fill_level_range():
+        if state.is_within_fill_level_range:
             bucket = state.bucket
             stored_state = self._states_by_bucket.get(bucket)
             if stored_state is None:
@@ -143,21 +145,21 @@ class FrbcTimestep:
     def duration(self) -> timedelta:
         return self.end_date - self.start_date
 
-    def get_duration_seconds(self) -> int:
+    @property
+    def duration_seconds(self) -> int:
         return int(self.duration.total_seconds())
 
-    def get_target(self) -> Optional[TargetProfile.Element]:
-        return self.target
-
-    def get_final_states(self) -> List["FrbcState"]:
+    @property
+    def final_states(self) -> List["FrbcState"]:
         final_states = list(self._states_by_bucket.values())
 
         if not final_states and self.emergency_state is not None:
             return [self.emergency_state]
         return final_states
 
-    def get_final_states_within_fill_level_target(self) -> List["FrbcState"]:
-        final_states = self.get_final_states()
+    @property
+    def final_states_within_fill_level_target(self) -> List["FrbcState"]:
+        final_states = self.final_states
         if self.fill_level_target is None:
             return final_states
         final_states = [
@@ -165,9 +167,7 @@ class FrbcTimestep:
         ]
         if final_states:
             return final_states
-        best_state = min(
-            self.get_final_states(), key=self.get_fill_level_target_distance
-        )
+        best_state = min(self.final_states, key=self.get_fill_level_target_distance)
         return [best_state]
 
     def state_is_within_fill_level_target_range(self, state: "FrbcState") -> bool:

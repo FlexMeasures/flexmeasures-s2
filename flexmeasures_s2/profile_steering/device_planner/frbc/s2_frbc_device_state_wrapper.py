@@ -248,7 +248,7 @@ class S2FrbcDeviceStateWrapper(S2FrbcDeviceState):
             fill_level_lower_limit,
             fill_level_upper_limit,
             nr_of_buckets,
-        ) = target_timestep.get_bucket_calculation_params()
+        ) = target_timestep.bucket_calculation_params
 
         if fill_level_upper_limit == fill_level_lower_limit:
             return 0

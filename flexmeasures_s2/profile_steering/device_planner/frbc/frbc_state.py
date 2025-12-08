@@ -59,7 +59,7 @@ class FrbcState:
             self.system_description = timestep.system_description
             self.bucket = 0
             self.timestep_energy = 0.0
-            seconds = self.timestep.get_duration_seconds()
+            seconds = self.timestep.duration_seconds
             for actuator_id, actuator_configuration in (
                 actuator_configurations or {}
             ).items():
@@ -127,7 +127,7 @@ class FrbcState:
                     )
                 )
             # calculate scores
-            target = self.timestep.get_target()
+            target = self.timestep.target
             if isinstance(target, TargetProfile.JouleElement):
                 self.sum_squared_distance = (
                     previous_state.sum_squared_distance
@@ -231,7 +231,7 @@ class FrbcState:
     ):
         self.timestep_energy = 0.0
         self.fill_level = previous_state.fill_level
-        seconds = self.timestep.get_duration_seconds()
+        seconds = self.timestep.duration_seconds
         for actuator_id, actuator_configuration in actuator_configurations.items():
             om = self.device_state.get_operation_mode(
                 self.timestep,
@@ -309,7 +309,7 @@ class FrbcState:
             )
 
     def calculate_scores(self, previous_state: "FrbcState"):
-        target = self.timestep.get_target()
+        target = self.timestep.target
         if isinstance(target, TargetProfile.JouleElement):
             self.sum_squared_distance = (
                 previous_state.sum_squared_distance
@@ -480,7 +480,8 @@ class FrbcState:
                 reason=SelectionReason.MIN_ENERGY,
             )
 
-    def is_within_fill_level_range(self):
+    @property
+    def is_within_fill_level_range(self) -> bool:
         fill_level_range = self.system_description.storage.fill_level_range
         return (
             self.fill_level >= fill_level_range.start_of_range
