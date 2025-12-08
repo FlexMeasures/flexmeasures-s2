@@ -487,7 +487,8 @@ class FrbcState:
             and self.fill_level <= fill_level_range.end_of_range
         )
 
-    def get_fill_level_distance(self):
+    @property
+    def fill_level_distance(self):
         fill_level_range = self.system_description.storage.fill_level_range
         if self.fill_level < fill_level_range.start_of_range:
             return fill_level_range.start_of_range - self.fill_level

@@ -130,8 +130,7 @@ class FrbcTimestep:
             pass
             if (
                 self.emergency_state is None
-                or state.get_fill_level_distance()
-                < self.emergency_state.get_fill_level_distance()
+                or state.fill_level_distance < self.emergency_state.fill_level_distance
             ):
                 self.emergency_state = state
                 state.set_selection_reason(SelectionReason.EMERGENCY_STATE)

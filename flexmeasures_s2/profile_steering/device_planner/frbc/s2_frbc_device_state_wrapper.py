@@ -97,7 +97,7 @@ class S2FrbcDeviceStateWrapper(S2FrbcDeviceState):
     ) -> bool:
         return self.get_operation_mode(
             target_timestep, actuator_id, operation_mode_id
-        ).is_uses_factor()
+        ).uses_factor
 
     @lru_cache(maxsize=None)
     def get_all_possible_actuator_configurations(

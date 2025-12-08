@@ -93,6 +93,3 @@ class FrbcOperationModeWrapper:
                 ):
                     return True
         return False
-
-    def is_uses_factor(self) -> bool:
-        return self.uses_factor
