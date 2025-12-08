@@ -262,7 +262,7 @@ class S2FlaskWSServerSync:
         self._handlers.register_handler(Handshake, self.handle_handshake)
         self._handlers.register_handler(ReceptionStatus, self.handle_reception_status)
         self._handlers.register_handler(
-            ResourceManagerDetails, self.handle_ResourceManagerDetails
+            ResourceManagerDetails, self.handle_resource_manager_details
         )
         self._handlers.register_handler(
             InstructionStatusUpdate, self.handle_instruction_status_update
@@ -665,7 +665,7 @@ class S2FlaskWSServerSync:
             return
         self._logger(websocket).debug(message.to_json())
 
-    def handle_ResourceManagerDetails(
+    def handle_resource_manager_details(
         self, _: "S2FlaskWSServerSync", message: S2Message, websocket: Sock
     ) -> None:
         if not isinstance(message, ResourceManagerDetails):
