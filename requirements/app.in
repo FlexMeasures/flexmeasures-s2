@@ -1,4 +1,4 @@
 flexmeasures>=0.27.0
-s2-python==0.5.0
+s2-python[ws]==0.5.0
 cryptography>=44.0.2
 inflect>=7.5.0
