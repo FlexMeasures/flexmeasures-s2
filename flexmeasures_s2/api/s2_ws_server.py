@@ -174,7 +174,7 @@ class MessageHandlersSync:
                 raise
         else:
             logger.warning(
-                f"Ignoring message of type {type(msg)}; no handler is registered",
+                f"Ignoring message of type {type(msg)}: no handler is registered",
             )
 
     def register_handler(
@@ -720,7 +720,7 @@ class S2FlaskWSServerSync:
                 self._logger(websocket).debug(
                     f"   🎯 Total duration: {total_duration_min:.0f} min, Start: {message.start_time.strftime('%H:%M:%S')}"
                 )
-            except Exception as e:
+            except Exception:
                 self._logger(websocket).debug(
                     f"   🎯 Start: {message.start_time.strftime('%H:%M:%S')}"
                 )
@@ -821,7 +821,7 @@ class S2FlaskWSServerSync:
                 self._logger(websocket).debug(
                     f"   💧 Total duration: {total_duration_min:.0f} min, Start: {message.start_time.strftime('%H:%M:%S')}"
                 )
-            except Exception as e:
+            except Exception:
                 self._logger(websocket).debug(
                     f"   💧 Start: {message.start_time.strftime('%H:%M:%S')}"
                 )
