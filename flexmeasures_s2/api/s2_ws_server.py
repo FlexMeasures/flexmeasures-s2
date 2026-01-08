@@ -290,7 +290,8 @@ class S2FlaskWSServerSync:
                     s2_ws.data_source_id = data_source.id
                     app.logger.info("Account authorized for WebSocket connections")
                 except Exception:
-                    app.logger.warning("Failed to fetch User")
+                    app.logger.warning("Failed to fetch User: rolling back session")
+                    db.session.rollback()
 
                 # Initialize S2Scheduler for this WebSocket connection if not already done
                 if getattr(s2_ws, "s2_scheduler", None) is None:
