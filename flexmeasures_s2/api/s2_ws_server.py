@@ -785,7 +785,7 @@ class S2FlaskWSServerSync:
         for measurement in power_measurements:
             try:
                 self.save_event(
-                    sensor_name=measurement.commodity_quantity,
+                    sensor_name=str(measurement.commodity_quantity),
                     event_value=measurement.value,
                     event_start=message.measurement_timestamp,
                     data_source_id=self.data_source_id,
