@@ -917,6 +917,7 @@ class S2FlaskWSServerSync:
             import traceback
 
             self.app.logger.debug(f"Traceback: {traceback.format_exc()}")
+            db.session.rollback()
         if resource_id not in self._device_data:
             self._device_data[resource_id] = FRBCDeviceData()
 
@@ -937,6 +938,7 @@ class S2FlaskWSServerSync:
             import traceback
 
             self.app.logger.debug(f"Traceback: {traceback.format_exc()}")
+            db.session.rollback()
 
     def save_attribute(self, resource_id: str, **kwargs):
         asset = self._assets[resource_id]
@@ -979,6 +981,7 @@ class S2FlaskWSServerSync:
             import traceback
 
             self.app.logger.debug(f"Traceback: {traceback.format_exc()}")
+            db.session.rollback()
             return
         try:
             event_value = convert_units(
@@ -1027,6 +1030,7 @@ class S2FlaskWSServerSync:
             import traceback
 
             self.app.logger.debug(f"Traceback: {traceback.format_exc()}")
+            db.session.rollback()
 
     def _logger(self, websocket: Sock) -> logging.Logger:
         """Get the logger associated with the resource ID, or the app logger otherwise."""
