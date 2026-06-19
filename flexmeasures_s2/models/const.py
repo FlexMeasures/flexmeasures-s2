@@ -1,0 +1,2 @@
+NAMESPACE = "fm-s2"
+FRBC_TYPE = f"{NAMESPACE}.FRBC"
