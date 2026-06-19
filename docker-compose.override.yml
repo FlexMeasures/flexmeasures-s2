@@ -1,0 +1,22 @@
+# ------------------------------------------------------------------
+# Use this to install flexmeasures-s2 in your local FlexMeasures
+# docker compose stack. Assuming your flexmeasures-s2 repo root
+# directory lives next to your flexmeasures repo root directory,
+# from either root directory, run:
+#   docker compose \
+#     -f ../flexmeasures/docker-compose.yml \
+#     -f ../flexmeasures-s2/docker-compose.override.yml \
+#     up
+# ------------------------------------------------------------------
+
+services:
+  server:
+    volumes:
+      - ../flexmeasures-s2:/plugins/flexmeasures-s2:rw
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+    - |
+      python3 -m pip install --break-system-packages -e /plugins/flexmeasures-s2
+      gunicorn --bind 0.0.0.0:5000 --worker-tmp-dir /dev/shm --workers 2 --threads 4 wsgi:application
+    environment:
+      FLEXMEASURES_PLUGINS: /plugins/flexmeasures-s2/flexmeasures_s2
