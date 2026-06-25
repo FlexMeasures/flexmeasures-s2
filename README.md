@@ -1,5 +1,9 @@
 # flexmeasures-s2 - a plugin for FlexMeasures
 
+Looking for S2 support using FlexMeasures as a Customer Energy Manager (CEM) via WebSockets (WS)? There are two options.
+
+1. Run your CEM as a WS server using the **FlexMeasures Client**, with the FlexMeasures server operating as a smart backend via REST API. Then this repo is not for you, please visit the [FlexMeasures Client docs](https://github.com/FlexMeasures/flexmeasures-client) instead.
+2. Run your CEM as a WS server using the **FlexMeasures Server**. Then this repo is the server plugin you'll likely want to use. But be advised, the FlexMeasures Client-based CEM is seeing much more maintenance activity.
 
 ## Usage
 
