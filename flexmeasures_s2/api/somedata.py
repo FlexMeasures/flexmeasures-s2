@@ -1,5 +1,5 @@
-from flask_security import auth_token_required
 from flask_json import as_json
+from flask_security import auth_token_required
 
 from .. import flexmeasures_s2_api_bp
 

@@ -1,0 +1,25 @@
+test_frbc_device.py::test_connexxion_ev_bus_baseline_byd_225 
+-------------------------------- live log call ---------------------------------
+DEBUG    root:test_frbc_device.py:189 id_on_operation_mode: 8c46733e-0c68-4175-85db-4e28ef11ecf9
+DEBUG    root:test_frbc_device.py:209 id_off_operation_mode: bbc4e2c2-599b-411b-b987-858d148846a4
+DEBUG    root:test_frbc_device.py:219 id_on_to_off_timer: bcafc296-929e-4973-b447-bc18f7d3ceb3
+DEBUG    root:test_frbc_device.py:227 id_off_to_on_timer: 412f76c3-6bb1-4654-b9c2-d31e50492987
+DEBUG    root:test_frbc_device.py:235 transition_id_from_on_to_off: 5b286161-3f7f-43f6-b019-b3c808c2d376
+DEBUG    root:test_frbc_device.py:247 transition_id_from_off_to_on: 24e5c3d3-4d7f-4c7e-a598-7c096f27083b
+DEBUG    root:test_frbc_device.py:259 charge_actuator_id: 91b16e98-47b1-463a-b679-f5baf6ee8cb7
+DEBUG    root:test_frbc_device.py:277 storage_status_id: 41f861c7-f9b7-46bb-94c0-1e131170bcbd
+DEBUG    root:test_frbc_device.py:305 leakage_id: 14dac666-eb11-4acb-a5ec-400a051cd1b4
+DEBUG    root:test_frbc_device.py:324 usage_id: 351fb97b-67e7-4901-9fcd-485cef127b0c
+DEBUG    root:test_frbc_device.py:351 fill_level_id: 632d6d5f-efb9-48dd-b22e-f08db900d956
+DEBUG    root:test_frbc_device.py:375 id_off_operation_mode_driving: b99c327d-8866-46be-9514-32851ccb50ef
+DEBUG    root:test_frbc_device.py:384 off_actuator_id_driving: 8e1dc01b-4b8b-426b-a98a-d9f0cabe3503
+DEBUG    root:test_frbc_device.py:189 id_on_operation_mode: 74e2d319-6fe4-4a0f-add4-e2709f2e21e0
+DEBUG    root:test_frbc_device.py:209 id_off_operation_mode: 4a7f2a5a-d519-4803-8719-7f3d22ade46c
+DEBUG    root:test_frbc_device.py:219 id_on_to_off_timer: 5c33e567-213a-4b2f-8575-808ea27b79f7
+DEBUG    root:test_frbc_device.py:227 id_off_to_on_timer: 83962f5e-5e0f-4173-88de-2ec1e0eabcd0
+DEBUG    root:test_frbc_device.py:235 transition_id_from_on_to_off: a65929ed-f7cd-4e7b-860d-9bfd68be9d6b
+DEBUG    root:test_frbc_device.py:247 transition_id_from_off_to_on: 5c3e73cc-1b8e-4c6c-87d6-1ba076daeacb
+DEBUG    root:test_frbc_device.py:259 charge_actuator_id: 3e728f7a-82c7-4a44-a1ea-7f8a220b8ed7
+DEBUG    root:test_frbc_device.py:277 storage_status_id: 38abda5b-6774-439d-a319-2a50671595bb
+DEBUG    root:test_frbc_device.py:305 leakage_id: 2ba72dcf-546d-45a2-9c87-1492437dd2c9
+DEBUG    root:test_frbc_device.py:324 usage_id: d3132d10-e226-4763-adae-bd9492f8251d
