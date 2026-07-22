@@ -4,75 +4,85 @@
 #
 #    pip-compile --output-file=requirements/dev.txt requirements/dev.in
 #
-black==22.10.0
-    # via -r dev.in
-cfgv==3.4.0
+ast-serialize==0.6.0
+    # via mypy
+black==25.1.0
+    # via -r requirements/dev.in
+cfgv==3.5.0
     # via pre-commit
 click==8.1.8
     # via
-    #   -c app.txt
-    #   -c test.txt
+    #   -c requirements/app.txt
+    #   -c requirements/test.txt
     #   black
-distlib==0.3.9
+distlib==0.4.3
     # via virtualenv
-filelock==3.16.1
+filelock==3.32.0
     # via
-    #   -c app.txt
+    #   -c requirements/app.txt
+    #   python-discovery
     #   virtualenv
 flake8==6.0.0
-    # via -r dev.in
+    # via -r requirements/dev.in
 flake8-blind-except==0.2.1
-    # via -r dev.in
-identify==2.6.5
+    # via -r requirements/dev.in
+identify==2.6.19
     # via pre-commit
+librt==0.13.0
+    # via mypy
 mccabe==0.7.0
     # via flake8
-mypy==1.14.1
-    # via -r dev.in
-mypy-extensions==1.0.0
+mypy==2.3.0
+    # via -r requirements/dev.in
+mypy-extensions==1.1.0
     # via
     #   black
     #   mypy
-nodeenv==1.9.1
+nodeenv==1.10.0
     # via pre-commit
-packaging==24.2
+packaging==26.2
     # via
-    #   -c app.txt
-    #   -c test.txt
-    #   setuptools-scm
-pathspec==0.12.1
-    # via black
-platformdirs==4.3.6
-    # via
-    #   -c app.txt
+    #   -c requirements/app.txt
+    #   -c requirements/test.txt
     #   black
+    #   setuptools-scm
+    #   vcs-versioning
+pathspec==1.1.1
+    # via
+    #   black
+    #   mypy
+platformdirs==4.11.0
+    # via
+    #   -c requirements/app.txt
+    #   black
+    #   python-discovery
     #   virtualenv
-pre-commit==2.11.0
-    # via -r dev.in
+pre-commit==4.6.1
+    # via -r requirements/dev.in
 pycodestyle==2.10.0
     # via flake8
 pyflakes==3.0.1
     # via flake8
 pytest-runner==6.0.1
-    # via -r dev.in
-pyyaml==6.0.2
+    # via -r requirements/dev.in
+python-discovery==1.5.0
+    # via virtualenv
+pyyaml==6.0.3
     # via
-    #   -c app.txt
+    #   -c requirements/app.txt
     #   pre-commit
-setuptools-scm==8.1.0
-    # via -r dev.in
-toml==0.10.2
-    # via pre-commit
-typing-extensions==4.12.2
+setuptools-scm==10.2.1
+    # via -r requirements/dev.in
+typing-extensions==4.16.0
     # via
-    #   -c app.txt
+    #   -c requirements/app.txt
     #   mypy
-virtualenv==20.26.6
-    # via
-    #   -r dev.in
-    #   pre-commit
+vcs-versioning==2.2.2
+    # via setuptools-scm
+virtualenv==21.7.0
+    # via pre-commit
 watchdog==6.0.0
-    # via -r dev.in
+    # via -r requirements/dev.in
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
